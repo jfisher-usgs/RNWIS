@@ -99,10 +99,10 @@ OpenRNWIS <- function() {
     data.idxs <- as.integer(tkcurselection(frame4.lst.2.3))
 
     ids <- NULL
-    if (length(site.idxs) != 0)
+    if (length(site.idxs) > 0)
       for (i in site.idxs)
         ids <- c(ids, as.character(tkget(frame4.lst.2.1, i, i)))
-    if (length(data.idxs) != 0)
+    if (length(data.idxs) > 0)
       for (i in data.idxs)
         ids <- c(ids, as.character(tkget(frame4.lst.2.3, i, i)))
 
@@ -175,14 +175,13 @@ OpenRNWIS <- function() {
     n <- length(retr.variables)
     idxs <- 1:n
 
-    if (type == "backward") {
+    if (type == "up") {
       for (i in sel.idxs) {
         if (i == 1L || idxs[i - 1L] %in% sel.idxs)
           next
         idxs[c(i - 1L, i)] <- c(i, idxs[i - 1L])
       }
-    } else if (type == "forward") {
-
+    } else if (type == "down") {
       for (i in rev(sel.idxs)) {
         if (i == n || idxs[i + 1L] %in% sel.idxs)
           return()
@@ -195,7 +194,6 @@ OpenRNWIS <- function() {
     for (i in 1:n)
       tclvalue(retr.var) <- tcl("lreplace", tclvalue(retr.var),
                                 i - 1, i - 1, retr.variables[i])
-
     tkselection.clear(lst, 0, "end")
     for (i in which(idxs %in% sel.idxs))
       tkselection.set(lst, i - 1)
@@ -236,28 +234,175 @@ OpenRNWIS <- function() {
     tclvalue(obj) <- f
   }
 
-
   # Map sites
 
-  MapSites <- function() {
-    print("notyet")
+  CallMapSites <- function() {
+    if (is.null(con))
+      return()
+    sqvars <- c(variables[['latitude']],
+                variables[['longitude']],
+                variables[['altitude']],
+                variables[['site number']],
+                variables[['station name']],
+                variables[['agency code']],
+                variables[['site type code']])
 
 
 
+    d <- GetSiteData(sqvars)
 
-
-
-  }
-
-
-
-
+    if (!is.null(d))
+      MapSites(d, sqvars[1], sqvars[2], sqvars[4], sqvars[5], sqvars[6])
+}
 
   # Retrieve data
 
   RetrieveData <- function() {
-    print("notyet")
+    if (is.null(con))
+      return()
+
+
+
+
+
+
+
+
+
   }
+
+
+
+
+
+
+
+
+
+
+  # Process site strings
+
+  ProcessSiteStrings <- function(s) {
+    str.split <- unlist(strsplit(s, '[[:punct:][:space:]]'))
+    int.split <- suppressWarnings(as.numeric(str.split))
+    as.character(int.split[!is.na(int.split)])
+  }
+
+  # Retrieve site data
+
+  GetSiteData <- function(sqvars) {
+
+    opt <- as.integer(tclvalue(opt.var))
+    site.nums <- NULL
+
+    # Site numbers
+    if (opt == 1L | opt == 2L) {
+
+      # Get site number(s) in entry box
+      if (opt == 1L) {
+        site.nums <- as.character(tclvalue(site.nums.var))
+        if (site.nums == "")
+          return()
+        site.nums <- ProcessSiteStrings(site.nums)
+
+      # Read site numbers in file
+      } else {
+        site.file <- as.character(tclvalue(site.file.var))
+        if (file.access(site.file, mode=0) < 0)
+          return()
+        scanned.strings <- scan(file=site.file, what="character",
+                                comment.char="#")
+        site.nums <- ProcessSiteStrings(paste(scanned.strings, collapse=","))
+      }
+      if (length(site.nums) == 0)
+        return()
+
+      # Query database
+      sel <- QueryDatabase(con=con, sqtable=site.table, sqvars=sqvars,
+                           site.no.var=variables[['site number']],
+                           site.no=site.nums)
+
+    # Site attributes
+    } else if (opt == 3L) {
+
+      # Spatial limits
+      lng.min <- suppressWarnings(as.numeric(tclvalue(lng.min.var)))
+      lng.max <- suppressWarnings(as.numeric(tclvalue(lng.max.var)))
+      lat.min <- suppressWarnings(as.numeric(tclvalue(lat.min.var)))
+      lat.max <- suppressWarnings(as.numeric(tclvalue(lat.max.var)))
+      alt.min <- suppressWarnings(as.numeric(tclvalue(alt.min.var)))
+      alt.max <- suppressWarnings(as.numeric(tclvalue(alt.max.var)))
+
+      # Polygon box domain
+      poly.obj <- NULL
+      poly.file <- as.character(tclvalue(poly.file.var))
+      if (poly.file != "" && file.access(poly.file, mode=0) == 0) {
+        poly.obj <- read.polyfile(poly.file, nohole=FALSE)
+        if (inherits(poly.obj, "gpc.poly")) {
+          poly.bbox <- get.bbox(poly.obj)
+          lng.min <- min(lng.min, poly.bbox$x[1], na.rm=TRUE)
+          lng.max <- max(lng.max, poly.bbox$x[2], na.rm=TRUE)
+          lat.min <- min(lat.min, poly.bbox$y[1], na.rm=TRUE)
+          lat.max <- max(lat.max, poly.bbox$y[2], na.rm=TRUE)
+        } else {
+          poly.obj <- NULL
+        }
+      }
+
+      # Site types
+      site.type.codes <- NULL
+      idxs <- as.integer(tkcurselection(frame3.lst.2.6))
+      if (length(idxs) > 0) {
+        for (i in idxs) {
+          site.type <- as.character(tkget(frame3.lst.2.6, i, i))
+          if (site.type %in% names(site.types)) {
+            site.type.codes <- c(site.type.codes, site.types[[site.type]])
+          } else {
+            site.type.codes <- NULL
+            break
+          }
+        }
+      }
+
+      # Query database
+      sel <- QueryDatabase(con=con,
+                           sqtable=site.table,
+                           sqvars=sqvars,
+                           site.tp.cd.var=variables[['site type code']],
+                           site.tp.cd=site.type.codes,
+                           lng.var=variables[['longitude']],
+                           lng.lim=c(lng.min, lng.max),
+                           lat.var=variables[['latitude']],
+                           lat.lim=c(lat.min, lat.max),
+                           alt.var=variables[['altitude']],
+                           alt.lim=c(alt.min, alt.max))
+
+      # Sites in polygon domain
+      if (!is.null(poly.obj)) {
+        x <- sel[, variables[['longitude']]]
+        y <- sel[, variables[['latitude']]]
+        poly.pts <- get.pts(poly.obj)
+
+        for (i in seq(along=poly.pts)) {
+          poly.x <- poly.pts[[i]]$x
+          poly.y <- poly.pts[[i]]$y
+          is.inside <- point.in.polygon(point.x=x, point.y=y,
+                                        pol.x=poly.x, pol.y=poly.y)
+          if (poly.pts[[i]]$hole)
+            sel <- sel[is.inside != 1, ]
+          else
+            sel <- sel[is.inside != 0, ]
+        }
+      }
+    }
+
+    if (!is.null(sel) && !inherits(sel, "data.frame"))
+      stop(sel)
+    sel
+  }
+
+
+
 
 
 
@@ -272,6 +417,7 @@ OpenRNWIS <- function() {
   # Main program
 
   require("RODBC")
+  require("gpclib")
   require("tcltk")
 
   con <- NULL
@@ -296,10 +442,11 @@ OpenRNWIS <- function() {
 
   variables <- list('latitude'       = "dec_lat_va",
                     'longitude'      = "dec_long_va",
+                    'altitude'       = "alt_va",
                     'site number'    = "site_no",
                     'station name'   = "station_nm",
                     'agency code'    = "agency_cd",
-                    'site type code' = "stie_tp_cd")
+                    'site type code' = "site_tp_cd")
 
   site.types <- list('Well'             = c("GW", "GW-CR", "GW-EX", "GW-HZ",
                                             "GW-IW", "GW-MW", "GW-TH"),
@@ -312,19 +459,20 @@ OpenRNWIS <- function() {
   # Assign variables linked to Tk widgets
 
   opt.var <- tclVar(1)
-  site.id.var <- tclVar()
+  site.nums.var <- tclVar()
   site.file.var <- tclVar()
   poly.file.var <- tclVar()
   site.type.var <- tclVar()
   for (i in c("All ...", names(site.types)))
     tcl("lappend", site.type.var, i)
 
-  xmin.var <- tclVar()
-  ymin.var <- tclVar()
-  zmin.var <- tclVar()
-  xmax.var <- tclVar()
-  ymax.var <- tclVar()
-  zmax.var <- tclVar()
+  lng.min.var <- tclVar()
+  lng.max.var <- tclVar()
+  lat.min.var <- tclVar()
+  lat.max.var <- tclVar()
+  alt.min.var <- tclVar()
+  alt.max.var <- tclVar()
+
   site.var <- tclVar()
   data.var <- tclVar()
   retr.var <- tclVar()
@@ -399,7 +547,7 @@ OpenRNWIS <- function() {
   frame0 <- ttkframe(tt, relief="flat")
 
   frame0.but.1 <- ttkbutton(frame0, width=15, text="Map Sites",
-                            command=MapSites)
+                            command=CallMapSites)
   frame0.but.2 <- ttkbutton(frame0, width=15, text="Retrieve Data",
                             command=RetrieveData)
 
@@ -439,7 +587,7 @@ OpenRNWIS <- function() {
 
   # Frame 2 and 3, select sites
 
-  txt <- "Select sites using one of the following options"
+  txt <- "Select sites based on one of the following options"
   frame2 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3, text=txt)
 
   frame2.rad.1.1 <- ttkradiobutton(frame2, variable=opt.var, value=1,
@@ -450,7 +598,7 @@ OpenRNWIS <- function() {
   frame2.rad.5.1 <- ttkradiobutton(frame2, variable=opt.var, value=3,
                                    command=SetState, text='Site attributes:')
 
-  frame2.ent.2.1 <- ttkentry(frame2, width=25, textvariable=site.id.var)
+  frame2.ent.2.1 <- ttkentry(frame2, width=25, textvariable=site.nums.var)
   frame2.ent.4.1 <- ttkentry(frame2, width=25, textvariable=site.file.var)
 
   frame2.but.4.2 <- ttkbutton(frame2, width=8, text="Browse",
@@ -461,17 +609,18 @@ OpenRNWIS <- function() {
 
   frame3.lab.1.2 <- ttklabel(frame3, text="Longitude")
   frame3.lab.1.3 <- ttklabel(frame3, text="Latitude")
-  frame3.lab.1.4 <- ttklabel(frame3, text="Open interval depth")
+  frame3.lab.1.4 <- ttklabel(frame3, text="Altitude")
   frame3.lab.1.6 <- ttklabel(frame3, text="Select type(s)")
   frame3.lab.2.1 <- ttklabel(frame3, text="Minimum")
   frame3.lab.3.1 <- ttklabel(frame3, text="Maximum")
 
-  frame3.ent.2.2 <- ttkentry(frame3, width=20, textvariable=xmin.var)
-  frame3.ent.2.3 <- ttkentry(frame3, width=20, textvariable=ymin.var)
-  frame3.ent.2.4 <- ttkentry(frame3, width=20, textvariable=zmin.var)
-  frame3.ent.3.2 <- ttkentry(frame3, width=20, textvariable=xmax.var)
-  frame3.ent.3.3 <- ttkentry(frame3, width=20, textvariable=ymax.var)
-  frame3.ent.3.4 <- ttkentry(frame3, width=20, textvariable=zmax.var)
+  width <- 15
+  frame3.ent.2.2 <- ttkentry(frame3, width=width, textvariable=lng.min.var)
+  frame3.ent.2.3 <- ttkentry(frame3, width=width, textvariable=lat.min.var)
+  frame3.ent.2.4 <- ttkentry(frame3, width=width, textvariable=alt.min.var)
+  frame3.ent.3.2 <- ttkentry(frame3, width=width, textvariable=lng.max.var)
+  frame3.ent.3.3 <- ttkentry(frame3, width=width, textvariable=lat.max.var)
+  frame3.ent.3.4 <- ttkentry(frame3, width=width, textvariable=alt.max.var)
 
   frame3.lst.2.6 <- tklistbox(frame3, selectmode="extended", activestyle="none",
                               relief="flat", borderwidth=5, width=15, height=6,
@@ -482,7 +631,7 @@ OpenRNWIS <- function() {
   frame3.lab.4.1 <- ttklabel(frame3, foreground=fg, text="e.g.")
   frame3.lab.4.2 <- ttklabel(frame3, foreground=fg, text="-112.980728")
   frame3.lab.4.3 <- ttklabel(frame3, foreground=fg, text="43.510023")
-  frame3.lab.4.4 <- ttklabel(frame3, foreground=fg, text="1295.2")
+  frame3.lab.4.4 <- ttklabel(frame3, foreground=fg, text="4382.3")
 
   frame3.lab.5.1 <- ttklabel(frame3, text="Polygon domain")
   frame3.ent.5.2 <- ttkentry(frame3, width=25, textvariable=poly.file.var)
@@ -583,10 +732,10 @@ OpenRNWIS <- function() {
 
   frame5 <- ttkframe(frame4, relief="flat")
   frame5.but.1.1 <- ttkbutton(frame5, width=2, image=arrow.up,
-                              command=function() Arrange("backward",
+                              command=function() Arrange("up",
                                                         frame4.lst.2.6))
   frame5.but.1.2 <- ttkbutton(frame5, width=2, image=arrow.down,
-                              command=function() Arrange("forward",
+                              command=function() Arrange("down",
                                                         frame4.lst.2.6))
 
   tkgrid(frame4.lab.1.1, "x", frame4.lab.1.3, "x", "x", frame4.lab.1.6, "x",
