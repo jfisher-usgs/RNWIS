@@ -9,11 +9,12 @@ Something
 }
 
 \usage{
-QueryDatabase(con, sqtable, sqvars = "*", 
-          site.no.var = NULL, site.no = NA, 
-          site.tp.cd.var = NULL, site.tp.cd = NA, 
-          lat.var = NULL, lat.lim = c(NA, NA), 
-          lng.var = NULL, lng.lim = c(NA, NA), 
+QueryDatabase(con, sqtable, sqvars = "*",
+          site.no.var = NULL, site.no = NULL,
+          site.tp.cd.var = NULL, site.tp.cd = NULL,
+          lat.var = NULL, lat.lim = c(NA, NA),
+          lng.var = NULL, lng.lim = c(NA, NA),
+          alt.var = NULL, alt.lim = c(NA, NA),
           d.t.var = NULL, d.t.lim = c(NA, NA))
 }
 
@@ -29,6 +30,8 @@ QueryDatabase(con, sqtable, sqvars = "*",
 \item{lat.lim}{numeric; something.}
 \item{lng.var}{character; something.}
 \item{lng.lim}{numeric; something.}
+\item{alt.var}{character; something.}
+\item{alt.lim}{numeric; something.}
 \item{d.t.var}{character; something.}
 \item{d.t.lim}{character, POSIXt; something.}
 }
