@@ -23,9 +23,9 @@ OpenRNWIS <- function() {
     if (idx < 0)
       return()
 
-    tkfocus(frame1.box.1.2)
     tkconfigure(tt, cursor="watch")
     tclServiceMode(FALSE)
+    Sys.sleep(1)
 
     dsn <- odbc.dsn[idx + 1]
 
@@ -293,9 +293,8 @@ OpenRNWIS <- function() {
   # Retrieve site data and polygon domain
 
   GetSiteInfo <- function(sqvars) {
-
     opt <- as.integer(tclvalue(opt.var))
-    site.no <- NULL
+    poly.obj <- NULL
 
     # Site numbers
     if (opt == 1L | opt == 2L) {
@@ -316,6 +315,7 @@ OpenRNWIS <- function() {
                                 comment.char="#")
         site.no <- ProcessSiteStrings(paste(scanned.strings, collapse=","))
       }
+
       if (length(site.no) == 0L)
         return()
 
