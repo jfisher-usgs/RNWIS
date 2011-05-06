@@ -1,2 +1,735 @@
-eval(function(p,a,c,k,e,d){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--){d[e(c)]=k[c]||e(c)}k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1};while(c--){if(k[c]){p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c])}}return p}('7 5(1r,1C,2C){3.15(5,v.u.39);3.g=1r;3.e=[];3.W=[];3.37=[4o,4p,4r,4j,4i];3.S=[];3.1I=C;6 K=2C||{};3.X=K[\'4h\']||4t;3.2t=K[\'13\']||E;3.S=K[\'1q\']||[];3.31=K[\'4u\']||3.2G;3.30=K[\'4I\']||3.2z;3.2o=J;9(K[\'2B\']!=2O){3.2o=K[\'2B\']}3.1u=C;9(K[\'2L\']!=2O){3.1u=K[\'2L\']}3.2N();3.M(1r);3.2q=3.g.1B();6 B=3;v.u.1k.2u(3.g,\'4v\',7(){6 13=B.g.36[B.g.2Z()].13;6 1d=B.g.1B();9(1d<0||1d>13){b}9(B.2q!=1d){B.2q=B.g.1B();B.P()}});v.u.1k.2u(3.g,\'3S\',7(){B.H()});9(1C&&1C.w){3.1M(1C,C)}}5.4.2G=\'3Q://v-u-3P-3L-3M.3N.3O/3V/3W/43/\'+\'44/m\';5.4.2z=\'45\';5.4.15=7(2D,2E){b(7(1P){A(6 2r 46 1P.4){3.4[2r]=1P.4[2r]}b 3}).41(2D,[2E])};5.4.18=7(){3.2M(J)};5.4.1a=7(){};5.4.2N=7(){9(3.S.w){b}A(6 i=0,17;17=3.37[i];i++){3.S.D({2s:3.31+(i+1)+\'.\'+3.30,14:17,1p:17})}};5.4.1T=7(){6 L=3.U();6 k=N v.u.1E();A(6 i=0,8;8=L[i];i++){k.15(8.Q())}3.g.3j(k)};5.4.47=7(1q){3.S=1q};5.4.1t=7(){b 3.S};5.4.3e=7(){b 3.2o};5.4.2K=7(){b 3.1u};5.4.U=7(){b 3.e};5.4.21=7(){b 3.e.w};5.4.3I=7(13){3.2t=13};5.4.1N=7(){b 3.2t||3.g.36[3.g.2Z()].13};5.4.2y=7(L,1D){6 p=0;6 2m=L.w;6 1A=2m;3E(1A!==0){1A=1W(1A/10,10);p++}p=s.3b(p,1D);b{1b:2m,p:p}};5.4.2k=7(2V){3.2y=2V};5.4.1O=7(){b 3.2y};5.4.1M=7(L,V){A(6 i=0,8;8=L[i];i++){3.2x(8)}9(!V){3.H()}};5.4.2x=7(8){8.1o=C;9(8[\'3D\']){6 B=3;v.u.1k.2u(8,\'3A\',7(){8.1o=C;B.P();B.H()})}3.e.D(8)};5.4.1g=7(8,V){3.2x(8);9(!V){3.H()}};5.4.2n=7(8){6 p=-1;9(3.e.1F){p=3.e.1F(8)}O{A(6 i=0,m;m=3.e[i];i++){9(m==8){p=i;3Z}}}9(p==-1){b C}3.e.4O(p,1);b J};5.4.1X=7(8,V){6 1f=3.2n(8);9(!V&&1f){3.P();3.H();b J}O{b C}};5.4.1S=7(L,V){6 1f=C;A(6 i=0,8;8=L[i];i++){6 r=3.2n(8);1f=1f||r}9(!V&&1f){3.P();3.H();b J}};5.4.2M=7(34){9(!3.1I){3.1I=34;3.2d()}};5.4.20=7(){b 3.W.w};5.4.Z=7(){b 3.g};5.4.M=7(1r){3.g=1r};5.4.1i=7(){b 3.X};5.4.2j=7(17){3.X=17};5.4.1l=7(k){6 1s=3.3u();6 2Y=N v.u.26(k.2a().G(),k.2a().Y());6 2W=N v.u.26(k.2g().G(),k.2g().Y());6 1w=1s.1Y(2Y);1w.x+=3.X;1w.y-=3.X;6 1x=1s.1Y(2W);1x.x-=3.X;1x.y+=3.X;6 2T=1s.2X(1w);6 2Q=1s.2X(1x);k.15(2T);k.15(2Q);b k};5.4.38=7(8,k){b k.3p(8.Q())};5.4.1U=7(){3.P(J);3.e=[]};5.4.P=7(2R){A(6 i=0,o;o=3.W[i];i++){o.1v()}A(6 i=0,8;8=3.e[i];i++){8.1o=C;9(2R){8.M(E)}}3.W=[]};5.4.2c=7(){6 2S=3.W.4F();3.W.w=0;3.P();3.H();33.4L(7(){A(6 i=0,o;o=2S[i];i++){o.1v()}},0)};5.4.H=7(){3.2d()};5.4.32=7(1n,1m){9(!1n||!1m){b 0}6 R=4N;6 1V=(1m.G()-1n.G())*s.1K/1H;6 22=(1m.Y()-1n.Y())*s.1K/1H;6 a=s.1z(1V/2)*s.1z(1V/2)+s.35(1n.G()*s.1K/1H)*s.35(1m.G()*s.1K/1H)*s.1z(22/2)*s.1z(22/2);6 c=2*s.4H(s.2P(a),s.2P(1-a));6 d=R*c;b d};5.4.2H=7(8){6 2b=4f;6 1h=E;6 t=8.Q();A(6 i=0,o;o=3.W[i];i++){6 16=o.1Q();9(16){6 d=3.32(16,8.Q());9(d<2b){2b=d;1h=o}}}9(1h&&1h.3t(8)){1h.1g(8)}O{6 o=N n(3);o.1g(8);3.W.D(o)}};5.4.2d=7(){9(!3.1I){b}6 2A=N v.u.1E(3.g.1J().2g(),3.g.1J().2a());6 k=3.1l(2A);A(6 i=0,8;8=3.e[i];i++){9(!8.1o&&3.38(8,k)){3.2H(8)}}};7 n(I){3.1c=I;3.g=I.Z();3.X=I.1i();3.1u=I.2K();3.q=E;3.e=[];3.28=E;3.1e=N h(3,I.1t(),I.1i())}n.4.2J=7(8){9(3.e.1F){b 3.e.1F(8)!=-1}O{A(6 i=0,m;m=3.e[i];i++){9(m==8){b J}}}b C};n.4.1g=7(8){9(3.2J(8)){b C}9(!3.q){3.q=8.Q();3.27()}O{9(3.1u){6 l=3.e.w+1;6 G=(3.q.G()*(l-1)+8.Q().G())/l;6 Y=(3.q.Y()*(l-1)+8.Q().Y())/l;3.q=N v.u.26(G,Y);3.27()}}9(3.e.w==0&&8.Z()!=3.g){8.M(3.g)}9(3.e.w>0){9(3.e.w==1){3.e[0].M(E)}8.M(E)}8.1o=J;3.e.D(8);3.3w();b J};n.4.2h=7(){b 3.1c};n.4.1J=7(){6 k=N v.u.1E(3.q,3.q);6 L=3.U();A(6 i=0,8;8=L[i];i++){k.15(8.Q())}b k};n.4.1v=7(){3.1e.1v();3.e.w=0;4n 3.e};n.4.2p=7(){b 3.e.w};n.4.U=7(){b 3.e};n.4.1Q=7(){b 3.q};n.4.27=7(){6 k=N v.u.1E(3.q,3.q);3.28=3.1c.1l(k)};n.4.3t=7(8){b 3.28.3p(8.Q())};n.4.Z=7(){b 3.g};n.4.3w=7(){6 1d=3.g.1B();6 3z=3.1c.1N();9(1d>3z){A(6 i=0,8;8=3.e[i];i++){8.M(3.g)}b}9(3.e.w<2){3.1e.2l();b}6 1D=3.1c.1t().w;6 12=3.1c.1O()(3.e,1D);3.1e.3i(3.q);3.1e.3f(12);3.1e.3r()};7 h(o,1q,3l){o.2h().15(h,v.u.39);3.S=1q;3.4g=3l||0;3.1L=o;3.q=E;3.g=o.Z();3.j=E;3.1y=E;3.1j=C;3.M(3.g)}h.4.3x=7(){6 I=3.1L.2h();v.u.1k.4G(I,\'4J\',3.1L);9(I.3e()){3.g.3j(3.1L.1J())}};h.4.18=7(){3.j=3o.4M(\'4E\');9(3.1j){6 t=3.1G(3.q);3.j.f.3q=3.29(t);3.j.3m=3.1y.1b}6 3c=3.4y();3c.4x.4w(3.j);6 B=3;v.u.1k.48(3.j,\'4z\',7(){B.3x()})};h.4.1G=7(3v){6 t=3.3u().1Y(3v);t.x-=1W(3.19/2,10);t.y-=1W(3.T/2,10);b t};h.4.1a=7(){9(3.1j){6 t=3.1G(3.q);3.j.f.24=t.y+\'z\';3.j.f.25=t.x+\'z\'}};h.4.2l=7(){9(3.j){3.j.f.3y=\'4C\'}3.1j=C};h.4.3r=7(){9(3.j){6 t=3.1G(3.q);3.j.f.3q=3.29(t);3.j.f.3y=\'\'}3.1j=J};h.4.1v=7(){3.M(E)};h.4.1R=7(){9(3.j&&3.j.3d){3.2l();3.j.3d.3J(3.j);3.j=E}};h.4.3f=7(12){3.1y=12;3.3H=12.1b;3.3C=12.p;9(3.j){3.j.3m=12.1b}3.3g()};h.4.3g=7(){6 p=s.3Y(0,3.1y.p-1);p=s.3b(3.S.w-1,p);6 f=3.S[p];3.2w=f[\'2s\'];3.T=f[\'14\'];3.19=f[\'1p\'];3.2e=f[\'4D\'];3.F=f[\'4A\'];3.2f=f[\'4K\'];3.2v=f[\'2i\']};h.4.3i=7(16){3.q=16};h.4.29=7(t){6 f=[];9(3o.3R){f.D(\'3T:3U:42.3X.3K(\'+\'40=3F,3G="\'+3.2w+\'");\')}O{f.D(\'3s-3B:2s(\'+3.2w+\');\');6 2i=3.2v?3.2v:\'0 0\';f.D(\'3s-2F:\'+2i+\';\')}9(1Z 3.F===\'1P\'){9(1Z 3.F[0]===\'3n\'&&3.F[0]>0&&3.F[0]<3.T){f.D(\'14:\'+(3.T-3.F[0])+\'z; 3h-24:\'+3.F[0]+\'z;\')}O{f.D(\'14:\'+3.T+\'z; 3k-14:\'+3.T+\'z;\')}9(1Z 3.F[1]===\'3n\'&&3.F[1]>0&&3.F[1]<3.19){f.D(\'1p:\'+(3.19-3.F[1])+\'z; 3h-25:\'+3.F[1]+\'z;\')}O{f.D(\'1p:\'+3.19+\'z; 1b-3a:16;\')}}O{f.D(\'14:\'+3.T+\'z; 3k-14:\'+3.T+\'z; 1p:\'+3.19+\'z; 1b-3a:16;\')}6 2U=3.2e?3.2e:\'4a\';6 2I=3.2f?3.2f:11;f.D(\'4b:4c; 24:\'+t.y+\'z; 25:\'+t.x+\'z; 4B:\'+2U+\'; 2F:4m; 23-17:\'+2I+\'z; 23-4l:4k,4s-4q; 23-49:4d\');b f.4e(\'\')};33[\'5\']=5;5.4[\'1g\']=5.4.1g;5.4[\'1M\']=5.4.1M;5.4[\'1U\']=5.4.1U;5.4[\'1T\']=5.4.1T;5.4[\'1O\']=5.4.1O;5.4[\'1i\']=5.4.1i;5.4[\'1l\']=5.4.1l;5.4[\'Z\']=5.4.Z;5.4[\'U\']=5.4.U;5.4[\'1N\']=5.4.1N;5.4[\'1t\']=5.4.1t;5.4[\'20\']=5.4.20;5.4[\'21\']=5.4.21;5.4[\'H\']=5.4.H;5.4[\'1X\']=5.4.1X;5.4[\'1S\']=5.4.1S;5.4[\'P\']=5.4.P;5.4[\'2c\']=5.4.2c;5.4[\'2k\']=5.4.2k;5.4[\'2j\']=5.4.2j;5.4[\'18\']=5.4.18;5.4[\'1a\']=5.4.1a;n.4[\'1Q\']=n.4.1Q;n.4[\'2p\']=n.4.2p;n.4[\'U\']=n.4.U;h.4[\'18\']=h.4.18;h.4[\'1a\']=h.4.1a;h.4[\'1R\']=h.4.1R;',62,299,'|||this|prototype|MarkerClusterer|var|function|marker|if||return|||markers_|style|map_|ClusterIcon||div_|bounds|||Cluster|cluster|index|center_||Math|pos|maps|google|length|||px|for|that|false|push|null|anchor_|lat|redraw|markerClusterer|true|options|markers|setMap|new|else|resetViewport|getPosition||styles_|height_|getMarkers|opt_nodraw|clusters_|gridSize_|lng|getMap|||sums|maxZoom|height|extend|center|size|onAdd|width_|draw|text|markerClusterer_|zoom|clusterIcon_|removed|addMarker|clusterToAddTo|getGridSize|visible_|event|getExtendedBounds|p2|p1|isAdded|width|styles|map|projection|getStyles|averageCenter_|remove|trPix|blPix|sums_|sin|dv|getZoom|opt_markers|numStyles|LatLngBounds|indexOf|getPosFromLatLng_|180|ready_|getBounds|PI|cluster_|addMarkers|getMaxZoom|getCalculator|object|getCenter|onRemove|removeMarkers|fitMapToMarkers|clearMarkers|dLat|parseInt|removeMarker|fromLatLngToDivPixel|typeof|getTotalClusters|getTotalMarkers|dLon|font|top|left|LatLng|calculateBounds_|bounds_|createCss|getNorthEast|distance|repaint|createClusters_|textColor_|textSize_|getSouthWest|getMarkerClusterer|backgroundPosition|setGridSize|setCalculator|hide|count|removeMarker_|zoomOnClick_|getSize|prevZoom_|property|url|maxZoom_|addListener|backgroundPosition_|url_|pushMarkerTo_|calculator_|MARKER_CLUSTER_IMAGE_EXTENSION_|mapBounds|zoomOnClick|opt_options|obj1|obj2|position|MARKER_CLUSTER_IMAGE_PATH_|addToClosestCluster_|txtSize|isMarkerAlreadyAdded|isAverageCenter|averageCenter|setReady_|setupStyles_|undefined|sqrt|sw|opt_hide|oldClusters|ne|txtColor|calculator|bl|fromDivPixelToLatLng|tr|getMapTypeId|imageExtension_|imagePath_|distanceBetweenPoints_|window|ready|cos|mapTypes|sizes|isMarkerInBounds_|OverlayView|align|min|panes|parentNode|isZoomOnClick|setSums|useStyle|padding|setCenter|fitBounds|line|opt_padding|innerHTML|number|document|contains|cssText|show|background|isMarkerInClusterBounds|getProjection|latlng|updateIcon|triggerClusterClick|display|mz|dragend|image|index_|draggable|while|scale|src|text_|setMaxZoom|removeChild|AlphaImageLoader|library|v3|googlecode|com|utility|http|all|idle|filter|progid|svn|trunk|Microsoft|max|break|sizingMethod|apply|DXImageTransform|markerclusterer|images|png|in|setStyles|addDomListener|weight|black|cursor|pointer|bold|join|40000|padding_|gridSize|90|78|Arial|family|absolute|delete|53|56|serif|66|sans|60|imagePath|zoom_changed|appendChild|overlayImage|getPanes|click|anchor|color|none|textColor|DIV|slice|trigger|atan2|imageExtension|clusterclick|textSize|setTimeout|createElement|6371|splice'.split('|'),0,{}))
+/**
+ * @name MarkerClusterer
+ * @version 1.0
+ * @author Xiaoxi Wu
+ * @copyright (c) 2009 Xiaoxi Wu
+ * @fileoverview
+ * This javascript library creates and manages per-zoom-level 
+ * clusters for large amounts of markers (hundreds or thousands).
+ * This library was inspired by the <a href="http://www.maptimize.com">
+ * Maptimize</a> hosted clustering solution.
+ * <br /><br/>
+ * <b>How it works</b>:<br/>
+ * The <code>MarkerClusterer</code> will group markers into clusters according to
+ * their distance from a cluster's center. When a marker is added,
+ * the marker cluster will find a position in all the clusters, and 
+ * if it fails to find one, it will create a new cluster with the marker.
+ * The number of markers in a cluster will be displayed
+ * on the cluster marker. When the map viewport changes,
+ * <code>MarkerClusterer</code> will destroy the clusters in the viewport 
+ * and regroup them into new clusters.
+ *
+ */
 
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+/**
+ * @name MarkerClustererOptions
+ * @class This class represents optional arguments to the {@link MarkerClusterer}
+ * constructor.
+ * @property {Number} [maxZoom] The max zoom level monitored by a
+ * marker cluster. If not given, the marker cluster assumes the maximum map
+ * zoom level. When maxZoom is reached or exceeded all markers will be shown
+ * without cluster.
+ * @property {Number} [gridSize=60] The grid size of a cluster in pixel. Each
+ * cluster will be a square. If you want the algorithm to run faster, you can set
+ * this value larger.
+ * @property {Array of MarkerStyleOptions} [styles]
+ * Custom styles for the cluster markers.
+ * The array should be ordered according to increasing cluster size,
+ * with the style for the smallest clusters first, and the style for the
+ * largest clusters last.
+ */
+
+/**
+ * @name MarkerStyleOptions
+ * @class An array of these is passed into the {@link MarkerClustererOptions}
+ * styles option.
+ * @property {String} [url] Image url.
+ * @property {Number} [height] Image height.
+ * @property {Number} [height] Image width.
+ * @property {Array of Number} [opt_anchor] Anchor for label text, like [24, 12]. 
+ *    If not set, the text will align center and middle.
+ * @property {String} [opt_textColor="black"] Text color.
+ */
+
+/**
+ * Creates a new MarkerClusterer to cluster markers on the map.
+ *
+ * @constructor
+ * @param {GMap2} map The map that the markers should be added to.
+ * @param {Array of GMarker} opt_markers Initial set of markers to be clustered.
+ * @param {MarkerClustererOptions} opt_opts A container for optional arguments.
+ */
+function MarkerClusterer(map, opt_markers, opt_opts) {
+  // private members
+  var clusters_ = [];
+  var map_ = map;
+  var maxZoom_ = null;
+  var me_ = this;
+  var gridSize_ = 60;
+  var sizes = [53, 56, 66, 78, 90];
+  var styles_ = [];
+  var leftMarkers_ = [];
+  var mcfn_ = null;
+
+  var i = 0;
+  for (i = 1; i <= 5; ++i) {
+    styles_.push({
+      'url': "http://gmaps-utility-library.googlecode.com/svn/trunk/markerclusterer/images/m" + i + ".png",
+      'height': sizes[i - 1],
+      'width': sizes[i - 1]
+    });
+  }
+
+  if (typeof opt_opts === "object" && opt_opts !== null) {
+    if (typeof opt_opts.gridSize === "number" && opt_opts.gridSize > 0) {
+      gridSize_ = opt_opts.gridSize;
+    }
+    if (typeof opt_opts.maxZoom === "number") {
+      maxZoom_ = opt_opts.maxZoom;
+    }
+    if (typeof opt_opts.styles === "object" && opt_opts.styles !== null && opt_opts.styles.length !== 0) {
+      styles_ = opt_opts.styles;
+    }
+  }
+
+  /**
+   * When we add a marker, the marker may not in the viewport of map, then we don't deal with it, instead
+   * we add the marker into a array called leftMarkers_. When we reset MarkerClusterer we should add the
+   * leftMarkers_ into MarkerClusterer.
+   */
+  function addLeftMarkers_() {
+    if (leftMarkers_.length === 0) {
+      return;
+    }
+    var leftMarkers = [];
+    for (i = 0; i < leftMarkers_.length; ++i) {
+      me_.addMarker(leftMarkers_[i], true, null, null, true);
+    }
+    leftMarkers_ = leftMarkers;
+  }
+
+  /**
+   * Get cluster marker images of this marker cluster. Mostly used by {@link Cluster}
+   * @private
+   * @return {Array of String}
+   */
+  this.getStyles_ = function () {
+    return styles_;
+  };
+
+  /**
+   * Remove all markers from MarkerClusterer.
+   */
+  this.clearMarkers = function () {
+    for (var i = 0; i < clusters_.length; ++i) {
+      if (typeof clusters_[i] !== "undefined" && clusters_[i] !== null) {
+        clusters_[i].clearMarkers();
+      }
+    }
+    clusters_ = [];
+    leftMarkers_ = [];
+    GEvent.removeListener(mcfn_);
+  };
+
+  /**
+   * Check a marker, whether it is in current map viewport.
+   * @private
+   * @return {Boolean} if it is in current map viewport
+   */
+  function isMarkerInViewport_(marker) {
+    return map_.getBounds().containsLatLng(marker.getLatLng());
+  }
+
+  /**
+   * When reset MarkerClusterer, there will be some markers get out of its cluster.
+   * These markers should be add to new clusters.
+   * @param {Array of GMarker} markers Markers to add.
+   */
+  function reAddMarkers_(markers) {
+    var len = markers.length;
+    var clusters = [];
+    for (var i = len - 1; i >= 0; --i) {
+      me_.addMarker(markers[i].marker, true, markers[i].isAdded, clusters, true);
+    }
+    addLeftMarkers_();
+  }
+
+  /**
+   * Add a marker.
+   * @private
+   * @param {GMarker} marker Marker you want to add
+   * @param {Boolean} opt_isNodraw Whether redraw the cluster contained the marker
+   * @param {Boolean} opt_isAdded Whether the marker is added to map. Never use it.
+   * @param {Array of Cluster} opt_clusters Provide a list of clusters, the marker
+   *     cluster will only check these cluster where the marker should join.
+   */
+  this.addMarker = function (marker, opt_isNodraw, opt_isAdded, opt_clusters, opt_isNoCheck) {
+    if (opt_isNoCheck !== true) {
+      if (!isMarkerInViewport_(marker)) {
+        leftMarkers_.push(marker);
+        return;
+      }
+    }
+
+    var isAdded = opt_isAdded;
+    var clusters = opt_clusters;
+    var pos = map_.fromLatLngToDivPixel(marker.getLatLng());
+
+    if (typeof isAdded !== "boolean") {
+      isAdded = false;
+    }
+    if (typeof clusters !== "object" || clusters === null) {
+      clusters = clusters_;
+    }
+
+    var length = clusters.length;
+    var cluster = null;
+    for (var i = length - 1; i >= 0; i--) {
+      cluster = clusters[i];
+      var center = cluster.getCenter();
+      if (center === null) {
+        continue;
+      }
+      center = map_.fromLatLngToDivPixel(center);
+
+      // Found a cluster which contains the marker.
+      if (pos.x >= center.x - gridSize_ && pos.x <= center.x + gridSize_ &&
+          pos.y >= center.y - gridSize_ && pos.y <= center.y + gridSize_) {
+        cluster.addMarker({
+          'isAdded': isAdded,
+          'marker': marker
+        });
+        if (!opt_isNodraw) {
+          cluster.redraw_();
+        }
+        return;
+      }
+    }
+
+    // No cluster contain the marker, create a new cluster.
+    cluster = new Cluster(this, map);
+    cluster.addMarker({
+      'isAdded': isAdded,
+      'marker': marker
+    });
+    if (!opt_isNodraw) {
+      cluster.redraw_();
+    }
+
+    // Add this cluster both in clusters provided and clusters_
+    clusters.push(cluster);
+    if (clusters !== clusters_) {
+      clusters_.push(cluster);
+    }
+  };
+
+  /**
+   * Remove a marker.
+   *
+   * @param {GMarker} marker The marker you want to remove.
+   */
+
+  this.removeMarker = function (marker) {
+    for (var i = 0; i < clusters_.length; ++i) {
+      if (clusters_[i].remove(marker)) {
+        clusters_[i].redraw_();
+        return;
+      }
+    }
+  };
+
+  /**
+   * Redraw all clusters in viewport.
+   */
+  this.redraw_ = function () {
+    var clusters = this.getClustersInViewport_();
+    for (var i = 0; i < clusters.length; ++i) {
+      clusters[i].redraw_(true);
+    }
+  };
+
+  /**
+   * Get all clusters in viewport.
+   * @return {Array of Cluster}
+   */
+  this.getClustersInViewport_ = function () {
+    var clusters = [];
+    var curBounds = map_.getBounds();
+    for (var i = 0; i < clusters_.length; i ++) {
+      if (clusters_[i].isInBounds(curBounds)) {
+        clusters.push(clusters_[i]);
+      }
+    }
+    return clusters;
+  };
+
+  /**
+   * Get max zoom level.
+   * @private
+   * @return {Number}
+   */
+  this.getMaxZoom_ = function () {
+    return maxZoom_;
+  };
+
+  /**
+   * Get map object.
+   * @private
+   * @return {GMap2}
+   */
+  this.getMap_ = function () {
+    return map_;
+  };
+
+  /**
+   * Get grid size
+   * @private
+   * @return {Number}
+   */
+  this.getGridSize_ = function () {
+    return gridSize_;
+  };
+
+  /**
+   * Get total number of markers.
+   * @return {Number}
+   */
+  this.getTotalMarkers = function () {
+    var result = 0;
+    for (var i = 0; i < clusters_.length; ++i) {
+      result += clusters_[i].getTotalMarkers();
+    }
+    return result;
+  };
+
+  /**
+   * Get total number of clusters.
+   * @return {int}
+   */
+  this.getTotalClusters = function () {
+    return clusters_.length;
+  };
+
+  /**
+   * Collect all markers of clusters in viewport and regroup them.
+   */
+  this.resetViewport = function () {
+    var clusters = this.getClustersInViewport_();
+    var tmpMarkers = [];
+    var removed = 0;
+
+    for (var i = 0; i < clusters.length; ++i) {
+      var cluster = clusters[i];
+      var oldZoom = cluster.getCurrentZoom();
+      if (oldZoom === null) {
+        continue;
+      }
+      var curZoom = map_.getZoom();
+      if (curZoom !== oldZoom) {
+
+        // If the cluster zoom level changed then destroy the cluster
+        // and collect its markers.
+        var mks = cluster.getMarkers();
+        for (var j = 0; j < mks.length; ++j) {
+          var newMarker = {
+            'isAdded': false,
+            'marker': mks[j].marker
+          };
+          tmpMarkers.push(newMarker);
+        }
+        cluster.clearMarkers();
+        removed++;
+        for (j = 0; j < clusters_.length; ++j) {
+          if (cluster === clusters_[j]) {
+            clusters_.splice(j, 1);
+          }
+        }
+      }
+    }
+
+    // Add the markers collected into marker cluster to reset
+    reAddMarkers_(tmpMarkers);
+    this.redraw_();
+  };
+
+
+  /**
+   * Add a set of markers.
+   *
+   * @param {Array of GMarker} markers The markers you want to add.
+   */
+  this.addMarkers = function (markers) {
+    for (var i = 0; i < markers.length; ++i) {
+      this.addMarker(markers[i], true);
+    }
+    this.redraw_();
+  };
+
+  // initialize
+  if (typeof opt_markers === "object" && opt_markers !== null) {
+    this.addMarkers(opt_markers);
+  }
+
+  // when map move end, regroup.
+  mcfn_ = GEvent.addListener(map_, "moveend", function () {
+    me_.resetViewport();
+  });
+}
+
+/**
+ * Create a cluster to collect markers.
+ * A cluster includes some markers which are in a block of area.
+ * If there are more than one markers in cluster, the cluster
+ * will create a {@link ClusterMarker_} and show the total number
+ * of markers in cluster.
+ *
+ * @constructor
+ * @private
+ * @param {MarkerClusterer} markerClusterer The marker cluster object
+ */
+function Cluster(markerClusterer) {
+  var center_ = null;
+  var markers_ = [];
+  var markerClusterer_ = markerClusterer;
+  var map_ = markerClusterer.getMap_();
+  var clusterMarker_ = null;
+  var zoom_ = map_.getZoom();
+
+  /**
+   * Get markers of this cluster.
+   *
+   * @return {Array of GMarker}
+   */
+  this.getMarkers = function () {
+    return markers_;
+  };
+
+  /**
+   * If this cluster intersects certain bounds.
+   *
+   * @param {GLatLngBounds} bounds A bounds to test
+   * @return {Boolean} Is this cluster intersects the bounds
+   */
+  this.isInBounds = function (bounds) {
+    if (center_ === null) {
+      return false;
+    }
+
+    if (!bounds) {
+      bounds = map_.getBounds();
+    }
+    var sw = map_.fromLatLngToDivPixel(bounds.getSouthWest());
+    var ne = map_.fromLatLngToDivPixel(bounds.getNorthEast());
+
+    var centerxy = map_.fromLatLngToDivPixel(center_);
+    var inViewport = true;
+    var gridSize = markerClusterer.getGridSize_();
+    if (zoom_ !== map_.getZoom()) {
+      var dl = map_.getZoom() - zoom_;
+      gridSize = Math.pow(2, dl) * gridSize;
+    }
+    if (ne.x !== sw.x && (centerxy.x + gridSize < sw.x || centerxy.x - gridSize > ne.x)) {
+      inViewport = false;
+    }
+    if (inViewport && (centerxy.y + gridSize < ne.y || centerxy.y - gridSize > sw.y)) {
+      inViewport = false;
+    }
+    return inViewport;
+  };
+
+  /**
+   * Get cluster center.
+   *
+   * @return {GLatLng}
+   */
+  this.getCenter = function () {
+    return center_;
+  };
+
+  /**
+   * Add a marker.
+   *
+   * @param {Object} marker An object of marker you want to add:
+   *   {Boolean} isAdded If the marker is added on map.
+   *   {GMarker} marker The marker you want to add.
+   */
+  this.addMarker = function (marker) {
+    if (center_ === null) {
+      /*var pos = marker['marker'].getLatLng();
+       pos = map.fromLatLngToContainerPixel(pos);
+       pos.x = parseInt(pos.x - pos.x % (GRIDWIDTH * 2) + GRIDWIDTH);
+       pos.y = parseInt(pos.y - pos.y % (GRIDWIDTH * 2) + GRIDWIDTH);
+       center = map.fromContainerPixelToLatLng(pos);*/
+      center_ = marker.marker.getLatLng();
+    }
+    markers_.push(marker);
+  };
+
+  /**
+   * Remove a marker from cluster.
+   *
+   * @param {GMarker} marker The marker you want to remove.
+   * @return {Boolean} Whether find the marker to be removed.
+   */
+  this.removeMarker = function (marker) {
+    for (var i = 0; i < markers_.length; ++i) {
+      if (marker === markers_[i].marker) {
+        if (markers_[i].isAdded) {
+          map_.removeOverlay(markers_[i].marker);
+        }
+        markers_.splice(i, 1);
+        return true;
+      }
+    }
+    return false;
+  };
+
+  /**
+   * Get current zoom level of this cluster.
+   * Note: the cluster zoom level and map zoom level not always the same.
+   *
+   * @return {Number}
+   */
+  this.getCurrentZoom = function () {
+    return zoom_;
+  };
+
+  /**
+   * Redraw a cluster.
+   * @private
+   * @param {Boolean} isForce If redraw by force, no matter if the cluster is
+   *     in viewport.
+   */
+  this.redraw_ = function (isForce) {
+    if (!isForce && !this.isInBounds()) {
+      return;
+    }
+
+    // Set cluster zoom level.
+    zoom_ = map_.getZoom();
+    var i = 0;
+    var mz = markerClusterer.getMaxZoom_();
+    if (mz === null) {
+      mz = map_.getCurrentMapType().getMaximumResolution();
+    }
+    if (zoom_ >= mz || this.getTotalMarkers() === 1) {
+
+      // If current zoom level is beyond the max zoom level or the cluster
+      // have only one marker, the marker(s) in cluster will be showed on map.
+      for (i = 0; i < markers_.length; ++i) {
+        if (markers_[i].isAdded) {
+          if (markers_[i].marker.isHidden()) {
+            markers_[i].marker.show();
+          }
+        } else {
+          map_.addOverlay(markers_[i].marker);
+          markers_[i].isAdded = true;
+        }
+      }
+      if (clusterMarker_ !== null) {
+        clusterMarker_.hide();
+      }
+    } else {
+      // Else add a cluster marker on map to show the number of markers in
+      // this cluster.
+      for (i = 0; i < markers_.length; ++i) {
+        if (markers_[i].isAdded && (!markers_[i].marker.isHidden())) {
+          markers_[i].marker.hide();
+        }
+      }
+      if (clusterMarker_ === null) {
+        clusterMarker_ = new ClusterMarker_(center_, this.getTotalMarkers(), markerClusterer_.getStyles_(), markerClusterer_.getGridSize_());
+        map_.addOverlay(clusterMarker_);
+      } else {
+        if (clusterMarker_.isHidden()) {
+          clusterMarker_.show();
+        }
+        clusterMarker_.redraw(true);
+      }
+    }
+  };
+
+  /**
+   * Remove all the markers from this cluster.
+   */
+  this.clearMarkers = function () {
+    if (clusterMarker_ !== null) {
+      map_.removeOverlay(clusterMarker_);
+    }
+    for (var i = 0; i < markers_.length; ++i) {
+      if (markers_[i].isAdded) {
+        map_.removeOverlay(markers_[i].marker);
+      }
+    }
+    markers_ = [];
+  };
+
+  /**
+   * Get number of markers.
+   * @return {Number}
+   */
+  this.getTotalMarkers = function () {
+    return markers_.length;
+  };
+}
+
+/**
+ * ClusterMarker_ creates a marker that shows the number of markers that
+ * a cluster contains.
+ *
+ * @constructor
+ * @private
+ * @param {GLatLng} latlng Marker's lat and lng.
+ * @param {Number} count Number to show.
+ * @param {Array of Object} styles The image list to be showed:
+ *   {String} url Image url.
+ *   {Number} height Image height.
+ *   {Number} width Image width.
+ *   {Array of Number} anchor Text anchor of image left and top.
+ *   {String} textColor text color.
+ * @param {Number} padding Padding of marker center.
+ */
+function ClusterMarker_(latlng, count, styles, padding) {
+  var index = 0;
+  var dv = count;
+  while (dv !== 0) {
+    dv = parseInt(dv / 10, 10);
+    index ++;
+  }
+
+  if (styles.length < index) {
+    index = styles.length;
+  }
+  this.url_ = styles[index - 1].url;
+  this.height_ = styles[index - 1].height;
+  this.width_ = styles[index - 1].width;
+  this.textColor_ = styles[index - 1].opt_textColor;
+  this.anchor_ = styles[index - 1].opt_anchor;
+  this.latlng_ = latlng;
+  this.index_ = index;
+  this.styles_ = styles;
+  this.text_ = count;
+  this.padding_ = padding;
+}
+
+ClusterMarker_.prototype = new GOverlay();
+
+/**
+ * Initialize cluster marker.
+ * @private
+ */
+ClusterMarker_.prototype.initialize = function (map) {
+  this.map_ = map;
+  var div = document.createElement("div");
+  var latlng = this.latlng_;
+  var pos = map.fromLatLngToDivPixel(latlng);
+  pos.x -= parseInt(this.width_ / 2, 10);
+  pos.y -= parseInt(this.height_ / 2, 10);
+  var mstyle = "";
+  if (document.all) {
+    mstyle = 'filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale,src="' + this.url_ + '");';
+  } else {
+    mstyle = "background:url(" + this.url_ + ");";
+  }
+  if (typeof this.anchor_ === "object") {
+    if (typeof this.anchor_[0] === "number" && this.anchor_[0] > 0 && this.anchor_[0] < this.height_) {
+      mstyle += 'height:' + (this.height_ - this.anchor_[0]) + 'px;padding-top:' + this.anchor_[0] + 'px;';
+    } else {
+      mstyle += 'height:' + this.height_ + 'px;line-height:' + this.height_ + 'px;';
+    }
+    if (typeof this.anchor_[1] === "number" && this.anchor_[1] > 0 && this.anchor_[1] < this.width_) {
+      mstyle += 'width:' + (this.width_ - this.anchor_[1]) + 'px;padding-left:' + this.anchor_[1] + 'px;';
+    } else {
+      mstyle += 'width:' + this.width_ + 'px;text-align:center;';
+    }
+  } else {
+    mstyle += 'height:' + this.height_ + 'px;line-height:' + this.height_ + 'px;';
+    mstyle += 'width:' + this.width_ + 'px;text-align:center;';
+  }
+  var txtColor = this.textColor_ ? this.textColor_ : 'black';
+
+  div.style.cssText = mstyle + 'cursor:pointer;top:' + pos.y + "px;left:" +
+      pos.x + "px;color:" + txtColor +  ";position:absolute;font-size:11px;" +
+      'font-family:Arial,sans-serif;font-weight:bold';
+  div.innerHTML = this.text_;
+  map.getPane(G_MAP_MAP_PANE).appendChild(div);
+  var padding = this.padding_;
+  GEvent.addDomListener(div, "click", function () {
+    var pos = map.fromLatLngToDivPixel(latlng);
+    var sw = new GPoint(pos.x - padding, pos.y + padding);
+    sw = map.fromDivPixelToLatLng(sw);
+    var ne = new GPoint(pos.x + padding, pos.y - padding);
+    ne = map.fromDivPixelToLatLng(ne);
+    var zoom = map.getBoundsZoomLevel(new GLatLngBounds(sw, ne), map.getSize());
+    map.setCenter(latlng, zoom);
+  });
+  this.div_ = div;
+};
+
+/**
+ * Remove this overlay.
+ * @private
+ */
+ClusterMarker_.prototype.remove = function () {
+  this.div_.parentNode.removeChild(this.div_);
+};
+
+/**
+ * Copy this overlay.
+ * @private
+ */
+ClusterMarker_.prototype.copy = function () {
+  return new ClusterMarker_(this.latlng_, this.index_, this.text_, this.styles_, this.padding_);
+};
+
+/**
+ * Redraw this overlay.
+ * @private
+ */
+ClusterMarker_.prototype.redraw = function (force) {
+  if (!force) {
+    return;
+  }
+  var pos = this.map_.fromLatLngToDivPixel(this.latlng_);
+  pos.x -= parseInt(this.width_ / 2, 10);
+  pos.y -= parseInt(this.height_ / 2, 10);
+  this.div_.style.top =  pos.y + "px";
+  this.div_.style.left = pos.x + "px";
+};
+
+/**
+ * Hide this cluster marker.
+ */
+ClusterMarker_.prototype.hide = function () {
+  this.div_.style.display = "none";
+};
+
+/**
+ * Show this cluster marker.
+ */
+ClusterMarker_.prototype.show = function () {
+  this.div_.style.display = "";
+};
+
+/**
+ * Get whether the cluster marker is hidden.
+ * @return {Boolean}
+ */
+ClusterMarker_.prototype.isHidden = function () {
+  return this.div_.style.display === "none";
+};
