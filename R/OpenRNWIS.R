@@ -25,7 +25,6 @@ OpenRNWIS <- function() {
 
     tkconfigure(tt, cursor="watch")
     tclServiceMode(FALSE)
-    Sys.sleep(1)
 
     dsn <- odbc.dsn[idx + 1]
 
@@ -419,9 +418,8 @@ OpenRNWIS <- function() {
 
   # Main program
 
-  require("RODBC")
-  require("gpclib")
-  require("tcltk")
+  for (i in c("tcltk", "sp", "RODBC", "gpclib"))
+    suppressPackageStartupMessages(require(i, character.only=TRUE))
 
   con <- NULL
   odbc.dsn <- names(odbcDataSources())
@@ -512,7 +510,7 @@ OpenRNWIS <- function() {
 
   tclServiceMode(FALSE)
   tt <- tktoplevel(padx=0, pady=0)
-  tktitle(tt) <- "NWIS Query Builder"
+  tktitle(tt) <- "National Water Information System: R Interface"
 
   # Create menus
 
@@ -532,7 +530,7 @@ OpenRNWIS <- function() {
 
   if (!"RNWIS" %in% .packages()) {
     if ("RSurvey" %in% .packages(all.available=TRUE)) {
-      require("RSurvey")
+      suppressPackageStartupMessages(require("RSurvey"))
 
       tkadd(menu.file, "separator")
       tkadd(menu.file, "command", label="Restore R session",
