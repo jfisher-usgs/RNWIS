@@ -9,8 +9,8 @@ Something
 }
 
 \usage{
-MapSites(data, lat.var, lng.var, site.var, name.var, agency.var, 
-         map.id = NULL)
+MapSites(data, lat.var, lng.var, site.var, name.var,
+         agency.var, type.var, map.id = NULL)
 }
 
 \arguments{
@@ -21,6 +21,7 @@ MapSites(data, lat.var, lng.var, site.var, name.var, agency.var,
 \item{name.var}{character; something.}
 \item{agency.var}{character; something.}
 \item{map.id}{character; something.}
+\item{type.var}{character; something.}
 }
 
 \details{

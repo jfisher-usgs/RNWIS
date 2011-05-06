@@ -1,5 +1,5 @@
 MapSites <- function(data, lat.var, lng.var, site.var, name.var, agency.var,
-                     map.id=NULL) {
+                     type.var, map.id=NULL) {
 
   # Remove records with NA coordinate values
 
@@ -12,7 +12,8 @@ MapSites <- function(data, lat.var, lng.var, site.var, name.var, agency.var,
                 "\"lng\": ", data[, lng.var], ", ",
                 "\"site\": \"", data[, site.var], "\", ",
                 "\"name\": \"", data[, name.var], "\", ",
-                "\"agency\": \"", data[, agency.var], "\"",
+                "\"agency\": \"", data[, agency.var], "\", ",
+                "\"type\": \"", data[, type.var], "\"",
                 "},", sep="")
   n <- length(data)
   data[n] <- substr(data[n], 1, nchar(data[n]) - 1)
@@ -30,16 +31,15 @@ MapSites <- function(data, lat.var, lng.var, site.var, name.var, agency.var,
   f.js <- paste(f, ".js", sep="")
 
   is.pkg <- "package:RNWIS" %in% search()
-  if (is.pkg) {
+  if (is.pkg)
     path <- system.file(package="RNWIS")
-  } else {
+  else
     path <- paste(getwd(), "/inst", sep="")
-  }
 
   obj <- readLines(paste(path, "/MapSites.html", sep=""))
   write(obj, file=f.html, sep="\n")
 
-  obj <- readLines(paste(path, "/markerclusterer.js", sep=""))
+  obj <- readLines(paste(path, "/markerclusterer_packed.js", sep=""))
   write(obj, file=f.js, sep="\n")
 
   con <- file(description=f.json, open="w")

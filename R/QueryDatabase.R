@@ -1,16 +1,21 @@
 QueryDatabase <- function(con, sqtable, sqvars="*",
-                      site.no.var=NULL, site.no=NULL,
-                      site.tp.cd.var=NULL, site.tp.cd=NULL,
-                      lat.var=NULL, lat.lim=c(NA, NA),
-                      lng.var=NULL, lng.lim=c(NA, NA),
-                      alt.var=NULL, alt.lim=c(NA, NA),
-                      d.t.var=NULL, d.t.lim=c(NA, NA)) {
+                          site.no.var=NULL, site.no=NULL,
+                          site.tp.cd.var=NULL, site.tp.cd=NULL,
+                          lat.var=NULL, lat.lim=c(NA, NA),
+                          lng.var=NULL, lng.lim=c(NA, NA),
+                          alt.var=NULL, alt.lim=c(NA, NA),
+                          d.t.var=NULL, d.t.lim=c(NA, NA)) {
+
+  # Additional functions (subroutines)
+
+  # Trim leading and trailing white space
 
   trim <- function(x) {
-      sub("^[[:space:]]*(.*?)[[:space:]]*$", "\\1", x, perl=TRUE)
+    sub("^[[:space:]]*(.*?)[[:space:]]*$", "\\1", x, perl=TRUE)
   }
 
-  # Open connection to database
+
+  # Main program
 
   if (!inherits(con, "RODBC")) {
     require("RODBC")
@@ -18,10 +23,9 @@ QueryDatabase <- function(con, sqtable, sqvars="*",
     on.exit(close(con))
   }
 
-  # Construct query
+  # Build query
 
   vars <- paste(sqvars, collapse=", ")
-
   cond <- c()
 
   if (!is.null(site.tp.cd.var)) {
@@ -79,7 +83,6 @@ QueryDatabase <- function(con, sqtable, sqvars="*",
 
   # Query database
 
-  print(query)
   d <- sqlQuery(con, query, stringsAsFactors=FALSE)
 
   # Remove leading and trailing white spaces

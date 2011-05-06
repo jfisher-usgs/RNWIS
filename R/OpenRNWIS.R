@@ -11,7 +11,6 @@ OpenRNWIS <- function() {
       return()
     if (!is.null(con))
       close(con)
-
     tclvalue(tt.done.var) <- 1
     tkdestroy(tt)
     tclServiceMode(TRUE)
@@ -23,27 +22,29 @@ OpenRNWIS <- function() {
     idx  <- as.integer(tcl(frame1.box.1.2, "current"))
     if (idx < 0)
       return()
+
+    tkfocus(frame1.box.1.2)
+    tkconfigure(tt, cursor="watch")
+    tclServiceMode(FALSE)
+
     dsn <- odbc.dsn[idx + 1]
 
     if (!is.null(con))
       close(con)
 
-    tkconfigure(tt, cursor="watch")
-    tclServiceMode(FALSE)
-
     con <<- odbcConnect(dsn, uid="", pwd="")
 
-    site.variables <<- NULL
-    data.variables <<- NULL
-    retr.variables <<- NULL
+    site.vars <<- NULL
+    data.vars <<- NULL
+    retr.vars <<- NULL
 
     tables <- sqlTables(con, errors=FALSE, as.is=TRUE)[, "TABLE_NAME"]
 
     if (site.table %in% tables) {
       tkconfigure(frame1.but.1.3, state="normal")
-      site.variables <<- sqlColumns(con, sqtable=site.table)[, "COLUMN_NAME"]
-      for (i in seq(along=site.variables))
-        tcl("lappend", site.var, site.variables[i])
+      site.vars <<- sqlColumns(con, sqtable=site.table)[, "COLUMN_NAME"]
+      for (i in seq(along=site.vars))
+        tcl("lappend", site.var, site.vars[i])
     } else {
       tcl(frame1.box.1.2, "current", 0)
       tkconfigure(frame1.but.1.3, state="disabled")
@@ -113,9 +114,9 @@ OpenRNWIS <- function() {
     tkselection.clear(frame4.lst.2.3, 0, "end")
 
     for (i in ids) {
-      if (!i %in% retr.variables) {
+      if (!i %in% retr.vars) {
         tcl("lappend", retr.var, i)
-        retr.variables <<- c(retr.variables, i)
+        retr.vars <<- c(retr.vars, i)
       }
     }
   }
@@ -129,7 +130,7 @@ OpenRNWIS <- function() {
     tkselection.clear(frame4.lst.2.6, 0, "end")
     for (i in idxs) {
       id <- as.character(tkget(frame4.lst.2.6, i, i))
-      retr.variables <<- retr.variables[!retr.variables %in% id]
+      retr.vars <<- retr.vars[!retr.vars %in% id]
       tclvalue(retr.var) <- tcl("lreplace", tclvalue(retr.var), i, i)
     }
   }
@@ -140,27 +141,28 @@ OpenRNWIS <- function() {
     if (is.null(con))
       return()
 
-    tbl <- data.tables[[as.character(tclvalue(data.type.var))]]
-    cols <- sqlColumns(con, sqtable=tbl)[, c("COLUMN_NAME", "TYPE_NAME")]
-    cols <- cols[!cols[, 1] %in% site.variables, ]
-    data.variables <<- cols[, 1]
-    data.types <- cols[, 2]
+    data.table <- data.tables[[as.character(tclvalue(data.type.var))]]
+    sqcols <- sqlColumns(con, sqtable=data.table)[, c("COLUMN_NAME",
+                                                      "TYPE_NAME")]
+    sqcols <- sqcols[!sqcols[, 1] %in% site.vars, ]
+    data.vars <<- sqcols[, 1]
+    data.types <- sqcols[, 2]
 
-    if (!is.null(retr.variables)) {
-      is.var <- retr.variables %in% c(site.variables, data.variables)
-      retr.variables <<- retr.variables[is.var]
+    if (!is.null(retr.vars)) {
+      is.var <- retr.vars %in% c(site.vars, data.vars)
+      retr.vars <<- retr.vars[is.var]
       tcl("lset", retr.var, "")
-      for (i in seq(along=retr.variables))
-        tcl("lappend", retr.var, retr.variables[i])
+      for (i in seq(along=retr.vars))
+        tcl("lappend", retr.var, retr.vars[i])
     }
 
     tcl("lset", data.var, "")
-    for (i in seq(along=data.variables))
-      tcl("lappend", data.var, data.variables[i])
+    for (i in seq(along=data.vars))
+      tcl("lappend", data.var, data.vars[i])
 
-    dt.variables <- data.variables[data.types == "DATE"]
-    if (length(dt.variables) > 0) {
-      tkconfigure(frame6.box.1.2, values=dt.variables)
+    dt.vars <- data.vars[data.types == "DATE"]
+    if (length(dt.vars) > 0) {
+      tkconfigure(frame6.box.1.2, values=dt.vars)
       tcl(frame6.box.1.2, "current", 0)
     }
   }
@@ -172,7 +174,7 @@ OpenRNWIS <- function() {
     if (length(sel.idxs) == 0)
       return()
 
-    n <- length(retr.variables)
+    n <- length(retr.vars)
     idxs <- 1:n
 
     if (type == "up") {
@@ -189,11 +191,11 @@ OpenRNWIS <- function() {
       }
     }
 
-    retr.variables <<- retr.variables[idxs]
+    retr.vars <<- retr.vars[idxs]
 
     for (i in 1:n)
       tclvalue(retr.var) <- tcl("lreplace", tclvalue(retr.var),
-                                i - 1, i - 1, retr.variables[i])
+                                i - 1, i - 1, retr.vars[i])
     tkselection.clear(lst, 0, "end")
     for (i in which(idxs %in% sel.idxs))
       tkselection.set(lst, i - 1)
@@ -239,20 +241,20 @@ OpenRNWIS <- function() {
   CallMapSites <- function() {
     if (is.null(con))
       return()
-    sqvars <- c(variables[['latitude']],
-                variables[['longitude']],
-                variables[['altitude']],
-                variables[['site number']],
-                variables[['station name']],
-                variables[['agency code']],
-                variables[['site type code']])
+    sqvars <- c(vars[['latitude']],
+                vars[['longitude']],
+                vars[['altitude']],
+                vars[['site number']],
+                vars[['station name']],
+                vars[['agency code']],
+                vars[['site type code']])
 
+    info <- GetSiteInfo(sqvars)
 
-
-    d <- GetSiteData(sqvars)
-
-    if (!is.null(d))
-      MapSites(d, sqvars[1], sqvars[2], sqvars[4], sqvars[5], sqvars[6])
+    MapSites(info$data,
+             vars[['latitude']], vars[['longitude']],
+             vars[['site number']], vars[['station name']],
+             vars[['agency code']], vars[['site type code']])
 }
 
   # Retrieve data
@@ -288,22 +290,22 @@ OpenRNWIS <- function() {
     as.character(int.split[!is.na(int.split)])
   }
 
-  # Retrieve site data
+  # Retrieve site data and polygon domain
 
-  GetSiteData <- function(sqvars) {
+  GetSiteInfo <- function(sqvars) {
 
     opt <- as.integer(tclvalue(opt.var))
-    site.nums <- NULL
+    site.no <- NULL
 
     # Site numbers
     if (opt == 1L | opt == 2L) {
 
       # Get site number(s) in entry box
       if (opt == 1L) {
-        site.nums <- as.character(tclvalue(site.nums.var))
-        if (site.nums == "")
+        site.no <- as.character(tclvalue(site.no.var))
+        if (site.no == "")
           return()
-        site.nums <- ProcessSiteStrings(site.nums)
+        site.no <- ProcessSiteStrings(site.no)
 
       # Read site numbers in file
       } else {
@@ -312,15 +314,15 @@ OpenRNWIS <- function() {
           return()
         scanned.strings <- scan(file=site.file, what="character",
                                 comment.char="#")
-        site.nums <- ProcessSiteStrings(paste(scanned.strings, collapse=","))
+        site.no <- ProcessSiteStrings(paste(scanned.strings, collapse=","))
       }
-      if (length(site.nums) == 0)
+      if (length(site.no) == 0L)
         return()
 
       # Query database
       sel <- QueryDatabase(con=con, sqtable=site.table, sqvars=sqvars,
-                           site.no.var=variables[['site number']],
-                           site.no=site.nums)
+                           site.no.var=vars[['site number']],
+                           site.no=site.no)
 
     # Site attributes
     } else if (opt == 3L) {
@@ -368,21 +370,20 @@ OpenRNWIS <- function() {
       sel <- QueryDatabase(con=con,
                            sqtable=site.table,
                            sqvars=sqvars,
-                           site.tp.cd.var=variables[['site type code']],
+                           site.tp.cd.var=vars[['site type code']],
                            site.tp.cd=site.type.codes,
-                           lng.var=variables[['longitude']],
+                           lng.var=vars[['longitude']],
                            lng.lim=c(lng.min, lng.max),
-                           lat.var=variables[['latitude']],
+                           lat.var=vars[['latitude']],
                            lat.lim=c(lat.min, lat.max),
-                           alt.var=variables[['altitude']],
+                           alt.var=vars[['altitude']],
                            alt.lim=c(alt.min, alt.max))
 
       # Sites in polygon domain
       if (!is.null(poly.obj)) {
-        x <- sel[, variables[['longitude']]]
-        y <- sel[, variables[['latitude']]]
+        x <- sel[, vars[['longitude']]]
+        y <- sel[, vars[['latitude']]]
         poly.pts <- get.pts(poly.obj)
-
         for (i in seq(along=poly.pts)) {
           poly.x <- poly.pts[[i]]$x
           poly.y <- poly.pts[[i]]$y
@@ -396,9 +397,11 @@ OpenRNWIS <- function() {
       }
     }
 
-    if (!is.null(sel) && !inherits(sel, "data.frame"))
+    # Return selection
+    if (inherits(sel, "data.frame") && nrow(sel) > 0)
+      return(list(data=sel, polygon=poly.obj))
+    else
       stop(sel)
-    sel
   }
 
 
@@ -423,9 +426,9 @@ OpenRNWIS <- function() {
   con <- NULL
   odbc.dsn <- names(odbcDataSources())
 
-  site.variables <- NULL
-  data.variables <- NULL
-  retr.variables <- NULL
+  site.vars <- NULL
+  data.vars <- NULL
+  retr.vars <- NULL
 
   initialdir <- NULL
 
@@ -440,26 +443,26 @@ OpenRNWIS <- function() {
                       'Casing construction'   = "gw_csng_01",
                       'Openings construction' = "gw_open_01")
 
-  variables <- list('latitude'       = "dec_lat_va",
-                    'longitude'      = "dec_long_va",
-                    'altitude'       = "alt_va",
-                    'site number'    = "site_no",
-                    'station name'   = "station_nm",
-                    'agency code'    = "agency_cd",
-                    'site type code' = "site_tp_cd")
+  vars <- list('latitude'       = "dec_lat_va",
+               'longitude'      = "dec_long_va",
+               'altitude'       = "alt_va",
+               'site number'    = "site_no",
+               'station name'   = "station_nm",
+               'agency code'    = "agency_cd",
+               'site type code' = "site_tp_cd")
 
   site.types <- list('Well'             = c("GW", "GW-CR", "GW-EX", "GW-HZ",
                                             "GW-IW", "GW-MW", "GW-TH"),
                      'Other subsurface' = c("SB", "SB-CV", "SB-GWD", "SB-TSM",
                                             "SB-UZ"),
                      'Stream'           = c("ST", "ST-CA", "ST-DCH", "ST-TS"),
-                     'Lake'             = c("LK"),
-                     'Spring'           = c("SP"))
+                     'Lake'             = "LK",
+                     'Spring'           = "SP")
 
   # Assign variables linked to Tk widgets
 
   opt.var <- tclVar(1)
-  site.nums.var <- tclVar()
+  site.no.var <- tclVar()
   site.file.var <- tclVar()
   poly.file.var <- tclVar()
   site.type.var <- tclVar()
@@ -598,7 +601,7 @@ OpenRNWIS <- function() {
   frame2.rad.5.1 <- ttkradiobutton(frame2, variable=opt.var, value=3,
                                    command=SetState, text='Site attributes:')
 
-  frame2.ent.2.1 <- ttkentry(frame2, width=25, textvariable=site.nums.var)
+  frame2.ent.2.1 <- ttkentry(frame2, width=25, textvariable=site.no.var)
   frame2.ent.4.1 <- ttkentry(frame2, width=25, textvariable=site.file.var)
 
   frame2.but.4.2 <- ttkbutton(frame2, width=8, text="Browse",
@@ -733,10 +736,10 @@ OpenRNWIS <- function() {
   frame5 <- ttkframe(frame4, relief="flat")
   frame5.but.1.1 <- ttkbutton(frame5, width=2, image=arrow.up,
                               command=function() Arrange("up",
-                                                        frame4.lst.2.6))
+                                                         frame4.lst.2.6))
   frame5.but.1.2 <- ttkbutton(frame5, width=2, image=arrow.down,
                               command=function() Arrange("down",
-                                                        frame4.lst.2.6))
+                                                         frame4.lst.2.6))
 
   tkgrid(frame4.lab.1.1, "x", frame4.lab.1.3, "x", "x", frame4.lab.1.6, "x",
          pady=c(0, 1))
