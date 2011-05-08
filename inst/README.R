@@ -232,3 +232,61 @@ MapSites(d, "dec_lat_va", "dec_long_va", "site_no", "station_nm", "agency_cd")
 RestoreSession()
 ConfigConnection()
 
+
+
+
+
+####################
+
+
+# Place in MapSites
+
+# Is the polygons winding direction clockwise
+ClockWise <- function(x, y) {
+  num <- length(x)
+  if (num < 3)
+    return()
+  count <- 0
+  m <- c(2:num, 1)
+  n <- c(3:num, 1:2)
+  for (i in 1:num) {
+    j <- m[i]
+    k <- n[i]
+    z <- (x[j] - x[i]) * (y[k] - y[j]) - (y[j] - y[i]) * (x[k] - x[j])
+    if (z < 0) {
+      count <- count - 1
+    } else if (z > 0) {
+      count <- count + 1
+    }
+  }
+  if (count > 0) {
+    return(FALSE)
+  } else if (count < 0) {
+    return(TRUE)
+  } else {
+    stop("incomputable winding")
+  }
+}
+
+
+
+
+
+require(gpclib)
+poly.file <- "C:/Documents and Settings/jfisher/Desktop/TestMap/ExamplePolygon.ply"
+poly.obj <- read.polyfile(poly.file, nohole=FALSE)
+poly.pts <- get.pts(poly.obj)
+
+s <- "\"polygons\": ["
+
+for (i in seq(along=poly.pts)) {
+  s <- c(s, "[")
+  lng <- poly.pts[[i]]$x
+  lat <- poly.pts[[i]]$y
+  is.clockwise <- ClockWise(lng, lat)
+  is.hole <- poly.pts[[i]]$hole
+  if ((is.hole & is.clockwise) | (!is.hole & !is.clockwise)) {
+    lng <- rev(lng)
+    lat <- rev(lat)
+  }
+
