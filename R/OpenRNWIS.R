@@ -143,7 +143,6 @@ OpenRNWIS <- function() {
     data.table <- data.tables[[as.character(tclvalue(data.type.var))]]
     sqcols <- sqlColumns(con, sqtable=data.table)[, c("COLUMN_NAME",
                                                       "TYPE_NAME")]
-    sqcols <- sqcols[!sqcols[, 1] %in% site.vars, ]
     data.vars <<- sqcols[, 1]
     data.types <- sqcols[, 2]
 
@@ -247,13 +246,10 @@ OpenRNWIS <- function() {
                 vars[['station name']],
                 vars[['agency code']],
                 vars[['site type code']])
-
-    info <- GetSiteInfo(sqvars)
-
-    MapSites(info$data,
-             vars[['latitude']], vars[['longitude']],
-             vars[['site number']], vars[['station name']],
-             vars[['agency code']], vars[['site type code']])
+    data <- GetSiteInfo(sqvars)
+    names(data$sites) <- c("lat", "lng", "alt", "site", "name",
+                           "agency", "type")
+    MapSites(data$sites, data$polygons)
 }
 
   # Retrieve data
@@ -262,14 +258,7 @@ OpenRNWIS <- function() {
     if (is.null(con))
       return()
 
-
-
-
-
-
-
-
-
+    print("notyet")
   }
 
 
@@ -380,10 +369,10 @@ OpenRNWIS <- function() {
 
       # Sites in polygon domain
       if (!is.null(poly.obj)) {
-        x <- sel[, vars[['longitude']]]
-        y <- sel[, vars[['latitude']]]
         poly.pts <- get.pts(poly.obj)
         for (i in seq(along=poly.pts)) {
+          x <- sel[, vars[['longitude']]]
+          y <- sel[, vars[['latitude']]]
           poly.x <- poly.pts[[i]]$x
           poly.y <- poly.pts[[i]]$y
           is.inside <- point.in.polygon(point.x=x, point.y=y,
@@ -393,12 +382,13 @@ OpenRNWIS <- function() {
           else
             sel <- sel[is.inside != 0, ]
         }
+        sel <- sel[rowSums(is.na(sel)) == 0, ]
       }
     }
 
     # Return selection
     if (inherits(sel, "data.frame") && nrow(sel) > 0)
-      return(list(data=sel, polygon=poly.obj))
+      return(list(sites=sel, polygons=poly.obj))
     else
       stop(sel)
   }

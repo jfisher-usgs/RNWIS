@@ -1,34 +1,66 @@
-MapSites <- function(data, lat.var, lng.var, site.var, name.var, agency.var,
-                     type.var, map.id=NULL) {
+MapSites <- function(sites, polygons=NULL, map.id=NULL) {
 
-  # Remove records with NA coordinate values
+  # Additional functions (subroutines)
 
-  data <- data[!is.na(data[, lng.var]) & !is.na(data[, lat.var]), ]
+  # Get JSON table
 
-  # Consolidate data
+  GetJSONTable <- function(d) {
+    modes <- sapply(1:ncol(d), function(i) mode(d[, i]))
+    idxs <- which(modes == "character")
+    for (i in seq(along=idxs))
+      d[, idxs[i]] <- paste("\"", d[, idxs[i]], "\"", sep="")
+    for (i in names(d))
+      d[, i] <- paste("\"", i, "\": ", d[, i], sep="")
+    s <- apply(d, 1, function(i) paste(i, collapse=", "))
+    s <- paste("{", s, "}", sep="")
+    s <- paste(s, collapse=",\n")
+    s
+  }
 
-  data <- paste("{",
-                "\"lat\": ", data[, lat.var], ", ",
-                "\"lng\": ", data[, lng.var], ", ",
-                "\"site\": \"", data[, site.var], "\", ",
-                "\"name\": \"", data[, name.var], "\", ",
-                "\"agency\": \"", data[, agency.var], "\", ",
-                "\"type\": \"", data[, type.var], "\"",
-                "},", sep="")
-  n <- length(data)
-  data[n] <- substr(data[n], 1, nchar(data[n]) - 1)
+  # Is the polygons winding direction clockwise
+
+  ClockWise <- function(x, y) {
+    num <- length(x)
+    if (num < 3)
+      return()
+    count <- 0
+    m <- c(2:num, 1)
+    n <- c(3:num, 1:2)
+    for (i in 1:num) {
+      j <- m[i]
+      k <- n[i]
+      z <- (x[j] - x[i]) * (y[k] - y[j]) - (y[j] - y[i]) * (x[k] - x[j])
+      if (z < 0) {
+        count <- count - 1
+      } else if (z > 0) {
+        count <- count + 1
+      }
+    }
+    if (count > 0) {
+      return(FALSE)
+    } else if (count < 0) {
+      return(TRUE)
+    } else {
+      stop("incomputable winding")
+    }
+  }
+
+
+  # Main program
 
   # Map ID
 
   if (is.null(map.id))
     map.id <- "MapID"
 
-  # Write temporary files
+  # Determine file names
 
   f <- tempfile(pattern=map.id, tmpdir=tempdir())
   f.html <- paste(f, ".html", sep="")
   f.json <- paste(f, ".json", sep="")
   f.js <- paste(f, ".js", sep="")
+
+  # Determine path to temporary directory
 
   is.pkg <- "package:RNWIS" %in% search()
   if (is.pkg)
@@ -36,38 +68,51 @@ MapSites <- function(data, lat.var, lng.var, site.var, name.var, agency.var,
   else
     path <- paste(getwd(), "/inst", sep="")
 
+  # Read and write html and js files
+
   obj <- readLines(paste(path, "/MapSites.html", sep=""))
   write(obj, file=f.html, sep="\n")
 
   obj <- readLines(paste(path, "/markerclusterer_packed.js", sep=""))
   write(obj, file=f.js, sep="\n")
 
+  # Build JSON character string
+
   con <- file(description=f.json, open="w")
 
-  # Beginning of html
+  is.sites <- !is.null(sites)
+  is.polygons <- !is.null(polygons) && inherits(polygons, "gpc.poly")
 
   s <- "var data = {"
-  s <- c(s, paste("\"count\": ", length(data), ",", sep=""))
-  s <- c(s, "\"sites\": [")
+  if (is.sites) {
+    sites <- sites[!is.na(sites[, "lng"]) & !is.na(sites[, "lat"]), ]
+    s <- c(s, "\"sites\": [", GetJSONTable(sites))
+    s <- c(s, if (is.polygons) "]," else "]")
+  }
+  if (is.polygons) {
+    poly.pts <- get.pts(polygons)
+    n <- length(poly.pts)
+    s <- c(s, "\"polygons\": [")
+    for (i in seq(along=poly.pts)) {
+      lng <- poly.pts[[i]]$x
+      lat <- poly.pts[[i]]$y
+      is.clockwise <- ClockWise(lng, lat)
+      is.hole <- poly.pts[[i]]$hole
+      if ((is.hole & is.clockwise) | (!is.hole & !is.clockwise)) {
+        lng <- rev(lng)
+        lat <- rev(lat)
+      }
+      d <- as.data.frame(cbind(lat=lat, lng=lng))
+      s <- c(s, "[", GetJSONTable(d))
+      s <- c(s, if (i < n) "]," else "]")
+    }
+    s <- c(s, "]")
+  }
+  s <- c(s, "}")
+
+  # Write JSON file
+
   cat(s, file=con, sep="\n", append=FALSE)
-
-  # Site information
-
-  increment <- 1000
-  imin <- seq(1, n, by=increment)
-  imax <- imin + increment - 1
-  if (imax[length(imax)] > n)
-    imax[length(imax)] <- n
-  apply(cbind(imin, imax), 1,
-        function(i) cat(data[i[1]:i[2]], file=con, sep="\n", append=TRUE))
-
-  # Ending of html
-
-  s <- "]}\n"
-  cat(s, file=con, append=TRUE)
-
-  # Close file connection
-
   close(con)
 
   # Open html file in web browser
