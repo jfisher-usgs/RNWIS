@@ -9,19 +9,13 @@ Something
 }
 
 \usage{
-MapSites(data, lat.var, lng.var, site.var, name.var,
-         agency.var, type.var, map.id = NULL)
+MapSites(sites, polygons = NULL, map.id = NULL)
 }
 
 \arguments{
-\item{data}{data.frame; something.}
-\item{lat.var}{character; something.}
-\item{lng.var}{character; something.}
-\item{site.var}{character; something.}
-\item{name.var}{character; something.}
-\item{agency.var}{character; something.}
+\item{sites}{data.frame; something.}
+\item{polygons}{list; something.}
 \item{map.id}{character; something.}
-\item{type.var}{character; something.}
 }
 
 \details{
