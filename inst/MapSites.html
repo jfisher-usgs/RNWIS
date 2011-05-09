@@ -45,7 +45,6 @@
 
         var bounds = new google.maps.LatLngBounds();
 
-
         if (typeof data.sites === 'object') {
           var markers = [];
 
@@ -75,7 +74,8 @@
                              "<br />" + "<b>Site Name:</b> " + dataSites.name +
                              "<br />" + "<a target='_blank' href='" + url +
                              "'>Access Data</a></div>"
-            addMarker(dataSites.lat, dataSites.lng, dataSites.site, htmlString);
+            addMarker(dataSites.lat, dataSites.lng, dataSites.site + '',
+                      htmlString);
           }
           var markerCluster = new MarkerClusterer(map, markers, mcOptions);
         }
