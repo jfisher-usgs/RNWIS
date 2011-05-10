@@ -26,11 +26,10 @@ OpenRNWIS <- function() {
     tkconfigure(tt, cursor="watch")
     tclServiceMode(FALSE)
 
-    dsn <- odbc.dsn[idx + 1]
-
     if (!is.null(con))
       close(con)
 
+    dsn <- as.character(tclvalue(dsn.var))
     con <<- odbcConnect(dsn, uid="", pwd="")
 
     site.vars <<- NULL
@@ -239,16 +238,10 @@ OpenRNWIS <- function() {
   CallMapSites <- function() {
     if (is.null(con))
       return()
-    sqvars <- c(vars[['latitude']],
-                vars[['longitude']],
-                vars[['altitude']],
-                vars[['site number']],
-                vars[['station name']],
-                vars[['agency code']],
-                vars[['site type code']])
+    sqvars <- c(vars[['lat']], vars[['lng']], vars[['alt']], vars[['site']],
+                vars[['name']], vars[['agency']], vars[['type']])
     data <- GetSiteInfo(sqvars)
-    names(data$sites) <- c("lat", "lng", "alt", "site", "name",
-                           "agency", "type")
+    names(data$sites) <- names(vars)
     MapSites(data$sites, data$polygons)
 }
 
@@ -309,7 +302,7 @@ OpenRNWIS <- function() {
 
       # Query database
       sel <- QueryDatabase(con=con, sqtable=site.table, sqvars=sqvars,
-                           site.no.var=vars[['site number']],
+                           site.no.var=vars[['site']],
                            site.no=site.no)
 
     # Site attributes
@@ -358,21 +351,21 @@ OpenRNWIS <- function() {
       sel <- QueryDatabase(con=con,
                            sqtable=site.table,
                            sqvars=sqvars,
-                           site.tp.cd.var=vars[['site type code']],
+                           site.tp.cd.var=vars[['type']],
                            site.tp.cd=site.type.codes,
-                           lng.var=vars[['longitude']],
+                           lng.var=vars[['lng']],
                            lng.lim=c(lng.min, lng.max),
-                           lat.var=vars[['latitude']],
+                           lat.var=vars[['lat']],
                            lat.lim=c(lat.min, lat.max),
-                           alt.var=vars[['altitude']],
+                           alt.var=vars[['alt']],
                            alt.lim=c(alt.min, alt.max))
 
       # Sites in polygon domain
       if (!is.null(poly.obj)) {
         poly.pts <- get.pts(poly.obj)
         for (i in seq(along=poly.pts)) {
-          x <- sel[, vars[['longitude']]]
-          y <- sel[, vars[['latitude']]]
+          x <- sel[, vars[['lng']]]
+          y <- sel[, vars[['lat']]]
           poly.x <- poly.pts[[i]]$x
           poly.y <- poly.pts[[i]]$y
           is.inside <- point.in.polygon(point.x=x, point.y=y,
@@ -394,61 +387,47 @@ OpenRNWIS <- function() {
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
   # Main program
 
   for (i in c("tcltk", "sp", "RODBC", "gpclib"))
     suppressPackageStartupMessages(require(i, character.only=TRUE))
 
-  con <- NULL
-  odbc.dsn <- names(odbcDataSources())
-
-  site.vars <- NULL
-  data.vars <- NULL
-  retr.vars <- NULL
-
-  initialdir <- NULL
-
-  fg <- "#414042"
-
   # Variables specific to NWIS
 
   site.table <- "sitefile_01"
 
-  data.tables <- list('Groundwater levels'    = "gw_lev_01",
-                      'Hole construction'     = "gw_hole_01",
-                      'Casing construction'   = "gw_csng_01",
+  data.tables <- list('Groundwater levels' = "gw_lev_01",
+                      'Hole construction' = "gw_hole_01",
+                      'Casing construction' = "gw_csng_01",
                       'Openings construction' = "gw_open_01")
 
-  vars <- list('latitude'       = "dec_lat_va",
-               'longitude'      = "dec_long_va",
-               'altitude'       = "alt_va",
-               'site number'    = "site_no",
-               'station name'   = "station_nm",
-               'agency code'    = "agency_cd",
-               'site type code' = "site_tp_cd")
-
-  site.types <- list('Well'             = c("GW", "GW-CR", "GW-EX", "GW-HZ",
-                                            "GW-IW", "GW-MW", "GW-TH"),
+  site.types <- list('Well' = c("GW", "GW-CR", "GW-EX", "GW-HZ", "GW-IW",
+                                "GW-MW", "GW-TH"),
                      'Other subsurface' = c("SB", "SB-CV", "SB-GWD", "SB-TSM",
                                             "SB-UZ"),
-                     'Stream'           = c("ST", "ST-CA", "ST-DCH", "ST-TS"),
-                     'Lake'             = "LK",
-                     'Spring'           = "SP")
+                     'Stream' = c("ST", "ST-CA", "ST-DCH", "ST-TS"),
+                     'Lake' = "LK",
+                     'Spring' = "SP")
+
+  vars <- list('lat' = "dec_lat_va",
+               'lng' = "dec_long_va",
+               'alt' = "alt_va",
+               'site' = "site_no",
+               'name' = "station_nm",
+               'agency' = "agency_cd",
+               'type' = "site_tp_cd")
+
+  # Initialize variables
+
+  con <- NULL
+  site.vars <- NULL
+  data.vars <- NULL
+  retr.vars <- NULL
+  initialdir <- NULL
 
   # Assign variables linked to Tk widgets
 
+  dsn.var <- tclVar()
   opt.var <- tclVar(1)
   site.no.var <- tclVar()
   site.file.var <- tclVar()
@@ -521,7 +500,6 @@ OpenRNWIS <- function() {
   if (!"RNWIS" %in% .packages()) {
     if ("RSurvey" %in% .packages(all.available=TRUE)) {
       suppressPackageStartupMessages(require("RSurvey"))
-
       tkadd(menu.file, "separator")
       tkadd(menu.file, "command", label="Restore R session",
             command=function() {
@@ -554,11 +532,11 @@ OpenRNWIS <- function() {
 
   # Frame 1, ODBC source name selection
 
-  txt <- "Select a registerd ODBC database"
-  frame1 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3, text=txt)
+  frame1 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3,
+                          text="Select a registerd ODBC database")
 
   frame1.lab.1.1 <- ttklabel(frame1, text="NWIS source name")
-  frame1.box.1.2 <- ttkcombobox(frame1, state="readonly")
+  frame1.box.1.2 <- ttkcombobox(frame1, textvariable=dsn.var, state="readonly")
   frame1.but.1.3 <- ttkbutton(frame1, width=8, text="Explore",
                               command=function() ExploreDatabase(con, tt))
 
@@ -572,7 +550,7 @@ OpenRNWIS <- function() {
 
   tkbind(frame1.box.1.2, "<<ComboboxSelected>>", OpenConnection)
 
-  tkconfigure(frame1.box.1.2, value=odbc.dsn)
+  tkconfigure(frame1.box.1.2, value=names(odbcDataSources()))
 
   tkconfigure(frame1.but.1.3, state="disabled")
 
@@ -619,10 +597,10 @@ OpenRNWIS <- function() {
                               highlightthickness=0)
   tkselection.set(frame3.lst.2.6, 0)
 
-  frame3.lab.4.1 <- ttklabel(frame3, foreground=fg, text="e.g.")
-  frame3.lab.4.2 <- ttklabel(frame3, foreground=fg, text="-112.980728")
-  frame3.lab.4.3 <- ttklabel(frame3, foreground=fg, text="43.510023")
-  frame3.lab.4.4 <- ttklabel(frame3, foreground=fg, text="4382.3")
+  frame3.lab.4.1 <- ttklabel(frame3, foreground="#414042", text="e.g.")
+  frame3.lab.4.2 <- ttklabel(frame3, foreground="#414042", text="-112.980728")
+  frame3.lab.4.3 <- ttklabel(frame3, foreground="#414042", text="43.510023")
+  frame3.lab.4.4 <- ttklabel(frame3, foreground="#414042", text="4382.3")
 
   frame3.lab.5.1 <- ttklabel(frame3, text="Polygon domain")
   frame3.ent.5.2 <- ttkentry(frame3, width=25, textvariable=poly.file.var)
@@ -678,8 +656,8 @@ OpenRNWIS <- function() {
 
   # Frame 4 and 3, select variables
 
-  txt <- "Add variables to retrieval list"
-  frame4 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3, text=txt)
+  frame4 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3,
+                          text="Add variables to retrieval list")
 
   frame4.lab.1.1 <- ttklabel(frame4, text="Site variables")
   frame4.lab.1.3 <- ttklabel(frame4, text="Data variables")
@@ -771,12 +749,13 @@ OpenRNWIS <- function() {
   txt <- "Specify date and time range"
   frame6 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3, text=txt)
 
+
   frame6.lab.1.1 <- ttklabel(frame6, text="Variable")
   frame6.lab.1.3 <- ttklabel(frame6, text="From")
   frame6.lab.2.3 <- ttklabel(frame6, text="To")
-  frame6.lab.1.5 <- ttklabel(frame6, foreground=fg,
+  frame6.lab.1.5 <- ttklabel(frame6, foreground="#414042",
                              text="e.g. 2010-06-27")
-  frame6.lab.2.5 <- ttklabel(frame6, foreground=fg,
+  frame6.lab.2.5 <- ttklabel(frame6, foreground="#414042",
                              text="e.g. 2011-03-13 17:00")
 
   frame6.box.1.2 <- ttkcombobox(frame6, state="readonly", value="", width=15)
@@ -802,11 +781,8 @@ OpenRNWIS <- function() {
   # GUI control
 
   SetState()
-
   tkbind(tt, "<Destroy>", CloseGUI)
   tkfocus(tt)
-
   tclServiceMode(TRUE)
-
   invisible()
 }
