@@ -24,38 +24,55 @@ OpenRNWIS <- function() {
       return()
 
     tkconfigure(tt, cursor="watch")
-    tclServiceMode(FALSE)
 
-    if (!is.null(con))
-      close(con)
-
+    odbcCloseAll()
     dsn <- as.character(tclvalue(dsn.var))
     con <<- odbcConnect(dsn, uid="", pwd="")
+    tkfocus(force=tt)
+    tclServiceMode(FALSE)
 
     site.vars <<- NULL
     data.vars <<- NULL
     retr.vars <<- NULL
 
-    tables <- sqlTables(con, errors=FALSE, as.is=TRUE)[, "TABLE_NAME"]
+    # Clear GUI
+    tcl("lset", site.var, "")
+    tcl("lset", data.var, "")
+    tcl("lset", retr.var, "")
+    tclvalue(data.type.var) <- ""
+    tclvalue(date.time.var) <- ""
+    tkconfigure(frame4.box.4.3, value="")
+    tkconfigure(frame6.box.1.2, value="")
+    tkconfigure(frame1.but.1.3, state="disabled")
 
-    if (site.table %in% tables) {
-      tkconfigure(frame1.but.1.3, state="normal")
-      site.vars <<- sqlColumns(con, sqtable=site.table)[, "COLUMN_NAME"]
-      for (i in seq(along=site.vars))
-        tcl("lappend", site.var, site.vars[i])
+    # Update GUI
+    if (inherits(con, "RODBC") && con > 0) {
+      tables <- sqlTables(con, errors=FALSE, as.is=TRUE)[, "TABLE_NAME"]
+      if (site.table %in% tables) {
+        # Establish table types
+        types <- names(data.tables)[sapply(data.tables, function(i) i)
+                                    %in% tables]
+        tkconfigure(frame4.box.4.3, values=types)
+        tcl(frame4.box.4.3, "current", 0)
+
+        # Update site variables
+        tkconfigure(frame1.but.1.3, state="normal")
+        site.vars <<- sqlColumns(con, sqtable=site.table)[, "COLUMN_NAME"]
+        for (i in seq(along=site.vars))
+          tcl("lappend", site.var, site.vars[i])
+
+        # Update data variables
+        UpdateDataVariables()
+      } else {
+        close(con)
+        con <<- NULL
+      }
     } else {
-      tcl(frame1.box.1.2, "current", 0)
-      tkconfigure(frame1.but.1.3, state="disabled")
-      close(con)
+      con <<- NULL
     }
 
-    tmp <- names(data.tables)[sapply(data.tables, function(i) i) %in% tables]
-    tkconfigure(frame4.box.4.3, values=tmp)
-    tcl(frame4.box.4.3, "current", 0)
-    UpdateDataVariables()
-
-    tclServiceMode(TRUE)
     tkconfigure(tt, cursor="arrow")
+    tclServiceMode(TRUE)
   }
 
   # Convert image bits to the image data string format
@@ -170,10 +187,8 @@ OpenRNWIS <- function() {
     sel.idxs <- as.integer(tkcurselection(lst)) + 1
     if (length(sel.idxs) == 0)
       return()
-
     n <- length(retr.vars)
     idxs <- 1:n
-
     if (type == "up") {
       for (i in sel.idxs) {
         if (i == 1L || idxs[i - 1L] %in% sel.idxs)
@@ -229,7 +244,6 @@ OpenRNWIS <- function() {
       return()
 
     initialdir <<- dirname(f)
-
     tclvalue(obj) <- f
   }
 
@@ -293,7 +307,7 @@ OpenRNWIS <- function() {
         if (file.access(site.file, mode=0) < 0)
           return()
         scanned.strings <- scan(file=site.file, what="character",
-                                comment.char="#")
+                                comment.char="#", quiet=TRUE)
         site.no <- ProcessSiteStrings(paste(scanned.strings, collapse=","))
       }
 
@@ -417,7 +431,7 @@ OpenRNWIS <- function() {
                'agency' = "agency_cd",
                'type' = "site_tp_cd")
 
-  # Initialize variables
+  # Initialize top-level variables
 
   con <- NULL
   site.vars <- NULL
@@ -433,6 +447,7 @@ OpenRNWIS <- function() {
   site.file.var <- tclVar()
   poly.file.var <- tclVar()
   site.type.var <- tclVar()
+  date.time.var <- tclVar()
   for (i in c("All ...", names(site.types)))
     tcl("lappend", site.type.var, i)
 
@@ -758,7 +773,8 @@ OpenRNWIS <- function() {
   frame6.lab.2.5 <- ttklabel(frame6, foreground="#414042",
                              text="e.g. 2011-03-13 17:00")
 
-  frame6.box.1.2 <- ttkcombobox(frame6, state="readonly", value="", width=15)
+  frame6.box.1.2 <- ttkcombobox(frame6, state="readonly", width=15,
+                                textvariable=date.time.var)
 
   frame6.ent.1.4 <- ttkentry(frame6, width=15, textvariable=tmin.var)
   frame6.ent.2.4 <- ttkentry(frame6, width=15, textvariable=tmax.var)
