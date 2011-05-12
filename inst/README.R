@@ -60,6 +60,8 @@ write.table(sel, file=f, sep="\t", quote=FALSE, row.names=FALSE)
 
 
 sel <- sqlQuery(con, "SELECT agency_cd FROM sitefile_01")
+sel <- sqlQuery(con, "SELECT lat_va, long_va, dec_lat_va, dec_long_va FROM sitefile_01 WHERE site_no = \'432714112560701\'")
+
 
 sel <- sqlQuery(con, "SELECT * FROM PARM_ALIAS")
 

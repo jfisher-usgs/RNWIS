@@ -423,8 +423,13 @@ OpenRNWIS <- function() {
                      'Lake' = "LK",
                      'Spring' = "SP")
 
-  vars <- list('lat' = "dec_lat_va",
-               'lng' = "dec_long_va",
+  # NWIS is using the WGS84 datum for the "dec_lat_va" and "dec_long_va"
+  # variables; Google Maps also uses this dataum. NWIS variables
+  # "lat_va" and "long_va" (not called in this program) are either using the
+  # NAD27 or NAD83 datum ("coord_datum_cd").
+
+  vars <- list('lat' = "dec_lat_va", # NWIS using WGS84 datum
+               'lng' = "dec_long_va", # NWIS using WGS84 datum
                'alt' = "alt_va",
                'site' = "site_no",
                'name' = "station_nm",
