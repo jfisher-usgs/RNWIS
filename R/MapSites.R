@@ -5,12 +5,21 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
   # Get JSON table
 
   GetJSONTable <- function(d) {
-    modes <- sapply(1:ncol(d), function(i) mode(d[, i]))
-    idxs <- which(modes == "character")
-    for (i in seq(along=idxs))
-      d[, idxs[i]] <- paste("\"", d[, idxs[i]], "\"", sep="")
-    for (i in names(d))
-      d[, i] <- paste("\"", i, "\": ", d[, i], sep="")
+    idxs <- which(sapply(1:ncol(d), function(i) mode(d[, i])) == "character")
+    col.names <- names(d)
+    for (i in seq(along=col.names)) {
+      na.rows <- is.na(d[, i])
+      if (i %in% idxs) {
+        d[, i] <- paste("\"", col.names[i], "\": \"", d[, i], "\"", sep="")
+      } else {
+        d[, i] <- paste("\"", col.names[i], "\": ", d[, i], sep="")
+        d[na.rows, i] <- paste("\"", col.names[i], "\": \"NA\"", sep="")
+      }
+    }
+
+
+
+
     s <- apply(d, 1, function(i) paste(i, collapse=", "))
     s <- paste("{", s, "}", sep="")
     s <- paste(s, collapse=",\n")
