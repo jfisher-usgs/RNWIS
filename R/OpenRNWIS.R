@@ -428,8 +428,8 @@ OpenRNWIS <- function() {
   # "lat_va" and "long_va" (not called in this program) are either using the
   # NAD27 or NAD83 datum ("coord_datum_cd").
 
-  vars <- list('lat' = "dec_lat_va", # NWIS using WGS84 datum
-               'lng' = "dec_long_va", # NWIS using WGS84 datum
+  vars <- list('lat' = "dec_lat_va",
+               'lng' = "dec_long_va",
                'alt' = "alt_va",
                'site' = "site_no",
                'name' = "station_nm",
