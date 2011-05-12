@@ -323,10 +323,11 @@ OpenRNWIS <- function() {
     } else if (opt == 3L) {
 
       # Spatial limits
-      lng.min <- suppressWarnings(as.numeric(tclvalue(lng.min.var)))
-      lng.max <- suppressWarnings(as.numeric(tclvalue(lng.max.var)))
+
       lat.min <- suppressWarnings(as.numeric(tclvalue(lat.min.var)))
       lat.max <- suppressWarnings(as.numeric(tclvalue(lat.max.var)))
+      lng.min <- suppressWarnings(as.numeric(tclvalue(lng.min.var)))
+      lng.max <- suppressWarnings(as.numeric(tclvalue(lng.max.var)))
       alt.min <- suppressWarnings(as.numeric(tclvalue(alt.min.var)))
       alt.max <- suppressWarnings(as.numeric(tclvalue(alt.max.var)))
 
@@ -337,10 +338,10 @@ OpenRNWIS <- function() {
         poly.obj <- read.polyfile(poly.file, nohole=FALSE)
         if (inherits(poly.obj, "gpc.poly")) {
           poly.bbox <- get.bbox(poly.obj)
-          lng.min <- min(lng.min, poly.bbox$x[1], na.rm=TRUE)
-          lng.max <- max(lng.max, poly.bbox$x[2], na.rm=TRUE)
           lat.min <- min(lat.min, poly.bbox$y[1], na.rm=TRUE)
           lat.max <- max(lat.max, poly.bbox$y[2], na.rm=TRUE)
+          lng.min <- min(lng.min, poly.bbox$x[1], na.rm=TRUE)
+          lng.max <- max(lng.max, poly.bbox$x[2], na.rm=TRUE)
         } else {
           poly.obj <- NULL
         }
@@ -424,9 +425,9 @@ OpenRNWIS <- function() {
                      'Spring' = "SP")
 
   # NWIS is using the WGS84 datum for the "dec_lat_va" and "dec_long_va"
-  # variables; Google Maps also uses this dataum. NWIS variables
-  # "lat_va" and "long_va" (not called in this program) are either using the
-  # NAD27 or NAD83 datum ("coord_datum_cd").
+  # optional variables; Google Maps also uses this dataum. NWIS required
+  # variables "lat_va" and "long_va" (not called in this program) are
+  # either using the NAD27 or NAD83 datum ("coord_datum_cd").
 
   vars <- list('lat' = "dec_lat_va",
                'lng' = "dec_long_va",
@@ -596,19 +597,22 @@ OpenRNWIS <- function() {
 
   frame3 <- ttkframe(frame2, relief="flat")
 
-  frame3.lab.1.2 <- ttklabel(frame3, text="Longitude")
-  frame3.lab.1.3 <- ttklabel(frame3, text="Latitude")
-  frame3.lab.1.4 <- ttklabel(frame3, text="Altitude")
-  frame3.lab.1.6 <- ttklabel(frame3, text="Select type(s)")
+  frame3.lab.1.2 <- ttklabel(frame3, justify="center", text="Latitude\n(WGS84)")
+  frame3.lab.1.3 <- ttklabel(frame3, justify="center", text="Longitude\n(WGS84)")
+  frame3.lab.1.4 <- ttklabel(frame3, justify="center", text="Altitude\n(WGS84 EGM96)")
+  frame3.lab.1.6 <- ttklabel(frame3, justify="center", text="Select type(s)")
   frame3.lab.2.1 <- ttklabel(frame3, text="Minimum")
   frame3.lab.3.1 <- ttklabel(frame3, text="Maximum")
 
   width <- 15
-  frame3.ent.2.2 <- ttkentry(frame3, width=width, textvariable=lng.min.var)
-  frame3.ent.2.3 <- ttkentry(frame3, width=width, textvariable=lat.min.var)
+
+  frame3.ent.2.3 <- ttkentry(frame3, width=width, textvariable=lng.min.var)
+  frame3.ent.3.3 <- ttkentry(frame3, width=width, textvariable=lng.max.var)
+
+  frame3.ent.2.2 <- ttkentry(frame3, width=width, textvariable=lat.min.var)
+  frame3.ent.3.2 <- ttkentry(frame3, width=width, textvariable=lat.max.var)
+
   frame3.ent.2.4 <- ttkentry(frame3, width=width, textvariable=alt.min.var)
-  frame3.ent.3.2 <- ttkentry(frame3, width=width, textvariable=lng.max.var)
-  frame3.ent.3.3 <- ttkentry(frame3, width=width, textvariable=lat.max.var)
   frame3.ent.3.4 <- ttkentry(frame3, width=width, textvariable=alt.max.var)
 
   frame3.lst.2.6 <- tklistbox(frame3, selectmode="extended", activestyle="none",
@@ -618,8 +622,8 @@ OpenRNWIS <- function() {
   tkselection.set(frame3.lst.2.6, 0)
 
   frame3.lab.4.1 <- ttklabel(frame3, foreground="#414042", text="e.g.")
-  frame3.lab.4.2 <- ttklabel(frame3, foreground="#414042", text="-112.980728")
-  frame3.lab.4.3 <- ttklabel(frame3, foreground="#414042", text="43.510023")
+  frame3.lab.4.2 <- ttklabel(frame3, foreground="#414042", text="43.510023")
+  frame3.lab.4.3 <- ttklabel(frame3, foreground="#414042", text="-112.980728")
   frame3.lab.4.4 <- ttklabel(frame3, foreground="#414042", text="4382.3")
 
   frame3.lab.5.1 <- ttklabel(frame3, text="Polygon domain")
