@@ -277,9 +277,9 @@ OpenRNWIS <- function() {
 
 
 
-  # Process site strings
+  # Process site strings, returns vector of site numbers
 
-  ProcessSiteStrings <- function(s) {
+  CleanSiteStrings <- function(s) {
     str.split <- unlist(strsplit(s, '[[:punct:][:space:]]'))
     int.split <- suppressWarnings(as.numeric(str.split))
     as.character(int.split[!is.na(int.split)])
@@ -299,7 +299,7 @@ OpenRNWIS <- function() {
         site.no <- as.character(tclvalue(site.no.var))
         if (site.no == "")
           return()
-        site.no <- ProcessSiteStrings(site.no)
+        site.no <- CleanSiteStrings(site.no)
 
       # Read site numbers in file
       } else {
@@ -308,7 +308,7 @@ OpenRNWIS <- function() {
           return()
         scanned.strings <- scan(file=site.file, what="character",
                                 comment.char="#", quiet=TRUE)
-        site.no <- ProcessSiteStrings(paste(scanned.strings, collapse=","))
+        site.no <- CleanSiteStrings(paste(scanned.strings, collapse=","))
       }
 
       if (length(site.no) == 0L)
@@ -404,6 +404,8 @@ OpenRNWIS <- function() {
 
   # Main program
 
+  # Load required R packages
+
   for (i in c("tcltk", "sp", "RODBC", "gpclib"))
     suppressPackageStartupMessages(require(i, character.only=TRUE))
 
@@ -474,7 +476,8 @@ OpenRNWIS <- function() {
 
   tt.done.var <- tclVar(0)
 
-  # Create arrow image bitmaps
+  # Create arrow image bitmaps,
+  # based on arrows.tcl by Keith Vetter, http://wiki.tcl.tk/8554
 
   bits <- c('0x00', '0x00', '0x20', '0x00', '0x30', '0x00', '0x38', '0x00',
             '0xfc', '0x01', '0xfe', '0x01', '0xfc', '0x01', '0x38', '0x00',
@@ -626,7 +629,7 @@ OpenRNWIS <- function() {
   frame3.lab.4.3 <- ttklabel(frame3, foreground="#414042", text="-112.980728")
   frame3.lab.4.4 <- ttklabel(frame3, foreground="#414042", text="4382.3")
 
-  frame3.lab.5.1 <- ttklabel(frame3, text="Polygon domain")
+  frame3.lab.5.1 <- ttklabel(frame3, text="Polygon file")
   frame3.ent.5.2 <- ttkentry(frame3, width=25, textvariable=poly.file.var)
   frame3.but.5.5 <- ttkbutton(frame3, width=8, text="Browse",
                               command=function() BrowseForFile("Polygon",
@@ -641,13 +644,13 @@ OpenRNWIS <- function() {
   tkgrid.configure(frame2.rad.1.1, frame2.rad.3.1, frame2.rad.5.1,
                    sticky="w", columnspan=2)
 
-  tkgrid.configure(frame2.ent.2.1, frame2.ent.4.1, sticky="we", padx=c(20, 2))
+  tkgrid.configure(frame2.ent.2.1, frame2.ent.4.1, sticky="we", padx=c(10, 2))
 
   tkgrid(frame3, columnspan=2, sticky="we")
 
   tkgrid("x", frame3.lab.1.2, frame3.lab.1.3, frame3.lab.1.4, "x",
          frame3.lab.1.6, pady=c(0, 1))
-  tkgrid.configure(frame3.lab.1.6, padx=c(20, 0))
+  tkgrid.configure(frame3.lab.1.6, padx=c(10, 0), sticky="s")
 
   tkgrid(frame3.lab.2.1, frame3.ent.2.2, frame3.ent.2.3, frame3.ent.2.4,
          "x", frame3.lst.2.6, padx=1, pady=c(0, 1), sticky="we")
@@ -655,7 +658,7 @@ OpenRNWIS <- function() {
   tkgrid(frame3.lab.3.1, frame3.ent.3.2, frame3.ent.3.3, frame3.ent.3.4,
          padx=1, pady=c(1, 0), sticky="we")
 
-  tkgrid.configure(frame3.lab.2.1, frame3.lab.3.1, sticky="e", padx=c(20, 0))
+  tkgrid.configure(frame3.lab.2.1, frame3.lab.3.1, sticky="e", padx=c(10, 0))
 
   tkgrid(frame3.lab.4.1, frame3.lab.4.2, frame3.lab.4.3, frame3.lab.4.4)
   tkgrid.configure(frame3.lab.4.1, sticky="e")
@@ -664,10 +667,10 @@ OpenRNWIS <- function() {
                    frame3.lab.4.4, columnspan=2)
 
   tkgrid(frame3.lab.5.1, frame3.ent.5.2, "x", "x", frame3.but.5.5, pady=c(7, 0))
-  tkgrid.configure(frame3.lab.5.1, padx=c(20, 0), sticky="e")
+  tkgrid.configure(frame3.lab.5.1, padx=c(10, 0), sticky="e")
   tkgrid.configure(frame3.ent.5.2, columnspan=3, sticky="we", padx=c(1, 2))
 
-  tkgrid.configure(frame3.lst.2.6, rowspan=4, padx=c(20, 0),
+  tkgrid.configure(frame3.lst.2.6, rowspan=4, padx=c(10, 0),
                    pady=1, sticky="nsew")
 
   tkgrid.columnconfigure(frame3, 1, weight=1, minsize=15)
@@ -689,15 +692,15 @@ OpenRNWIS <- function() {
   frame4.lab.4.1 <- ttklabel(frame4, text="Type")
 
   frame4.lst.2.1 <- tklistbox(frame4, selectmode="extended", activestyle="none",
-                              relief="flat", borderwidth=5, width=15, height=8,
+                              relief="flat", borderwidth=5, width=15, height=6,
                               exportselection=FALSE, listvariable=site.var,
                               highlightthickness=0)
   frame4.lst.2.3 <- tklistbox(frame4, selectmode="extended", activestyle="none",
-                              relief="flat", borderwidth=5, width=15, height=8,
+                              relief="flat", borderwidth=5, width=15, height=6,
                               exportselection=FALSE, listvariable=data.var,
                               highlightthickness=0)
   frame4.lst.2.6 <- tklistbox(frame4, selectmode="extended", activestyle="none",
-                              relief="flat", borderwidth=5, width=15, height=8,
+                              relief="flat", borderwidth=5, width=15, height=6,
                               exportselection=FALSE, listvariable=retr.var,
                               highlightthickness=0)
 

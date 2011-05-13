@@ -1,4 +1,4 @@
 RNWIS: National Water Information System: R Interface
 =====================================================
 
-This R package is in the early stages of development.
+This R package is in its early stages of development.

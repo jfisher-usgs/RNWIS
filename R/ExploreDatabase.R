@@ -21,12 +21,6 @@ ExploreDatabase <- function(con, parent=NULL) {
 
   # Main program
 
-  if (missing(con))
-    return()
-
-  require("RODBC")
-  require("tcltk")
-
   sql.tables <- sqlTables(con, errors=FALSE, as.is=TRUE)[, "TABLE_NAME"]
   sql.tables <- sort(sql.tables)
 

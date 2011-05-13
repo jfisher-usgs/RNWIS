@@ -2,9 +2,9 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
 
   # Additional functions (subroutines)
 
-  # Get JSON table
+  # Build JavaScript Object Notation (JSON) data table
 
-  GetJSONTable <- function(d) {
+  BuildJSONTable <- function(d) {
     idxs <- which(sapply(1:ncol(d), function(i) mode(d[, i])) == "character")
     col.names <- names(d)
     for (i in seq(along=col.names)) {
@@ -16,17 +16,13 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
         d[na.rows, i] <- paste("\"", col.names[i], "\": \"NA\"", sep="")
       }
     }
-
-
-
-
     s <- apply(d, 1, function(i) paste(i, collapse=", "))
     s <- paste("{", s, "}", sep="")
     s <- paste(s, collapse=",\n")
     s
   }
 
-  # Is the polygons winding direction clockwise
+  # Is polygon winding direction clockwise
 
   ClockWise <- function(x, y) {
     num <- length(x)
@@ -95,7 +91,7 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
   s <- "var data = {"
   if (is.sites) {
     sites <- sites[!is.na(sites[, "lng"]) & !is.na(sites[, "lat"]), ]
-    s <- c(s, "\"sites\": [", GetJSONTable(sites))
+    s <- c(s, "\"sites\": [", BuildJSONTable(sites))
     s <- c(s, if (is.polygons) "]," else "]")
   }
   if (is.polygons) {
@@ -105,6 +101,11 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
     for (i in seq(along=poly.pts)) {
       lng <- poly.pts[[i]]$x
       lat <- poly.pts[[i]]$y
+
+      # Browser graphics engines require clockwise outer polygon(s) and
+      # counterclockwise inner polygon(s) for proper rendering of inner
+      # hole; this is not documented in the Google Maps API (wtf).
+
       is.clockwise <- ClockWise(lng, lat)
       is.hole <- poly.pts[[i]]$hole
       if ((is.hole & is.clockwise) | (!is.hole & !is.clockwise)) {
@@ -112,7 +113,7 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
         lat <- rev(lat)
       }
       d <- as.data.frame(cbind(lat=lat, lng=lng))
-      s <- c(s, "[", GetJSONTable(d))
+      s <- c(s, "[", BuildJSONTable(d))
       s <- c(s, if (i < n) "]," else "]")
     }
     s <- c(s, "]")

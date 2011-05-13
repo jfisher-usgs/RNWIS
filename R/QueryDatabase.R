@@ -18,12 +18,11 @@ QueryDatabase <- function(con, sqtable, sqvars="*",
   # Main program
 
   if (!inherits(con, "RODBC")) {
-    require("RODBC")
     con <- odbcConnect(con, uid="", pwd="")
     on.exit(close(con))
   }
 
-  # Build query
+  # Build query string
 
   vars <- paste(sqvars, collapse=", ")
   cond <- c()
