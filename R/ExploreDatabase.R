@@ -9,11 +9,18 @@ ExploreDatabase <- function(con, parent=NULL) {
       return()
     table.name <- as.character(tkget(frame1.lst.2.1, idx, idx))
 
-    sql.table.cols <- sqlColumns(con, sqtable=table.name)[, "COLUMN_NAME"]
+    cols <- sqlColumns(con, sqtable=table.name)[, c("COLUMN_NAME",
+                                                    "TYPE_NAME",
+                                                    "COLUMN_SIZE",
+                                                    "DECIMAL_DIGITS")]
 
-    tcl("lset", vars.var, "")
-    for (i in seq(along=sql.table.cols))
-      tcl("lappend", vars.var, sql.table.cols[i])
+    tree.children <- tcl(frame2.tre.2.1, "children", "")
+    tkdelete(frame2.tre.2.1, tree.children)
+    for (i in seq(along=cols[, 1]))
+       tkinsert(frame2.tre.2.1, "", "end",
+                text=cols[i, 1],
+                values=c(cols[i, 2], cols[i, 3], cols[i, 4]),
+                tags="bg")
 
     tkfocus(frame1.lst.2.1)
   }
@@ -106,20 +113,38 @@ ExploreDatabase <- function(con, parent=NULL) {
 
   frame2.lab.1.1 <- ttklabel(frame2, text="Table variables")
 
-  frame2.lst.2.1 <- tklistbox(frame2, selectmode="browse", activestyle="none",
-                relief="flat", borderwidth=5, exportselection=FALSE,
-                listvariable=vars.var, highlightthickness=0,
-                width=30, height=10)
+  tcl("ttk::style", "configure", "Custom.Treeview", rowheight=15)
+  frame2.tre.2.1 <- ttktreeview(frame2, selectmode="browse",
+                                columns=c("type.name",
+                                          "column.size",
+                                          "decimal.digits"))
+  tkconfigure(frame2.tre.2.1, style="Custom.Treeview")
+  tktag.configure(frame2.tre.2.1, "bg", background="white")
+
   frame2.ysc.2.2 <- ttkscrollbar(frame2, orient="vertical")
-  tkconfigure(frame2.lst.2.1, background="white",
-              yscrollcommand=paste(.Tk.ID(frame2.ysc.2.2), "set"))
-  tkconfigure(frame2.ysc.2.2, command=paste(.Tk.ID(frame2.lst.2.1), "yview"))
+  tkconfigure(frame2.tre.2.1, yscrollcommand=paste(.Tk.ID(frame2.ysc.2.2),
+                                                   "set"))
+  tkconfigure(frame2.ysc.2.2, command=paste(.Tk.ID(frame2.tre.2.1), "yview"))
+
+  tcl(frame2.tre.2.1, "column", "#0",
+      width=150, minwidth=80, anchor="w")
+  tcl(frame2.tre.2.1, "column", "type.name",
+      width=80, minwidth=80, anchor="w")
+  tcl(frame2.tre.2.1, "column", "column.size",
+      width=80, minwidth=80, anchor="e")
+  tcl(frame2.tre.2.1, "column", "decimal.digits",
+      width=80, minwidth=80, anchor="e")
+
+  tcl(frame2.tre.2.1, "heading", "#0", text="Column name")
+  tcl(frame2.tre.2.1, "heading", "type.name", text="Type name")
+  tcl(frame2.tre.2.1, "heading", "column.size", text="Column size")
+  tcl(frame2.tre.2.1, "heading", "decimal.digits", text="Decimal digits")
 
   tkgrid(frame2.lab.1.1, "x")
-  tkgrid(frame2.lst.2.1, frame2.ysc.2.2)
+  tkgrid(frame2.tre.2.1, frame2.ysc.2.2)
 
   tkgrid.configure(frame2.lab.1.1, pady=c(0, 3), sticky="w")
-  tkgrid.configure(frame2.lst.2.1, sticky="nswe")
+  tkgrid.configure(frame2.tre.2.1, sticky="nswe")
   tkgrid.configure(frame2.ysc.2.2, sticky="ns", padx=c(0, 2))
 
   tkgrid.rowconfigure(frame2, 1, weight=1)
@@ -129,7 +154,7 @@ ExploreDatabase <- function(con, parent=NULL) {
 
   tkgrid(frame1, frame2, padx=2, pady=2, sticky="nswe")
 
-  tkadd(pw, frame1, weight=1)
+  tkadd(pw, frame1, weight=0)
   tkadd(pw, frame2, weight=1)
 
   tkpack(pw, fill="both", expand=TRUE, padx=15, pady=5)
