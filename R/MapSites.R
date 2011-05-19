@@ -69,9 +69,9 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
 
   is.pkg <- "package:RNWIS" %in% search()
   if (is.pkg)
-    path <- system.file(package="RNWIS")
+    path <- system.file("map", package="RNWIS")
   else
-    path <- paste(getwd(), "/inst", sep="")
+    path <- paste(getwd(), "/inst/map", sep="")
 
   # Read and write html and js files
 
