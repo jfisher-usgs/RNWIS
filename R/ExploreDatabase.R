@@ -9,6 +9,7 @@ ExploreDatabase <- function(con, parent=NULL) {
       return()
     table.name <- as.character(tkget(frame1.lst.2.1, idx, idx))
 
+    tkconfigure(tt, cursor="watch")
     tclServiceMode(FALSE)
 
     # Clear treeview
@@ -20,14 +21,20 @@ ExploreDatabase <- function(con, parent=NULL) {
     cols <- cols[, c("COLUMN_NAME", "TYPE_NAME", "NUM_PREC_RADIX",
                      "CHAR_OCTET_LENGTH")]
 
+    # Eliminate duplicates of rows with identical column names;
+    # why this occurs is unknown.
+    is.duplicated <- duplicated(cols[, "COLUMN_NAME"])
+    cols <- cols[!is.duplicated, ]
+
     # Query keys
     keys <- sqlPrimaryKeys(con, sqtable=table.name)
     which.is.key <- which(cols[, "COLUMN_NAME"] %in% keys[, "COLUMN_NAME"])
 
     # Tags, all rows have white background, key rows have red foreground
-    tags <- as.list(rep("bg", nrow(cols)))
+
+    tags <- as.list(rep(c("odd", "even"), nrow(cols) / 2 + 1))
     for (i in seq(along=which.is.key))
-      tags[[which.is.key[i]]] <- c("bg", "fg")
+      tags[[which.is.key[i]]][2] <- "key"
 
     # Populate treeview
     for (i in seq(along=cols[, 1]))
@@ -35,6 +42,7 @@ ExploreDatabase <- function(con, parent=NULL) {
                 text=cols[i, 1], values=c(cols[i, 2], cols[i, 3], cols[i, 4]))
 
     tkfocus(frame1.lst.2.1)
+    tkconfigure(tt, cursor="arrow")
     tclServiceMode(TRUE)
   }
 
@@ -129,8 +137,9 @@ ExploreDatabase <- function(con, parent=NULL) {
   tcl("ttk::style", "configure", "Custom.Treeview", rowheight=15)
   frame2.tre.2.1 <- ttktreeview(frame2, selectmode="browse", columns=columns)
   tkconfigure(frame2.tre.2.1, style="Custom.Treeview")
-  tktag.configure(frame2.tre.2.1, "bg", background="white")
-  tktag.configure(frame2.tre.2.1, "fg", foreground="red")
+  tktag.configure(frame2.tre.2.1, "odd", background="#FFFFFF")
+  tktag.configure(frame2.tre.2.1, "even", background="#ECF3F7")
+  tktag.configure(frame2.tre.2.1, "key", foreground="#E60000")
 
   frame2.ysc.2.2 <- ttkscrollbar(frame2, orient="vertical")
   tkconfigure(frame2.tre.2.1,
