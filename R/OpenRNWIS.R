@@ -156,6 +156,8 @@ OpenRNWIS <- function() {
     if (is.null(con))
       return()
 
+    tclServiceMode(FALSE)
+
     data.table <- data.tables[[as.character(tclvalue(data.type.var))]]
     sqcols <- sqlColumns(con, sqtable=data.table)[, c("COLUMN_NAME",
                                                       "TYPE_NAME")]
@@ -179,6 +181,8 @@ OpenRNWIS <- function() {
       tkconfigure(frame6.box.1.2, values=dt.vars)
       tcl(frame6.box.1.2, "current", 0)
     }
+
+    tclServiceMode(TRUE)
   }
 
   # Arrange variables in listbox
@@ -213,21 +217,37 @@ OpenRNWIS <- function() {
       tkselection.set(lst, i - 1)
   }
 
-  # Browse for file
+  # Open file
 
-  BrowseForFile <- function(type, obj) {
-    if (type == "Polygon") {
+  OpenFile <- function(type, obj) {
+    if (type == "Sites") {
+      caption <- "Select site number file"
+      defaultextension <- NULL
+      filters <- NULL
+    } else if (type == "Polygon") {
       caption <- "Select polygon file"
       defaultextension <- "ply"
       filters <- matrix(c("Polygon Text Files", ".ply", "All files", "*"),
                         2, 2, byrow=TRUE)
-    } else {
-      caption <- "Select site number file"
-      filters <- NULL
-      defaultextension <- NULL
     }
+    f <- CallFileDialogBox("tk_getOpenFile", caption, defaultextension, filters)
+    tclvalue(obj) <- f
+  }
 
-    args <- list("tk_getOpenFile", title=caption, multiple=FALSE, parent=tt)
+   # Save file as
+
+  SaveFile <- function() {
+    caption <- "Save data as"
+    defaultextension <- "txt"
+    filters <- matrix(c("Text Files", ".txt", "All files", "*"),
+                      2, 2, byrow=TRUE)
+    CallFileDialogBox("tk_getSaveFile", caption, defaultextension, filters)
+  }
+
+  # Call file dialog box
+
+  CallFileDialogBox <- function(cmd, caption, defaultextension, filters) {
+    args <- list(cmd, title=caption, parent=tt)
     if (!is.null(defaultextension))
       args <- c(args, defaultextension=defaultextension)
     if (!is.null(initialdir))
@@ -238,13 +258,11 @@ OpenRNWIS <- function() {
       filters <- paste(paste("{", filters, "}", sep=""), collapse=" ")
       args <- c(args, filetypes=filters)
     }
-
     f <- tclvalue(do.call(tcl, args))
-    if (!nzchar(f))
-      return()
-
-    initialdir <<- dirname(f)
-    tclvalue(obj) <- f
+    if (nzchar(f)) {
+      initialdir <<- dirname(f)
+      return(f)
+    }
   }
 
   # Map sites
@@ -262,20 +280,81 @@ OpenRNWIS <- function() {
   # Retrieve data
 
   RetrieveData <- function() {
-    if (is.null(con))
+    if (is.null(con) || is.null(retr.vars) || length(retr.vars) == 0L)
       return()
 
-    print("notyet")
+    tkconfigure(tt, cursor="watch")
+
+    # Variable navigation
+    key <- vars[['site']]
+    is.site <- retr.vars %in% site.vars
+
+    # Construct site table and identify site numbers
+    sqvars <- unique(c(key, retr.vars[is.site]))
+    d.site <- GetSiteInfo(sqvars)
+    if (is.null(d.site)) {
+      tkconfigure(tt, cursor="arrow")
+      return()
+    }
+    d.site <- d.site$sites
+    site.no <- d.site[, key]
+
+   # Date and time range
+    d.t.lim <- c(NA, NA)
+    d.t.var <- as.character(tclvalue(date.time.var))
+    if (d.t.var != "")
+      d.t.lim <- c(ConvertEntryToDate(tmin.var), ConvertEntryToDate(tmax.var))
+    else
+      d.t.var <- NULL
+
+    # Construct data table
+    d.data <- NULL
+    sqvars <- retr.vars[!is.site]
+    data.table <- data.tables[[as.character(tclvalue(data.type.var))]]
+    if (length(sqvars) > 0) {
+      d.data <- QueryDatabase(con=con,
+                              sqtable=data.table,
+                              sqvars=unique(c(key, sqvars)),
+                              site.no.var=vars[['site']],
+                              site.no=site.no,
+                              d.t.var=d.t.var,
+                              d.t.lim=d.t.lim
+                             )
+      if (nrow(d.data) == 0L)
+        d.data <- NULL
+    }
+
+    # Merge site and data tables
+    if (is.null(d.data))
+      d <- d.site
+    else
+      d <- merge(d.site, d.data, by=key)
+
+    # Organize columns
+    d <- d[, retr.vars]
+
+    # Save data to file
+    f <- SaveFile()
+    if (!is.null(f))
+      write.table(d, file=f, sep="\t", quote=FALSE, row.names=FALSE)
+
+    tkconfigure(tt, cursor="arrow")
   }
 
+  # Convert Tk entry to date-time value
 
-
-
-
-
-
-
-
+  ConvertEntryToDate <- function(tk.ent) {
+    string <- as.character(tclvalue(tk.ent))
+    if (string == "")
+      return(NA)
+    fmt <- "%Y-%m-%d"
+    if (length(strsplit(string, " ")[[1]]) > 1)
+      fmt <- paste(fmt, "%H:%M")
+    date <- as.POSIXct(string, format=fmt)
+    if (is.na(date))
+      tclvalue(tk.ent) <- ""
+    date
+  }
 
   # Process site strings, returns vector of site numbers
 
@@ -595,7 +674,7 @@ OpenRNWIS <- function() {
   frame2.ent.4.1 <- ttkentry(frame2, width=25, textvariable=site.file.var)
 
   frame2.but.4.2 <- ttkbutton(frame2, width=8, text="Browse",
-                              command=function() BrowseForFile("Text",
+                              command=function() OpenFile("Sites",
                                                                site.file.var))
 
   frame3 <- ttkframe(frame2, relief="flat")
@@ -632,7 +711,7 @@ OpenRNWIS <- function() {
   frame3.lab.5.1 <- ttklabel(frame3, text="Polygon file")
   frame3.ent.5.2 <- ttkentry(frame3, width=25, textvariable=poly.file.var)
   frame3.but.5.5 <- ttkbutton(frame3, width=8, text="Browse",
-                              command=function() BrowseForFile("Polygon",
+                              command=function() OpenFile("Polygon",
                                                                poly.file.var))
 
   tkgrid(frame2.rad.1.1)
@@ -752,8 +831,8 @@ OpenRNWIS <- function() {
   tkgrid.configure(frame4.ysc.2.2, frame4.ysc.2.4, sticky="ns", padx=c(0, 20))
   tkgrid.configure(frame4.ysc.2.7, sticky="ns", padx=0)
 
-  tkgrid.configure(frame4.but.2.5, sticky="sw", padx=c(0, 20), pady=c(0, 2))
-  tkgrid.configure(frame4.but.3.5, sticky="nw", padx=c(0, 20), pady=c(2, 0))
+  tkgrid.configure(frame4.but.2.5, sticky="sw", padx=c(0, 4), pady=c(0, 2))
+  tkgrid.configure(frame4.but.3.5, sticky="nw", padx=c(0, 4), pady=c(2, 0))
 
   tkgrid.configure(frame4.lab.4.1, sticky="e", padx=c(0, 1), pady=c(4, 0),
                    columnspan=2)
