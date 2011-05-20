@@ -692,15 +692,15 @@ OpenRNWIS <- function() {
   frame4.lab.4.1 <- ttklabel(frame4, text="Type")
 
   frame4.lst.2.1 <- tklistbox(frame4, selectmode="extended", activestyle="none",
-                              relief="flat", borderwidth=5, width=15, height=6,
+                              relief="flat", borderwidth=5, width=15, height=3,
                               exportselection=FALSE, listvariable=site.var,
                               highlightthickness=0)
   frame4.lst.2.3 <- tklistbox(frame4, selectmode="extended", activestyle="none",
-                              relief="flat", borderwidth=5, width=15, height=6,
+                              relief="flat", borderwidth=5, width=15, height=3,
                               exportselection=FALSE, listvariable=data.var,
                               highlightthickness=0)
   frame4.lst.2.6 <- tklistbox(frame4, selectmode="extended", activestyle="none",
-                              relief="flat", borderwidth=5, width=15, height=6,
+                              relief="flat", borderwidth=5, width=15, height=3,
                               exportselection=FALSE, listvariable=retr.var,
                               highlightthickness=0)
 
