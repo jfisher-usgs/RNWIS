@@ -1,5 +1,5 @@
 ExploreDatabase <- function(con, parent=NULL) {
-  # A GUI for exploring a database connection
+  # Explore database connection
 
   # Additional functions (subroutines)
 
@@ -9,20 +9,33 @@ ExploreDatabase <- function(con, parent=NULL) {
       return()
     table.name <- as.character(tkget(frame1.lst.2.1, idx, idx))
 
-    cols <- sqlColumns(con, sqtable=table.name)[, c("COLUMN_NAME",
-                                                    "TYPE_NAME",
-                                                    "COLUMN_SIZE",
-                                                    "DECIMAL_DIGITS")]
+    tclServiceMode(FALSE)
 
+    # Clear treeview
     tree.children <- tcl(frame2.tre.2.1, "children", "")
     tkdelete(frame2.tre.2.1, tree.children)
+
+    # Query column names
+    cols <- sqlColumns(con, sqtable=table.name)
+    cols <- cols[, c("COLUMN_NAME", "TYPE_NAME", "NUM_PREC_RADIX",
+                     "CHAR_OCTET_LENGTH")]
+
+    # Query keys
+    keys <- sqlPrimaryKeys(con, sqtable=table.name)
+    which.is.key <- which(cols[, "COLUMN_NAME"] %in% keys[, "COLUMN_NAME"])
+
+    # Tags, all rows have white background, key rows have red foreground
+    tags <- as.list(rep("bg", nrow(cols)))
+    for (i in seq(along=which.is.key))
+      tags[[which.is.key[i]]] <- c("bg", "fg")
+
+    # Populate treeview
     for (i in seq(along=cols[, 1]))
-       tkinsert(frame2.tre.2.1, "", "end",
-                text=cols[i, 1],
-                values=c(cols[i, 2], cols[i, 3], cols[i, 4]),
-                tags="bg")
+       tkinsert(frame2.tre.2.1, "", "end", tags=tags[[i]],
+                text=cols[i, 1], values=c(cols[i, 2], cols[i, 3], cols[i, 4]))
 
     tkfocus(frame1.lst.2.1)
+    tclServiceMode(TRUE)
   }
 
 
@@ -38,9 +51,7 @@ ExploreDatabase <- function(con, parent=NULL) {
   tables.var <- tclVar()
   for (i in seq(along=sql.tables))
     tcl("lappend", tables.var, sql.tables[i])
-
   vars.var <- tclVar()
-
   tt.done.var <- tclVar(0)
 
   # Open GUI
@@ -82,7 +93,7 @@ ExploreDatabase <- function(con, parent=NULL) {
 
   frame1 <- ttkframe(pw, relief="flat", borderwidth=0, padding=0)
 
-  frame1.lab.1.1 <- ttklabel(frame1, text="Database tables")
+  frame1.lab.1.1 <- ttklabel(frame1, text="Select table")
 
   frame1.lst.2.1 <- tklistbox(frame1, selectmode="browse", activestyle="none",
                 relief="flat", borderwidth=5, exportselection=FALSE,
@@ -111,34 +122,31 @@ ExploreDatabase <- function(con, parent=NULL) {
 
   frame2 <- ttkframe(pw, relief="flat", borderwidth=0, padding=0)
 
-  frame2.lab.1.1 <- ttklabel(frame2, text="Table variables")
+  frame2.lab.1.1 <- ttklabel(frame2, text="Table summary")
+
+  columns <- c("type.name", "num.prec.radix", "char.octet.length")
 
   tcl("ttk::style", "configure", "Custom.Treeview", rowheight=15)
-  frame2.tre.2.1 <- ttktreeview(frame2, selectmode="browse",
-                                columns=c("type.name",
-                                          "column.size",
-                                          "decimal.digits"))
+  frame2.tre.2.1 <- ttktreeview(frame2, selectmode="browse", columns=columns)
   tkconfigure(frame2.tre.2.1, style="Custom.Treeview")
   tktag.configure(frame2.tre.2.1, "bg", background="white")
+  tktag.configure(frame2.tre.2.1, "fg", foreground="red")
 
   frame2.ysc.2.2 <- ttkscrollbar(frame2, orient="vertical")
-  tkconfigure(frame2.tre.2.1, yscrollcommand=paste(.Tk.ID(frame2.ysc.2.2),
-                                                   "set"))
+  tkconfigure(frame2.tre.2.1,
+              yscrollcommand=paste(.Tk.ID(frame2.ysc.2.2), "set"))
   tkconfigure(frame2.ysc.2.2, command=paste(.Tk.ID(frame2.tre.2.1), "yview"))
 
-  tcl(frame2.tre.2.1, "column", "#0",
-      width=150, minwidth=80, anchor="w")
-  tcl(frame2.tre.2.1, "column", "type.name",
-      width=80, minwidth=80, anchor="w")
-  tcl(frame2.tre.2.1, "column", "column.size",
-      width=80, minwidth=80, anchor="e")
-  tcl(frame2.tre.2.1, "column", "decimal.digits",
-      width=80, minwidth=80, anchor="e")
+  tcl(frame2.tre.2.1, "column", "#0", width=100, minwidth=80)
+  tcl(frame2.tre.2.1, "column", columns[1], width=100, minwidth=80,
+      anchor="center")
+  tcl(frame2.tre.2.1, "column", columns[2], width=100, minwidth=80, anchor="e")
+  tcl(frame2.tre.2.1, "column", columns[3], width=100, minwidth=80, anchor="e")
 
-  tcl(frame2.tre.2.1, "heading", "#0", text="Column name")
-  tcl(frame2.tre.2.1, "heading", "type.name", text="Type name")
-  tcl(frame2.tre.2.1, "heading", "column.size", text="Column size")
-  tcl(frame2.tre.2.1, "heading", "decimal.digits", text="Decimal digits")
+  tcl(frame2.tre.2.1, "heading", "#0", text="Name")
+  tcl(frame2.tre.2.1, "heading", columns[1], text="Type")
+  tcl(frame2.tre.2.1, "heading", columns[2], text="Precision")
+  tcl(frame2.tre.2.1, "heading", columns[3], text="Length")
 
   tkgrid(frame2.lab.1.1, "x")
   tkgrid(frame2.tre.2.1, frame2.ysc.2.2)
