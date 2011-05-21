@@ -275,7 +275,7 @@ OpenRNWIS <- function() {
     data <- GetSiteInfo(sqvars)
     names(data$sites) <- names(vars)
     MapSites(data$sites, data$polygons)
-}
+  }
 
   # Retrieve data
 
@@ -558,10 +558,11 @@ OpenRNWIS <- function() {
   # Create arrow image bitmaps,
   # based on arrows.tcl by Keith Vetter, http://wiki.tcl.tk/8554
 
-  bits <- c('0x00', '0x00', '0x20', '0x00', '0x30', '0x00', '0x38', '0x00',
-            '0xfc', '0x01', '0xfe', '0x01', '0xfc', '0x01', '0x38', '0x00',
-            '0x30', '0x00', '0x20', '0x00', '0x00', '0x00')
-  arrow.left <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
+
+  bits <- c('0x00', '0x00', '0x06', '0x03', '0x8e', '0x03', '0xdc', '0x01',
+            '0xf8', '0x00', '0x70', '0x00', '0xf8', '0x00', '0xdc', '0x01',
+            '0x8e', '0x03', '0x06', '0x03', '0x00', '0x00')
+  arrow.del <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
 
   bits <- c('0x00', '0x00', '0x20', '0x00', '0x60', '0x00', '0xe0', '0x00',
             '0xfc', '0x01', '0xfc', '0x03', '0xfc', '0x01', '0xe0', '0x00',
@@ -577,6 +578,16 @@ OpenRNWIS <- function() {
             '0x70', '0x00', '0xfe', '0x03', '0xfc', '0x01', '0xf8', '0x00',
             '0x70', '0x00', '0x20', '0x00', '0x00', '0x00')
   arrow.down <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
+
+  bits <- c('0x00', '0x00', '0xfe', '0x03', '0xfe', '0x03', '0x20', '0x00',
+            '0x70', '0x00', '0xf8', '0x00', '0xfc', '0x01', '0xfe', '0x03',
+            '0x70', '0x00', '0x70', '0x00', '0x70', '0x00')
+  arrow.top <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
+
+  bits <- c('0x70', '0x00', '0x70', '0x00', '0x70', '0x00', '0xfe', '0x03',
+            '0xfc', '0x01', '0xf8', '0x00', '0x70', '0x00', '0x20', '0x00',
+            '0xfe', '0x03', '0xfe', '0x03', '0x00', '0x00')
+  arrow.bottom <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
 
   # Open GUI
 
@@ -799,19 +810,24 @@ OpenRNWIS <- function() {
 
   frame4.but.2.5 <- ttkbutton(frame4, width=2, image=arrow.right,
                               command=AddVariables)
-  frame4.but.3.5 <- ttkbutton(frame4, width=2, image=arrow.left,
+  frame4.but.3.5 <- ttkbutton(frame4, width=2, image=arrow.del,
                               command=RemoveVariables)
 
   frame4.box.4.3 <- ttkcombobox(frame4, state="readonly",
                                 textvariable=data.type.var, width=10)
 
   frame5 <- ttkframe(frame4, relief="flat")
-  frame5.but.1.1 <- ttkbutton(frame5, width=2, image=arrow.up,
+
+  frame5.but.1.1 <- ttkbutton(frame5, width=2, image=arrow.top,
+                              command=function() print("notyet"))
+  frame5.but.1.2 <- ttkbutton(frame5, width=2, image=arrow.up,
                               command=function() Arrange("up",
                                                          frame4.lst.2.6))
-  frame5.but.1.2 <- ttkbutton(frame5, width=2, image=arrow.down,
+  frame5.but.1.3 <- ttkbutton(frame5, width=2, image=arrow.down,
                               command=function() Arrange("down",
                                                          frame4.lst.2.6))
+  frame5.but.1.4 <- ttkbutton(frame5, width=2, image=arrow.bottom,
+                              command=function() print("notyet"))
 
   tkgrid(frame4.lab.1.1, "x", frame4.lab.1.3, "x", "x", frame4.lab.1.6, "x",
          pady=c(0, 1))
@@ -820,8 +836,8 @@ OpenRNWIS <- function() {
   tkgrid("x", "x", "x", "x", frame4.but.3.5, "x", "x")
   tkgrid(frame4.lab.4.1, "x", frame4.box.4.3, "x", "x", frame5, "x")
   tkgrid.configure(frame5, columnspan=2)
-  tkgrid(frame5.but.1.1, frame5.but.1.2, padx=c(0, 4), pady=c(4, 0))
-
+  tkgrid(frame5.but.1.1, frame5.but.1.2, frame5.but.1.3, frame5.but.1.4,
+         padx=c(0, 4), pady=c(4, 0))
 
   tkgrid.configure(frame4.lst.2.1, frame4.ysc.2.2, frame4.lst.2.3,
                    frame4.ysc.2.4, frame4.lst.2.6, frame4.ysc.2.7, rowspan=2)
@@ -854,7 +870,6 @@ OpenRNWIS <- function() {
 
   txt <- "Specify date and time range"
   frame6 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3, text=txt)
-
 
   frame6.lab.1.1 <- ttklabel(frame6, text="Variable")
   frame6.lab.1.3 <- ttklabel(frame6, text="From")
