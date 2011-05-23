@@ -18,13 +18,10 @@ ExploreDatabase <- function(con, parent=NULL) {
 
     # Query column names
     cols <- sqlColumns(con, sqtable=table.name)
-    cols <- cols[, c("COLUMN_NAME", "TYPE_NAME", "NUM_PREC_RADIX",
-                     "CHAR_OCTET_LENGTH")]
 
-    # Eliminate duplicates of rows with identical column names;
-    # why this occurs is unknown.
-    is.duplicated <- duplicated(cols[, "COLUMN_NAME"])
-    cols <- cols[!is.duplicated, ]
+    cols <- cols[cols[, "TABLE_NAME"] == table.name,
+                 c("COLUMN_NAME", "TYPE_NAME", "NUM_PREC_RADIX",
+                   "CHAR_OCTET_LENGTH")]
 
     # Query keys
     keys <- sqlPrimaryKeys(con, sqtable=table.name)
