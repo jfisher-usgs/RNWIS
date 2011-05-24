@@ -7,7 +7,6 @@ OpenRNWIS <- function() {
 
   SaveQueryObject <- function() {
     d <- list()
-
     d[["dsn.sel"]] <- as.integer(tcl(frame1.box.1.2, "current"))
     d[["opt"]] <- tclvalue(opt.var)
     d[["site.no"]] <- tclvalue(site.no.var)
@@ -24,11 +23,9 @@ OpenRNWIS <- function() {
     d[["date.time"]] <- tclvalue(date.time.var)
     d[["tmin"]] <- tclvalue(tmin.var)
     d[["tmax"]] <- tclvalue(tmax.var)
-
     d[["retr.vars"]] <- retr.vars
     d[["initialdir"]] <- initialdir
     d[["save.file"]] <- save.file
-
     d
   }
 
@@ -589,7 +586,6 @@ OpenRNWIS <- function() {
       }
 
       # Site types
-      site.type.codes <- NULL
       idxs <- as.integer(tkcurselection(frame3.lst.2.6))
       if (length(idxs) > 0) {
         for (i in idxs) {
@@ -601,6 +597,9 @@ OpenRNWIS <- function() {
             break
           }
         }
+      } else {
+        site.type.codes <- NULL
+        tkselection.set(frame3.lst.2.6, 0)
       }
 
       # Query database
