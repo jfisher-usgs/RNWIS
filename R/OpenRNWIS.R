@@ -3,6 +3,103 @@ OpenRNWIS <- function() {
 
   # Additional functions (subroutines)
 
+  # Save query object
+
+  SaveQueryObject <- function() {
+    d <- list()
+
+    d[["dsn.sel"]] <- as.integer(tcl(frame1.box.1.2, "current"))
+    d[["opt"]] <- tclvalue(opt.var)
+    d[["site.no"]] <- tclvalue(site.no.var)
+    d[["site.file"]] <- tclvalue(site.file.var)
+    d[["site.type.sel"]] <- as.integer(tkcurselection(frame3.lst.2.6))
+    d[["poly.file"]] <- tclvalue(poly.file.var)
+    d[["lng.min"]] <- tclvalue(lng.min.var)
+    d[["lng.max"]] <- tclvalue(lng.max.var)
+    d[["lat.min"]] <- tclvalue(lat.min.var)
+    d[["lat.max"]] <- tclvalue(lat.max.var)
+    d[["alt.min"]] <- tclvalue(alt.min.var)
+    d[["alt.max"]] <- tclvalue(alt.max.var)
+    d[["data.type.sel"]] <- as.integer(tcl(frame4.box.4.3, "current"))
+    d[["date.time"]] <- tclvalue(date.time.var)
+    d[["tmin"]] <- tclvalue(tmin.var)
+    d[["tmax"]] <- tclvalue(tmax.var)
+
+    d[["retr.vars"]] <- retr.vars
+    d[["initialdir"]] <- initialdir
+    d[["save.file"]] <- save.file
+
+    d
+  }
+
+  # Open query object
+
+  OpenQueryObject <- function(d) {
+    tclServiceMode(FALSE)
+
+    tclvalue(opt.var) <- d$opt
+    tclvalue(site.no.var) <- d$site.no
+    tclvalue(site.file.var) <- d$site.file
+    tclvalue(poly.file.var) <- d$poly.file
+    tclvalue(lng.min.var) <- d$lng.min
+    tclvalue(lng.max.var) <- d$lng.max
+    tclvalue(lat.min.var) <- d$lat.min
+    tclvalue(lat.max.var) <- d$lat.max
+    tclvalue(alt.min.var) <- d$alt.min
+    tclvalue(alt.max.var) <- d$alt.max
+    tclvalue(tmin.var) <- d$tmin
+    tclvalue(tmax.var) <- d$tmax
+
+    SetState()
+
+    tkselection.clear(frame3.lst.2.6, 0, "end")
+    for (i in seq(along=d[["site.type.sel"]]))
+      tkselection.set(frame3.lst.2.6, d[["site.type.sel"]][i])
+
+    tcl(frame1.box.1.2, "current", d$dsn.sel)
+    OpenConnection()
+
+    tcl(frame4.box.4.3, "current", d$data.type.sel)
+    UpdateDataVariables()
+
+    tcl("lset", retr.var, "")
+    if (!is.null(d$retr.vars)) {
+      is.retr <- d$retr.vars %in% c(site.vars, data.vars)
+      retr.vars <<- d$retr.vars[is.retr]
+      for (i in seq(along=retr.vars))
+        tcl("lappend", retr.var, retr.vars[i])
+    }
+
+    cur.vals <- as.character(tkcget(frame6.box.1.2, "-values"))
+    if (d$date.time %in% cur.vals)
+      tcl(frame6.box.1.2, "set", d$date.time)
+
+    tclServiceMode(TRUE)
+  }
+
+  # Save query object to file
+
+  SaveQueryFile <- function(f) {
+    if (missing(f) || is.null(f)) {
+      f <- SaveFile("Query")
+      if (is.null(f))
+        return()
+      save.file <<- f
+    }
+    d <- SaveQueryObject()
+    save(d, file=f)
+  }
+
+  # Open query object file
+
+  OpenQueryFile <- function() {
+    f <- OpenFile("Query")
+    if (is.null(f))
+      return()
+    load(file=f)
+    OpenQueryObject(d)
+  }
+
   # Close GUI
 
   CloseGUI <- function() {
@@ -19,7 +116,7 @@ OpenRNWIS <- function() {
   # Open database connection and query tables/variables
 
   OpenConnection <- function() {
-    idx  <- as.integer(tcl(frame1.box.1.2, "current"))
+    idx <- as.integer(tcl(frame1.box.1.2, "current"))
     if (idx < 0)
       return()
 
@@ -230,27 +327,42 @@ OpenRNWIS <- function() {
 
   OpenFile <- function(type, obj) {
     if (type == "Sites") {
-      caption <- "Select site number file"
+      caption <- "Open Site Number File"
       defaultextension <- NULL
       filters <- NULL
     } else if (type == "Polygon") {
-      caption <- "Select polygon file"
+      caption <- "Open Polygon File"
       defaultextension <- "ply"
       filters <- matrix(c("Polygon Text Files", ".ply", "All files", "*"),
                         2, 2, byrow=TRUE)
+    } else if (type == "Query") {
+      caption <- "Open RNWIS Project File"
+      defaultextension <- "rda"
+      filters <- matrix(c("RNWIS Project Files", ".rda", "All files", "*"),
+                        2, 2, byrow=TRUE)
     }
     f <- CallFileDialogBox("tk_getOpenFile", caption, defaultextension, filters)
-    tclvalue(obj) <- f
+    if (missing(obj)) {
+      return(f)
+    } else {
+      tclvalue(obj) <- f
+    }
   }
 
    # Save file as
 
-  SaveFile <- function() {
-    caption <- "Save data as"
-    defaultextension <- "txt"
-    filters <- matrix(c("Text Files", ".txt", "ESRI Shapefiles", ".shp",
-                        "All files", "*"), 2, 2, byrow=TRUE)
-    CallFileDialogBox("tk_getSaveFile", caption, defaultextension, filters)
+  SaveFile <- function(type) {
+    if (type == "Data") {
+      defaultextension <- "txt"
+      filters <- matrix(c("Text Files", ".txt", "ESRI Shapefiles", ".shp",
+                          "All files", "*"), 3, 2, byrow=TRUE)
+    } else if (type == "Query") {
+      defaultextension <- "rda"
+      filters <- matrix(c("RNWIS Project Files", ".rda", "All files", "*"),
+                        2, 2, byrow=TRUE)
+    }
+    CallFileDialogBox("tk_getSaveFile", caption="Save As",
+                      defaultextension, filters)
   }
 
   # Call file dialog box
@@ -350,7 +462,7 @@ OpenRNWIS <- function() {
       d <- merge(d.site, d.data, by=vars[['site']])
 
     # Save data to file
-    f <- SaveFile()
+    f <- SaveFile("Data")
     if (!is.null(f)) {
       if (tolower(substr(f, nchar(f) - 2, nchar(f))) == "shp") {
         col.names <- unique(c(vars[['lng']], vars[['lat']], retr.vars))
@@ -552,11 +664,6 @@ OpenRNWIS <- function() {
 
   # Main program
 
-  # Load required R packages
-
-  for (i in c("tcltk", "sp", "RODBC", "gpclib", "rgdal"))
-    suppressPackageStartupMessages(require(i, character.only=TRUE))
-
   # Variables specific to NWIS
 
   site.table <- "sitefile_01"
@@ -578,6 +685,7 @@ OpenRNWIS <- function() {
   # optional variables; Google Maps also uses this dataum. NWIS required
   # variables "lat_va" and "long_va" (not called in this program) are
   # either using the NAD27 or NAD83 datum ("coord_datum_cd").
+
   vars <- list('lat' = "dec_lat_va",
                'lng' = "dec_long_va",
                'alt' = "alt_va",
@@ -586,27 +694,31 @@ OpenRNWIS <- function() {
                'agency' = "agency_cd",
                'type' = "site_tp_cd")
 
+  # Load required R packages
 
-  # Error and warning messages: icon, type, title, message
+  for (i in c("tcltk", "sp", "RODBC", "gpclib", "rgdal"))
+    suppressPackageStartupMessages(require(i, character.only=TRUE))
+
+  # Error and warning messages: [icon, type, title, message]
 
   err <- list()
   err[['01']] <- c("warning", "ok",
                    "Missing Database Connection",
-                   "Select an ODBC NWIS database connection.")
+                   "Select a registerd ODBC data source")
   err[['02']] <- c("warning", "ok",
                    "Missing Retrieval Variables",
-                   "Variables must be added to retrieval list.")
+                   "Add variables to retrieval list.")
   err[['03']] <- c("error", "ok",
                    "Missing Site Numbers",
-                   "Site numbers may be missing or improperly formatted.")
+                   "Site numbers missing or improperly formatted.")
   err[['04']] <- c("error", "ok",
                    "Empty Database Query",
-                   "Nothing returned from query of site table.")
+                   "Query of site table returned no data.")
   err[['05']] <- c("warning", "ok",
-                   "Date and Time",
-                   "Character string could not be converted to date.")
+                   "Date and Time Conversion",
+                   "Character string could not be converted to date object.")
   err[['06']] <- c("error", "ok",
-                   "Query Failed",
+                   "Query Error",
                    "Query resulted in error.")
 
   # Initialize top-level variables
@@ -616,19 +728,19 @@ OpenRNWIS <- function() {
   data.vars <- NULL
   retr.vars <- NULL
   initialdir <- NULL
+  save.file <- NULL
 
   # Assign variables linked to Tk widgets
 
   dsn.var <- tclVar()
+
   opt.var <- tclVar(1)
   site.no.var <- tclVar()
   site.file.var <- tclVar()
   poly.file.var <- tclVar()
   site.type.var <- tclVar()
-  date.time.var <- tclVar()
   for (i in c("All ...", names(site.types)))
     tcl("lappend", site.type.var, i)
-
   lng.min.var <- tclVar()
   lng.max.var <- tclVar()
   lat.min.var <- tclVar()
@@ -636,19 +748,19 @@ OpenRNWIS <- function() {
   alt.min.var <- tclVar()
   alt.max.var <- tclVar()
 
+  data.type.var <- tclVar()
   site.var <- tclVar()
   data.var <- tclVar()
   retr.var <- tclVar()
+
+  date.time.var <- tclVar()
   tmin.var <- tclVar()
   tmax.var <- tclVar()
 
-  data.type.var <- tclVar()
-
   tt.done.var <- tclVar(0)
 
-  # Create arrow image bitmaps,
+  # Create image bitmaps for buttons,
   # based on arrows.tcl by Keith Vetter, http://wiki.tcl.tk/8554
-
 
   bits <- c('0x00', '0x00', '0x06', '0x03', '0x8e', '0x03', '0xdc', '0x01',
             '0xf8', '0x00', '0x70', '0x00', '0xf8', '0x00', '0xdc', '0x01',
@@ -693,11 +805,11 @@ OpenRNWIS <- function() {
   menu.file <- tkmenu(tt, tearoff=0, relief="flat")
   tkadd(top.menu, "cascade", label="File", menu=menu.file, underline=0)
   tkadd(menu.file, "command", label="Open", accelerator="Ctrl+O",
-        command=function() print("notyet"))
+        command=function() OpenQueryFile())
   tkadd(menu.file, "command", label="Save", accelerator="Ctrl+S",
-        command=function() print("notyet"))
+        command=function() SaveQueryFile(save.file))
   tkadd(menu.file, "command", label="Save as", accelerator="Shift+Ctrl+S",
-        command=function() print("notyet"))
+        command=function() SaveQueryFile())
   tkadd(menu.file, "separator")
   tkadd(menu.file, "command", label="Exit",
         command=CloseGUI)
@@ -705,9 +817,15 @@ OpenRNWIS <- function() {
   if (!"RNWIS" %in% .packages()) {
     if ("RSurvey" %in% .packages(all.available=TRUE)) {
       suppressPackageStartupMessages(require("RSurvey"))
+      if (!is.null(Data("win.loc")))
+        tkwm.geometry(tt, Data("win.loc"))
       tkadd(menu.file, "separator")
       tkadd(menu.file, "command", label="Restore R session",
             command=function() {
+              geo <- unlist(strsplit(as.character(tkwm.geometry(tt)), "\\+"))
+              win.loc <- paste("+", as.integer(geo[2]),
+                               "+", as.integer(geo[3]), sep="")
+              Data("win.loc", win.loc)
               CloseGUI()
               RestoreSession(paste(getwd(), "R", sep="/"), fun.call="OpenRNWIS")
             })
@@ -738,7 +856,7 @@ OpenRNWIS <- function() {
   # Frame 1, ODBC source name selection
 
   frame1 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3,
-                          text="Select a registerd ODBC NWIS database")
+                          text="Select a registerd ODBC data source")
 
   frame1.lab.1.1 <- ttklabel(frame1, text="Source name")
   frame1.box.1.2 <- ttkcombobox(frame1, textvariable=dsn.var, state="readonly")
@@ -790,16 +908,14 @@ OpenRNWIS <- function() {
   frame3.lab.2.1 <- ttklabel(frame3, text="Minimum")
   frame3.lab.3.1 <- ttklabel(frame3, text="Maximum")
 
-  width <- 15
+  frame3.ent.2.3 <- ttkentry(frame3, width=15, textvariable=lng.min.var)
+  frame3.ent.3.3 <- ttkentry(frame3, width=15, textvariable=lng.max.var)
 
-  frame3.ent.2.3 <- ttkentry(frame3, width=width, textvariable=lng.min.var)
-  frame3.ent.3.3 <- ttkentry(frame3, width=width, textvariable=lng.max.var)
+  frame3.ent.2.2 <- ttkentry(frame3, width=15, textvariable=lat.min.var)
+  frame3.ent.3.2 <- ttkentry(frame3, width=15, textvariable=lat.max.var)
 
-  frame3.ent.2.2 <- ttkentry(frame3, width=width, textvariable=lat.min.var)
-  frame3.ent.3.2 <- ttkentry(frame3, width=width, textvariable=lat.max.var)
-
-  frame3.ent.2.4 <- ttkentry(frame3, width=width, textvariable=alt.min.var)
-  frame3.ent.3.4 <- ttkentry(frame3, width=width, textvariable=alt.max.var)
+  frame3.ent.2.4 <- ttkentry(frame3, width=15, textvariable=alt.min.var)
+  frame3.ent.3.4 <- ttkentry(frame3, width=15, textvariable=alt.max.var)
 
   frame3.lst.2.6 <- tklistbox(frame3, selectmode="extended", activestyle="none",
                               relief="flat", borderwidth=5, width=15, height=6,
