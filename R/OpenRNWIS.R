@@ -586,6 +586,7 @@ OpenRNWIS <- function() {
       }
 
       # Site types
+      site.type.codes <- NULL
       idxs <- as.integer(tkcurselection(frame3.lst.2.6))
       if (length(idxs) > 0) {
         for (i in idxs) {
@@ -598,7 +599,6 @@ OpenRNWIS <- function() {
           }
         }
       } else {
-        site.type.codes <- NULL
         tkselection.set(frame3.lst.2.6, 0)
       }
 
