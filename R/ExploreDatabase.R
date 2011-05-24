@@ -27,8 +27,7 @@ ExploreDatabase <- function(con, parent=NULL) {
     keys <- sqlPrimaryKeys(con, sqtable=table.name)
     which.is.key <- which(cols[, "COLUMN_NAME"] %in% keys[, "COLUMN_NAME"])
 
-    # Tags, all rows have white background, key rows have red foreground
-
+    # Tags, color styles in treeview
     tags <- as.list(rep(c("odd", "even"), nrow(cols) / 2 + 1))
     for (i in seq(along=which.is.key))
       tags[[which.is.key[i]]][2] <- "key"
