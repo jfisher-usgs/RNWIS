@@ -11,7 +11,8 @@ OpenRNWIS <- function() {
     d[["opt"]] <- tclvalue(opt.var)
     d[["site.no"]] <- tclvalue(site.no.var)
     d[["site.file"]] <- tclvalue(site.file.var)
-    d[["site.type.sel"]] <- as.integer(tkcurselection(frame3.lst.2.6))
+    d[["site.type.sel"]] <- as.integer(tcl(frame3.box.2.5, "current"))
+    d[["agency.sel"]] <- as.integer(tcl(frame3.box.3.5, "current"))
     d[["poly.file"]] <- tclvalue(poly.file.var)
     d[["lng.min"]] <- tclvalue(lng.min.var)
     d[["lng.max"]] <- tclvalue(lng.max.var)
@@ -35,6 +36,8 @@ OpenRNWIS <- function() {
     tclServiceMode(FALSE)
 
     tclvalue(opt.var) <- d$opt
+    SetState()
+
     tclvalue(site.no.var) <- d$site.no
     tclvalue(site.file.var) <- d$site.file
     tclvalue(poly.file.var) <- d$poly.file
@@ -47,15 +50,11 @@ OpenRNWIS <- function() {
     tclvalue(tmin.var) <- d$tmin
     tclvalue(tmax.var) <- d$tmax
 
-    SetState()
-
-    tkselection.clear(frame3.lst.2.6, 0, "end")
-    for (i in seq(along=d[["site.type.sel"]]))
-      tkselection.set(frame3.lst.2.6, d[["site.type.sel"]][i])
-
     tcl(frame1.box.1.2, "current", d$dsn.sel)
     OpenConnection()
 
+    tcl(frame3.box.2.5, "current", d$site.type.sel)
+    tcl(frame3.box.3.5, "current", d$agency.sel)
     tcl(frame4.box.4.3, "current", d$data.type.sel)
     UpdateDataVariables()
 
@@ -93,6 +92,7 @@ OpenRNWIS <- function() {
     f <- OpenFile("Query")
     if (is.null(f))
       return()
+    d <- NULL
     load(file=f)
     OpenQueryObject(d)
   }
@@ -201,9 +201,12 @@ OpenRNWIS <- function() {
     tkconfigure(frame3.ent.3.2, state=s)
     tkconfigure(frame3.ent.3.3, state=s)
     tkconfigure(frame3.ent.3.4, state=s)
-    tkconfigure(frame3.lst.2.6, state=s)
     tkconfigure(frame3.ent.5.2, state=s)
-    tkconfigure(frame3.but.5.5, state=s)
+    tkconfigure(frame3.but.5.6, state=s)
+
+    s <- if (opt == 3L) "readonly" else "disabled"
+    tkconfigure(frame3.box.2.5, state=s)
+    tkconfigure(frame3.box.3.5, state=s)
   }
 
   # Add variables to retrieval list
@@ -259,7 +262,6 @@ OpenRNWIS <- function() {
 
     sel <- sqlColumns(con, sqtable=data.table)
     sel <- sel[sel[, "TABLE_NAME"] == data.table, ]
-
     data.vars <<- sel[, "COLUMN_NAME"]
     data.types <- sel[, "TYPE_NAME"]
 
@@ -433,21 +435,35 @@ OpenRNWIS <- function() {
 
     # Construct data table
     d.data <- NULL
-    sqvars <- retr.vars[!is.site]
+    sqvars <- unique(c(vars[['site']], retr.vars[!is.site]))
     data.table <- data.tables[[as.character(tclvalue(data.type.var))]]
+
     if (length(sqvars) > 0) {
-      d.data <- QueryDatabase(con=con,
-                              sqtable=data.table,
-                              sqvars=unique(c(vars[['site']], sqvars)),
-                              site.no.var=vars[['site']],
-                              site.no=site.no,
-                              d.t.var=d.t.var,
-                              d.t.lim=d.t.lim
-                             )
-      if (inherits(d.data, "character")) {
-        ShowErrorMessage('06', d.data[1])
-        stop()
+
+      # Maintain a reasonable number of site numbers for each query;
+      # an error results from a query size that's too large.
+      n <- length(site.no)
+      inc <- seq(0, n, by=200)
+      if (n != inc[length(inc)])
+        inc <- c(inc, n)
+
+      # Query data table
+      for (i in seq(along=inc[-1])) {
+        site.numbers <- site.no[inc[i]:inc[i + 1]]
+        sel <- QueryDatabase(con=con,
+                             sqtable=data.table,
+                             sqvars=sqvars,
+                             site.no.var=vars[['site']],
+                             site.no=site.numbers,
+                             d.t.var=d.t.var,
+                             d.t.lim=d.t.lim)
+        if (inherits(sel, "character")) {
+          ShowErrorMessage('06', d.data[1])
+          stop()
+        }
+        d.data <- rbind(d.data, sel)
       }
+
       if (nrow(d.data) == 0L)
         d.data <- NULL
     }
@@ -460,6 +476,8 @@ OpenRNWIS <- function() {
 
     # Save data to file
     f <- SaveFile("Data")
+    retr.vars <- retr.vars[retr.vars %in% names(d)]
+
     if (!is.null(f)) {
       if (tolower(substr(f, nchar(f) - 2, nchar(f))) == "shp") {
         col.names <- unique(c(vars[['lng']], vars[['lat']], retr.vars))
@@ -586,21 +604,18 @@ OpenRNWIS <- function() {
       }
 
       # Site types
-      site.type.codes <- NULL
-      idxs <- as.integer(tkcurselection(frame3.lst.2.6))
-      if (length(idxs) > 0) {
-        for (i in idxs) {
-          site.type <- as.character(tkget(frame3.lst.2.6, i, i))
-          if (site.type %in% names(site.types)) {
-            site.type.codes <- c(site.type.codes, site.types[[site.type]])
-          } else {
-            site.type.codes <- NULL
-            break
-          }
-        }
-      } else {
-        tkselection.set(frame3.lst.2.6, 0)
-      }
+      site.type <- as.character(tclvalue(site.type.var))
+      if (site.type %in% names(site.types))
+        site.type.codes <- site.types[[site.type]]
+      else
+        site.type.codes <- NULL
+
+      # Agency
+      agency <- as.character(tclvalue(agency.var))
+      if (agency %in% names(agencies))
+        agency.codes <- agencies[[agency]]
+      else
+        agency.codes <- NULL
 
       # Query database
       sel <- QueryDatabase(con=con,
@@ -608,6 +623,8 @@ OpenRNWIS <- function() {
                            sqvars=sqvars,
                            site.tp.cd.var=vars[['type']],
                            site.tp.cd=site.type.codes,
+                           agency.cd.var=vars[['agency']],
+                           agency.cd=agency.codes,
                            lng.var=vars[['lng']],
                            lng.lim=c(lng.min, lng.max),
                            lat.var=vars[['lat']],
@@ -667,18 +684,20 @@ OpenRNWIS <- function() {
 
   site.table <- "sitefile_01"
 
-  data.tables <- list('Groundwater levels' = "gw_lev_01",
-                      'Hole construction' = "gw_hole_01",
-                      'Casing construction' = "gw_csng_01",
-                      'Openings construction' = "gw_open_01")
+  data.tables <- list('Groundwater levels'="gw_lev_01",
+                      'Hole construction'="gw_hole_01",
+                      'Casing construction'="gw_csng_01",
+                      'Openings construction'="gw_open_01")
 
-  site.types <- list('Well' = c("GW", "GW-CR", "GW-EX", "GW-HZ", "GW-IW",
-                                "GW-MW", "GW-TH"),
-                     'Other subsurface' = c("SB", "SB-CV", "SB-GWD", "SB-TSM",
-                                            "SB-UZ"),
-                     'Stream' = c("ST", "ST-CA", "ST-DCH", "ST-TS"),
-                     'Lake' = "LK",
-                     'Spring' = "SP")
+  site.types <- list('Well'=c("GW", "GW-CR", "GW-EX", "GW-HZ", "GW-IW",
+                              "GW-MW", "GW-TH"),
+                     'Other subsurface'=c("SB", "SB-CV", "SB-GWD", "SB-TSM",
+                                          "SB-UZ"),
+                     'Stream'=c("ST", "ST-CA", "ST-DCH", "ST-TS"),
+                     'Lake'="LK",
+                     'Spring'="SP")
+
+  agencies <- list('USGS'="USGS", 'EPA'="USEPA")
 
   # NWIS is using the WGS84 datum for the "dec_lat_va" and "dec_long_va"
   # optional variables; Google Maps also uses this dataum. NWIS required
@@ -719,6 +738,9 @@ OpenRNWIS <- function() {
   err[['06']] <- c("error", "ok",
                    "Query Error",
                    "Query resulted in error.")
+  err[['07']] <- c("error", "ok",
+                   "Empty Database Query",
+                   "Query of data table returned no data.")
 
   # Initialize top-level variables
 
@@ -738,8 +760,7 @@ OpenRNWIS <- function() {
   site.file.var <- tclVar()
   poly.file.var <- tclVar()
   site.type.var <- tclVar()
-  for (i in c("All ...", names(site.types)))
-    tcl("lappend", site.type.var, i)
+  agency.var <- tclVar()
   lng.min.var <- tclVar()
   lng.max.var <- tclVar()
   lat.min.var <- tclVar()
@@ -902,8 +923,8 @@ OpenRNWIS <- function() {
                              text="Longitude\n(WGS84)")
   frame3.lab.1.4 <- ttklabel(frame3, justify="center",
                              text="Altitude\n(WGS84 EGM96)")
-  frame3.lab.1.6 <- ttklabel(frame3, justify="center",
-                             text="Select type(s)")
+  frame3.lab.1.5 <- ttklabel(frame3, justify="center",
+                             text="Select site type\nand agency")
   frame3.lab.2.1 <- ttklabel(frame3, text="Minimum")
   frame3.lab.3.1 <- ttklabel(frame3, text="Maximum")
 
@@ -916,20 +937,24 @@ OpenRNWIS <- function() {
   frame3.ent.2.4 <- ttkentry(frame3, width=15, textvariable=alt.min.var)
   frame3.ent.3.4 <- ttkentry(frame3, width=15, textvariable=alt.max.var)
 
-  frame3.lst.2.6 <- tklistbox(frame3, selectmode="extended", activestyle="none",
-                              relief="flat", borderwidth=5, width=15, height=6,
-                              exportselection=FALSE, listvariable=site.type.var,
-                              highlightthickness=0)
-  tkselection.set(frame3.lst.2.6, 0)
+  frame3.box.2.5 <- ttkcombobox(frame3, state="readonly", width=15,
+                                textvariable=site.type.var)
+  frame3.box.3.5 <- ttkcombobox(frame3, state="readonly", width=15,
+                                textvariable=agency.var)
+  tkconfigure(frame3.box.2.5, values=c("All types ...", names(site.types)))
+  tkconfigure(frame3.box.3.5, values=c("All agencies ...",
+                                       names(agencies)))
+  tcl(frame3.box.2.5, "current", 0)
+  tcl(frame3.box.3.5, "current", 0)
 
   frame3.lab.4.1 <- ttklabel(frame3, foreground="#414042", text="e.g.")
   frame3.lab.4.2 <- ttklabel(frame3, foreground="#414042", text="43.510023")
   frame3.lab.4.3 <- ttklabel(frame3, foreground="#414042", text="-112.980728")
   frame3.lab.4.4 <- ttklabel(frame3, foreground="#414042", text="4382.3")
 
-  frame3.lab.5.1 <- ttklabel(frame3, text="Polygon file")
+  frame3.lab.5.1 <- ttklabel(frame3, text="Polygon")
   frame3.ent.5.2 <- ttkentry(frame3, width=25, textvariable=poly.file.var)
-  frame3.but.5.5 <- ttkbutton(frame3, width=8, text="Browse",
+  frame3.but.5.6 <- ttkbutton(frame3, width=8, text="Browse",
                               command=function() OpenFile("Polygon",
                                                           poly.file.var))
 
@@ -946,34 +971,33 @@ OpenRNWIS <- function() {
 
   tkgrid(frame3, columnspan=2, sticky="we")
 
-  tkgrid("x", frame3.lab.1.2, frame3.lab.1.3, frame3.lab.1.4, "x",
-         frame3.lab.1.6, pady=c(0, 1))
-  tkgrid.configure(frame3.lab.1.6, padx=c(10, 0), sticky="s")
+  tkgrid("x", frame3.lab.1.2, frame3.lab.1.3, frame3.lab.1.4, frame3.lab.1.5,
+         "x", pady=c(0, 1))
 
   tkgrid(frame3.lab.2.1, frame3.ent.2.2, frame3.ent.2.3, frame3.ent.2.4,
-         "x", frame3.lst.2.6, padx=1, pady=c(0, 1), sticky="we")
+         frame3.box.2.5, "x", padx=1, pady=c(0, 1), sticky="we")
 
   tkgrid(frame3.lab.3.1, frame3.ent.3.2, frame3.ent.3.3, frame3.ent.3.4,
-         padx=1, pady=c(1, 0), sticky="we")
+         frame3.box.3.5, "x", padx=1, pady=c(1, 0), sticky="we")
 
   tkgrid.configure(frame3.lab.2.1, frame3.lab.3.1, sticky="e", padx=c(10, 0))
 
   tkgrid(frame3.lab.4.1, frame3.lab.4.2, frame3.lab.4.3, frame3.lab.4.4)
   tkgrid.configure(frame3.lab.4.1, sticky="e")
 
-  tkgrid.configure(frame3.lab.1.4, frame3.ent.2.4, frame3.ent.3.4,
-                   frame3.lab.4.4, columnspan=2)
+  tkgrid(frame3.lab.5.1, frame3.ent.5.2, "x", "x", "x", frame3.but.5.6,
+         pady=c(7, 0))
 
-  tkgrid(frame3.lab.5.1, frame3.ent.5.2, "x", "x", frame3.but.5.5, pady=c(7, 0))
+  tkgrid.configure(frame3.lab.1.5, frame3.box.2.5, frame3.box.3.5,
+                   padx=c(10, 0), columnspan=2)
+
   tkgrid.configure(frame3.lab.5.1, padx=c(10, 0), sticky="e")
-  tkgrid.configure(frame3.ent.5.2, columnspan=3, sticky="we", padx=c(1, 2))
-
-  tkgrid.configure(frame3.lst.2.6, rowspan=4, padx=c(10, 0),
-                   pady=1, sticky="nsew")
+  tkgrid.configure(frame3.ent.5.2, columnspan=4, sticky="we", padx=c(1, 2))
 
   tkgrid.columnconfigure(frame3, 1, weight=1, minsize=15)
   tkgrid.columnconfigure(frame3, 2, weight=1, minsize=15)
   tkgrid.columnconfigure(frame3, 3, weight=1, minsize=15)
+  tkgrid.columnconfigure(frame3, 4, weight=1, minsize=15)
 
   tkgrid.columnconfigure(frame2, 0, weight=1, minsize=15)
 
