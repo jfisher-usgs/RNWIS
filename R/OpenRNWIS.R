@@ -33,7 +33,11 @@ OpenRNWIS <- function() {
   # Open query object
 
   OpenQueryObject <- function(d) {
+    tcl(frame1.box.1.2, "current", d$dsn.sel)
+
     tclServiceMode(FALSE)
+
+    OpenConnection()
 
     tclvalue(opt.var) <- d$opt
     SetState()
@@ -50,8 +54,8 @@ OpenRNWIS <- function() {
     tclvalue(tmin.var) <- d$tmin
     tclvalue(tmax.var) <- d$tmax
 
-    tcl(frame1.box.1.2, "current", d$dsn.sel)
-    OpenConnection()
+    initialdir <<- d$initialdir
+    save.file <<- d$save.file
 
     tcl(frame3.box.2.5, "current", d$site.type.sel)
     tcl(frame3.box.3.5, "current", d$agency.sel)
@@ -677,10 +681,29 @@ OpenRNWIS <- function() {
     as.character(ans)
   }
 
+  # About package
+
+  AboutPackage <- function() {
+    if ("package:RNWIS" %in% search())
+      path <- system.file("DESCRIPTION", package="RNWIS")
+    else
+      path <- paste(getwd(), "/DESCRIPTION", sep="")
+    msg <- paste(readLines(path, n=-1L), collapse="\n")
+    tkmessageBox(icon="info", message=msg, title="About", parent=tt)
+  }
+
 
   # Main program
 
-  # Variables specific to NWIS
+  # Variables specific to NWIS:
+
+  # NWIS uses the WGS84 datum for <optional> variables "dec_lat_va" and
+  # "dec_long_va"; Google Maps also uses this dataum. NWIS <required>
+  # variables "lat_va" and "long_va" (unused in this program) are
+  # either using the NAD27 or NAD83 datum and specified with "coord_datum_cd".
+  # NWIS altitudes "alt_va" are either in NGVD29 or NAVD88; this
+  # program does not convert altitudes to the Google Maps WGS84 EGM96 vertical
+  # datum (this may be possible with future versions of PROJ.4).
 
   site.table <- "sitefile_01"
 
@@ -698,11 +721,6 @@ OpenRNWIS <- function() {
                      'Spring'="SP")
 
   agencies <- list('USGS'="USGS", 'EPA'="USEPA")
-
-  # NWIS is using the WGS84 datum for the "dec_lat_va" and "dec_long_va"
-  # optional variables; Google Maps also uses this dataum. NWIS required
-  # variables "lat_va" and "long_va" (not called in this program) are
-  # either using the NAD27 or NAD83 datum ("coord_datum_cd").
 
   vars <- list('lat' = "dec_lat_va",
                'lng' = "dec_long_va",
@@ -834,13 +852,16 @@ OpenRNWIS <- function() {
   tkadd(menu.file, "command", label="Exit",
         command=CloseGUI)
 
+  menu.help <- tkmenu(tt, tearoff=0)
+  tkadd(top.menu, "cascade", label="Help", menu=menu.help, underline=0)
+  tkadd(menu.help, "command", label="About", command=AboutPackage)
   if (!"RNWIS" %in% .packages()) {
     if ("RSurvey" %in% .packages(all.available=TRUE)) {
       suppressPackageStartupMessages(require("RSurvey"))
       if (!is.null(Data("win.loc")))
         tkwm.geometry(tt, Data("win.loc"))
-      tkadd(menu.file, "separator")
-      tkadd(menu.file, "command", label="Restore R session",
+      tkadd(menu.help, "separator")
+      tkadd(menu.help, "command", label="Restore R session",
             command=function() {
               geo <- unlist(strsplit(as.character(tkwm.geometry(tt)), "\\+"))
               win.loc <- paste("+", as.integer(geo[2]),
@@ -922,7 +943,7 @@ OpenRNWIS <- function() {
   frame3.lab.1.3 <- ttklabel(frame3, justify="center",
                              text="Longitude\n(WGS84)")
   frame3.lab.1.4 <- ttklabel(frame3, justify="center",
-                             text="Altitude\n(WGS84 EGM96)")
+                             text="Altitude\nin feet")
   frame3.lab.1.5 <- ttklabel(frame3, justify="center",
                              text="Select site type\nand agency")
   frame3.lab.2.1 <- ttklabel(frame3, text="Minimum")
