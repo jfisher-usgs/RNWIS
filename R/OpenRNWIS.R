@@ -1148,6 +1148,10 @@ OpenRNWIS <- function() {
 
   # Bind events
 
+  tkbind(tt, "<Control-o>", function() OpenQueryFile())
+  tkbind(tt, "<Control-s>", function() SaveQueryFile(save.file))
+  tkbind(tt, "<Shift-Control-S>", function() SaveQueryFile())
+
   tkbind(frame1.box.1.2, "<<ComboboxSelected>>", OpenConnection)
   tkbind(frame4.box.4.3, "<<ComboboxSelected>>", UpdateDataVariables)
 
