@@ -12,6 +12,7 @@ Something
 QueryDatabase(con, sqtable, sqvars = "*",
           site.no.var = NULL, site.no = NULL,
           site.tp.cd.var = NULL, site.tp.cd = NULL,
+          agency.cd.var = NULL, agency.cd = NULL,
           lat.var = NULL, lat.lim = c(NA, NA),
           lng.var = NULL, lng.lim = c(NA, NA),
           alt.var = NULL, alt.lim = c(NA, NA),
@@ -26,6 +27,8 @@ QueryDatabase(con, sqtable, sqvars = "*",
 \item{site.no}{numeric; something.}
 \item{site.tp.cd.var}{character; something.}
 \item{site.tp.cd}{character; something.}
+\item{agency.cd.var}{character; something.}
+\item{agency.cd}{character; something.}
 \item{lat.var}{character; something.}
 \item{lat.lim}{numeric; something.}
 \item{lng.var}{character; something.}

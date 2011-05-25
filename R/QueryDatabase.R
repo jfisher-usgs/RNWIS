@@ -1,6 +1,7 @@
 QueryDatabase <- function(con, sqtable, sqvars="*",
                           site.no.var=NULL, site.no=NULL,
                           site.tp.cd.var=NULL, site.tp.cd=NULL,
+                          agency.cd.var=NULL, agency.cd=NULL,
                           lat.var=NULL, lat.lim=c(NA, NA),
                           lng.var=NULL, lng.lim=c(NA, NA),
                           alt.var=NULL, alt.lim=c(NA, NA),
@@ -29,7 +30,15 @@ QueryDatabase <- function(con, sqtable, sqvars="*",
 
   if (!is.null(site.tp.cd.var)) {
     if (!is.null(site.tp.cd)) {
-      hold <- paste(site.tp.cd.var, " = \'", site.tp.cd, "\'", sep="")
+      hold <- paste(site.tp.cd.var, "=\'", site.tp.cd, "\'", sep="")
+      hold <- paste("(", paste(hold, collapse=" OR "), ")", sep="")
+      cond <- c(cond, hold)
+    }
+  }
+
+  if (!is.null(agency.cd.var)) {
+    if (!is.null(agency.cd)) {
+      hold <- paste(agency.cd.var, "=\'", agency.cd, "\'", sep="")
       hold <- paste("(", paste(hold, collapse=" OR "), ")", sep="")
       cond <- c(cond, hold)
     }
@@ -38,21 +47,21 @@ QueryDatabase <- function(con, sqtable, sqvars="*",
   if (is.null(site.no.var)) {
     if (!is.null(lat.var)) {
       if (!is.na(lat.lim[1]))
-        cond <- c(cond, paste(lat.var, " >= \'", lat.lim[1], "\'", sep=""))
+        cond <- c(cond, paste(lat.var, ">=\'", lat.lim[1], "\'", sep=""))
       if (!is.na(lat.lim[2]))
-        cond <- c(cond, paste(lat.var, " <= \'", lat.lim[2], "\'", sep=""))
+        cond <- c(cond, paste(lat.var, "<=\'", lat.lim[2], "\'", sep=""))
     }
     if (!is.null(lng.var)) {
       if (!is.na(lng.lim[1]))
-        cond <- c(cond, paste(lng.var, " >= \'", lng.lim[1], "\'", sep=""))
+        cond <- c(cond, paste(lng.var, ">=\'", lng.lim[1], "\'", sep=""))
       if (!is.na(lng.lim[2]))
-        cond <- c(cond, paste(lng.var, " <= \'", lng.lim[2], "\'", sep=""))
+        cond <- c(cond, paste(lng.var, "<=\'", lng.lim[2], "\'", sep=""))
     }
     if (!is.null(alt.var)) {
       if (!is.na(alt.lim[1]))
-        cond <- c(cond, paste(alt.var, " >= \'", alt.lim[1], "\'", sep=""))
+        cond <- c(cond, paste(alt.var, ">=\'", alt.lim[1], "\'", sep=""))
       if (!is.na(alt.lim[2]))
-        cond <- c(cond, paste(alt.var, " <= \'", alt.lim[2], "\'", sep=""))
+        cond <- c(cond, paste(alt.var, "<=\'", alt.lim[2], "\'", sep=""))
     }
   } else {
     if (is.null(site.no))
@@ -69,9 +78,9 @@ QueryDatabase <- function(con, sqtable, sqvars="*",
     if (inherits(d.t.lim, "POSIXt"))
       d.t.lim <- format(d.t.lim, format="%Y-%m-%d %H:%M:%S")
     if (!is.na(d.t.lim[1]))
-      cond <- c(cond, paste(d.t.var, " >= \'", d.t.lim[1], "\'", sep=""))
+      cond <- c(cond, paste(d.t.var, ">=\'", d.t.lim[1], "\'", sep=""))
     if (!is.na(d.t.lim[2]))
-      cond <- c(cond, paste(d.t.var, " <= \'", d.t.lim[2], "\'", sep=""))
+      cond <- c(cond, paste(d.t.var, "<=\'", d.t.lim[2], "\'", sep=""))
   }
 
   conds <- ""
