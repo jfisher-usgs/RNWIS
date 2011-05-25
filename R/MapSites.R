@@ -67,8 +67,7 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
 
   # Determine path to temporary directory
 
-  is.pkg <- "package:RNWIS" %in% search()
-  if (is.pkg)
+  if ("package:RNWIS" %in% search())
     path <- system.file("map", package="RNWIS")
   else
     path <- paste(getwd(), "/inst/map", sep="")
