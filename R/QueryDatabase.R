@@ -22,12 +22,12 @@ QueryDatabase <- function(con, sqtable, sqvars="*",
     con <- odbcConnect(con, uid="", pwd="")
     on.exit(close(con))
   }
-
-  # Build query string
-
-  vars <- paste(sqvars, collapse=", ")
   cond <- c()
 
+  # Variables
+  vars <- paste(sqvars, collapse=", ")
+
+  # Site type
   if (!is.null(site.tp.cd.var)) {
     if (!is.null(site.tp.cd)) {
       hold <- paste(site.tp.cd.var, "=\'", site.tp.cd, "\'", sep="")
@@ -36,6 +36,7 @@ QueryDatabase <- function(con, sqtable, sqvars="*",
     }
   }
 
+  # Agency
   if (!is.null(agency.cd.var)) {
     if (!is.null(agency.cd)) {
       hold <- paste(agency.cd.var, "=\'", agency.cd, "\'", sep="")
@@ -44,26 +45,29 @@ QueryDatabase <- function(con, sqtable, sqvars="*",
     }
   }
 
-  if (is.null(site.no.var)) {
+  if (is.null(site.no.var)) { # spatial domain
+    # Latitude limits
     if (!is.null(lat.var)) {
       if (!is.na(lat.lim[1]))
         cond <- c(cond, paste(lat.var, ">=\'", lat.lim[1], "\'", sep=""))
       if (!is.na(lat.lim[2]))
         cond <- c(cond, paste(lat.var, "<=\'", lat.lim[2], "\'", sep=""))
     }
+    # Longitude limits
     if (!is.null(lng.var)) {
       if (!is.na(lng.lim[1]))
         cond <- c(cond, paste(lng.var, ">=\'", lng.lim[1], "\'", sep=""))
       if (!is.na(lng.lim[2]))
         cond <- c(cond, paste(lng.var, "<=\'", lng.lim[2], "\'", sep=""))
     }
+    # Altitude limits
     if (!is.null(alt.var)) {
       if (!is.na(alt.lim[1]))
         cond <- c(cond, paste(alt.var, ">=\'", alt.lim[1], "\'", sep=""))
       if (!is.na(alt.lim[2]))
         cond <- c(cond, paste(alt.var, "<=\'", alt.lim[2], "\'", sep=""))
     }
-  } else {
+  } else { # site numbers
     if (is.null(site.no))
       return()
     site.no <- na.omit(as.numeric(site.no))
@@ -74,6 +78,7 @@ QueryDatabase <- function(con, sqtable, sqvars="*",
     cond <- c(cond, hold)
   }
 
+  # Date limits
   if (!is.null(d.t.var)) {
     if (inherits(d.t.lim, "POSIXt"))
       d.t.lim <- format(d.t.lim, format="%Y-%m-%d %H:%M:%S")
@@ -83,18 +88,16 @@ QueryDatabase <- function(con, sqtable, sqvars="*",
       cond <- c(cond, paste(d.t.var, "<=\'", d.t.lim[2], "\'", sep=""))
   }
 
+  # Construct query string
   conds <- ""
   if (length(cond) > 0)
     conds <- paste("WHERE (", paste(cond, collapse=" AND "), ")", sep="")
-
   query <- paste("SELECT", vars, "FROM", sqtable, conds)
 
   # Query database
-
   d <- sqlQuery(con, query, stringsAsFactors=FALSE)
 
   # Remove leading and trailing white spaces
-
   for (i in seq(along=names(d))) {
     if (inherits(d[, i], "character"))
       d[, i] <- trim(d[, i])
