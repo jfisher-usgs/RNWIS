@@ -6,6 +6,7 @@ QueryDatabase <- function(con, sqtable, sqvars="*",
                           lng.var=NULL, lng.lim=c(NA, NA),
                           alt.var=NULL, alt.lim=c(NA, NA),
                           d.t.var=NULL, d.t.lim=c(NA, NA)) {
+  # Construct and submit SQL query to an ODBC database.
 
   # Additional functions (subroutines)
 

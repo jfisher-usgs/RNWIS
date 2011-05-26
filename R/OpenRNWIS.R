@@ -1,5 +1,5 @@
 OpenRNWIS <- function() {
-  # A GUI for configuring the database connection
+  # GUI for defining search parameters in query.
 
   # Additional functions (subroutines)
 
@@ -530,7 +530,7 @@ OpenRNWIS <- function() {
     date
   }
 
-  # Process site strings, returns vector of site numbers
+  # Convert site strings to vector of site numbers
 
   CleanSiteStrings <- function(s) {
     str.split <- unlist(strsplit(s, '[[:punct:][:space:]]'))
@@ -546,20 +546,17 @@ OpenRNWIS <- function() {
 
     sqvars <- unique(c(vars[['lat']], vars[['lng']], sqvars))
 
-    # Site numbers
+    # Base query on site numbers
     if (opt == 1L | opt == 2L) {
 
-      # Get site number(s) in entry box
-      if (opt == 1L) {
+      if (opt == 1L) { # get site number(s) in entry box
         site.no <- as.character(tclvalue(site.no.var))
         if (site.no == "") {
           ShowErrorMessage('03')
           stop()
         }
         site.no <- CleanSiteStrings(site.no)
-
-      # Read site numbers in file
-      } else {
+      } else { # read site number(s) from file
         site.file <- as.character(tclvalue(site.file.var))
         if (site.file == "" || file.access(site.file, mode=0) < 0) {
           ShowErrorMessage('03')
@@ -580,7 +577,7 @@ OpenRNWIS <- function() {
                            site.no.var=vars[['site']],
                            site.no=site.no)
 
-    # Site attributes
+    # Base query on site attributes
     } else if (opt == 3L) {
 
       # Spatial limits
@@ -591,7 +588,7 @@ OpenRNWIS <- function() {
       alt.min <- suppressWarnings(as.numeric(tclvalue(alt.min.var)))
       alt.max <- suppressWarnings(as.numeric(tclvalue(alt.max.var)))
 
-      # Polygon box domain
+      # Account for spatial limits imposed by polygon bounding box
       poly.obj <- NULL
       poly.file <- as.character(tclvalue(poly.file.var))
       if (poly.file != "" && file.access(poly.file, mode=0) == 0) {
@@ -640,7 +637,7 @@ OpenRNWIS <- function() {
         stop()
       }
 
-      # Sites in polygon domain
+      # Only permit sites inside polygon spatial domain
       if (!is.null(poly.obj)) {
         poly.pts <- get.pts(poly.obj)
         for (i in seq(along=poly.pts)) {
@@ -836,7 +833,7 @@ OpenRNWIS <- function() {
   tt <- tktoplevel(padx=0, pady=0)
   tktitle(tt) <- "National Water Information System: R Interface"
 
-  # Create menus
+  # Create pull-down menus
 
   top.menu <- tkmenu(tt, tearoff=0)
 
@@ -894,7 +891,7 @@ OpenRNWIS <- function() {
 
   tkpack(frame0, side="bottom", anchor="e")
 
-  # Frame 1, ODBC source name selection
+  # Frame 1, ODBC database source name selection
 
   frame1 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3,
                           text="Select a registerd ODBC data source")

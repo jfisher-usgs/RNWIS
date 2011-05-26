@@ -1,4 +1,5 @@
 MapSites <- function(sites, polygons=NULL, map.id=NULL) {
+  # Write site data and polygon data to JSON file, open Google Map.
 
   # Additional functions (subroutines)
 
@@ -22,7 +23,7 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
     s
   }
 
-  # Is polygon winding direction clockwise
+  # Check if polygon winding direction is clockwise
 
   ClockWise <- function(x, y) {
     num <- length(x)
@@ -72,7 +73,7 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
   else
     path <- paste(getwd(), "/inst/map", sep="")
 
-  # Read and write html and js files
+  # Read and write html and js files (TODO: find better way of doing this)
 
   obj <- readLines(paste(path, "/MapSites.html", sep=""))
   write(obj, file=f.html, sep="\n")
@@ -80,7 +81,7 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
   obj <- readLines(paste(path, "/markerclusterer_packed.js", sep=""))
   write(obj, file=f.js, sep="\n")
 
-  # Build JSON character string
+  # Construct character string with JSON format
 
   con <- file(description=f.json, open="w")
 
@@ -103,7 +104,7 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
 
       # Browser graphics engines require clockwise outer polygon(s) and
       # counterclockwise inner polygon(s) for proper rendering of inner
-      # hole; this is not documented in the Google Maps API (wtf).
+      # hole; this is not documented in the Google Maps API (wtf!).
 
       is.clockwise <- ClockWise(lng, lat)
       is.hole <- poly.pts[[i]]$hole
@@ -124,7 +125,7 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
   cat(s, file=con, sep="\n", append=FALSE)
   close(con)
 
-  # Open html file in web browser
+  # Open html file in default web browser
 
   browseURL(paste("file:\\\\", f.html, sep=""), browser=getOption("browser"))
 }

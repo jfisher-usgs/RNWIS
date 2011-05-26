@@ -1,7 +1,9 @@
 ExploreDatabase <- function(con, parent=NULL) {
-  # Explore database connection
+  # GUI for exploring contents of database.
 
   # Additional functions (subroutines)
+
+  # Retrieve column structure for a database table.
 
   GetVariables <- function() {
     idx <- as.integer(tkcurselection(frame1.lst.2.1))
@@ -48,7 +50,7 @@ ExploreDatabase <- function(con, parent=NULL) {
   sql.tables <- sqlTables(con, errors=FALSE, as.is=TRUE)[, "TABLE_NAME"]
   sql.tables <- sort(sql.tables)
 
-  help.url <- "http://nwis.usgs.gov/dbms/"
+  help.url <- "http://nwis.usgs.gov/dbms/" # only available on USGS intranet
 
   # Assign variables linked to Tk widgets
 
@@ -78,15 +80,11 @@ ExploreDatabase <- function(con, parent=NULL) {
                             command=function() browseURL(help.url))
   frame0.but.2 <- ttkbutton(frame0, width=12, text="Close",
                             command=function() tclvalue(tt.done.var) <- 1)
-
   frame0.grp.3 <- ttksizegrip(frame0)
-
   tkgrid(frame0.but.1, frame0.but.2, frame0.grp.3)
-
   tkgrid.configure(frame0.but.1, frame0.but.2, sticky="e",
                    padx=2, pady=c(12, 10))
   tkgrid.configure(frame0.grp.3, sticky="se")
-
   tkpack(frame0, side="bottom", anchor="e")
 
   # Paned window
@@ -98,7 +96,6 @@ ExploreDatabase <- function(con, parent=NULL) {
   frame1 <- ttkframe(pw, relief="flat", borderwidth=0, padding=0)
 
   frame1.lab.1.1 <- ttklabel(frame1, text="Select table")
-
   frame1.lst.2.1 <- tklistbox(frame1, selectmode="browse", activestyle="none",
                 relief="flat", borderwidth=5, exportselection=FALSE,
                 listvariable=tables.var, highlightthickness=0,
@@ -166,10 +163,8 @@ ExploreDatabase <- function(con, parent=NULL) {
   # Final layout
 
   tkgrid(frame1, frame2, padx=2, pady=2, sticky="nswe")
-
   tkadd(pw, frame1, weight=0)
   tkadd(pw, frame2, weight=1)
-
   tkpack(pw, fill="both", expand=TRUE, padx=15, pady=5)
 
   # GUI control
