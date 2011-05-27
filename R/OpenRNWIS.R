@@ -851,8 +851,6 @@ OpenRNWIS <- function() {
 
   menu.help <- tkmenu(tt, tearoff=0)
   tkadd(top.menu, "cascade", label="Help", menu=menu.help, underline=0)
-  tkadd(menu.help, "command", label="License",
-        command=function() RShowDoc("COPYING", package="RNWIS"))
   tkadd(menu.help, "command", label="About", command=AboutPackage)
   if (!"RNWIS" %in% .packages()) {
     if ("RSurvey" %in% .packages(all.available=TRUE)) {
