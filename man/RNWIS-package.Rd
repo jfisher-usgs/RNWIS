@@ -28,8 +28,7 @@ application, using multiple top-level windows for the console, graphics, and
 pager.
 
 The set of standards used for coding \pkg{RNWIS} is documented in
-\emph{Google's R Style Guide},
-\url{http://google-styleguide.googlecode.com/svn/trunk/google-r-style.html}.
+\href{http://google-styleguide.googlecode.com/svn/trunk/google-r-style.html}{Google's R Style Guide}.
 }
 
 \author{
