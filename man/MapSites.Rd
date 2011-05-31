@@ -13,9 +13,9 @@ MapSites(sites, polygons = NULL, map.id = NULL)
 }
 
 \arguments{
-\item{sites}{data.frame; site location information, see \sQuote{Details}.}
+\item{sites}{data.frame; site information, see \sQuote{Details}.}
 \item{polygons}{gpc.poly; polygon information.}
-\item{map.id}{character; the initial part of the temporary file names.}
+\item{map.id}{character; initial part of the temporary file names.}
 }
 
 \details{
@@ -23,9 +23,10 @@ The \code{sites} data table has components of
 \code{lat}, \code{lng}, \code{alt}, \code{site}, \code{name}, \code{agency},
 and \code{type}.
 Where \code{lat} and \code{lng} are the latitude and longitude
-based on the WGS84 datum;
+based on the \href{http://en.wikipedia.org/wiki/WGS84}{WGS84} datum;
 \code{alt} is the altitude of the site referenced to the specified
-vertical datum (NGVD29 or NAVD88);
+vertical datum (\href{http://en.wikipedia.org/wiki/NGVD29}{NGVD29} or
+\href{http://en.wikipedia.org/wiki/NAVD88}{NAVD 88});
 \code{site} is the unique site identification number;
 \code{name} is the name of the site;
 \code{agency} is the code for the agency reporting the data;
@@ -37,8 +38,8 @@ Writes three files to a temporary directory. Base names are identical with
 extensions indicating file type. An \acronym{HTML} file (\file{.html}) is
 loaded into the default web browser and calls on MarkerClusterer,
 a javascript library (\file{.js}) that creates and manages per-zoom-level
-clusters for large amounts of markers, and a \acronym{JSON} data file
-(\file{.json}) dynamically created from site and polygon information.
+clusters for large amounts of markers, and a \href{http://www.json.org/}{JSON}
+data file (\file{.json}) dynamically created from site and polygon information.
 }
 
 \author{Fisher, J.C.}

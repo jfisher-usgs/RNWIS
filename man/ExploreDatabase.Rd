@@ -13,12 +13,12 @@ ExploreDatabase(con, parent = NULL)
 }
 
 \arguments{
-\item{con}{RODBC; a connection to a ODBC database.}
-\item{parent}{tkwin; the parent window (optional).}
+\item{con}{RODBC; connection to ODBC database.}
+\item{parent}{tkwin; parent window (optional).}
 }
 
 \details{
-Shows the database table names and column structure for each table.
+Shows database table names and column structure for each table.
 }
 
 \author{Fisher, J.C.}
