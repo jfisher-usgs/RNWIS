@@ -28,7 +28,7 @@ Shows database table names and column structure for each table.
 }
 
 \examples{
-\donttest{con <- odbcConnect("NWIS Idaho", uid="", pwd="")
+\donttest{con <- odbcConnect("NWIS Idaho", uid = "", pwd = "")
 ExploreDatabase(con)}
 }
 

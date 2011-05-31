@@ -66,21 +66,21 @@ Something.
 }
 
 \examples{
-\donttest{con <- odbcConnect("NWIS Idaho", uid="", pwd="")
+\donttest{con <- odbcConnect("NWIS Idaho", uid = "", pwd = "")
 
-d <- QueryDatabase(con, sqtable="sitefile_01",
+d <- QueryDatabase(con, sqtable = "sitefile_01",
                    sqvars = c("site_no", "alt_va"),
                    site.no.var = "site_no",
                    site.no = c(432700112470801, 435038112453401))
 
-d <- QueryDatabase(con, sqtable="sitefile_01",
+d <- QueryDatabase(con, sqtable = "sitefile_01",
                    sqvars = c("site_no", "dec_lat_va", "dec_long_va"),
                    site.tp.cd.var = "site_tp_cd", site.tp.cd = "GW",
                    agency.cd.var = "agency_cd", agency.cd = c("USGS", "USEPA"),
                    lng.var = "dec_long_va", lng.lim = c(-114.00, -112.00),
                    lat.var = "dec_lat_va", lat.lim = c(43.00, 44.00))
 
-d <- QueryDatabase(con, sqtable="gw_lev_01",
+d <- QueryDatabase(con, sqtable = "gw_lev_01",
                    sqvars = c("site_no", "lev_dt", "lev_va"),
                    site.no.var = "site_no", site.no = 432700112470801)
 }
