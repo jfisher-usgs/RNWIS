@@ -689,6 +689,23 @@ OpenRNWIS <- function() {
     tkmessageBox(icon="info", message=msg, title="About", parent=tt)
   }
 
+  # Open HTML help for R functions
+
+  OpenHTMLHelp <- function() {
+    if (!("RNWIS" %in% .packages(all.available=TRUE)))
+      return()
+    if (tools:::httpdPort == 0L)
+      tools::startDynamicHelp()
+    if (tools:::httpdPort > 0L) {
+      url <- paste("http://127.0.0.1:", tools:::httpdPort,
+                   "/library/RNWIS/html/00Index.html", sep="")
+      browseURL(url)
+    } else {
+      stop("requires the HTTP server to be running", call.=FALSE)
+    }
+    invisible()
+  }
+
 
   # Main program
 
@@ -851,6 +868,9 @@ OpenRNWIS <- function() {
 
   menu.help <- tkmenu(tt, tearoff=0)
   tkadd(top.menu, "cascade", label="Help", menu=menu.help, underline=0)
+  tkadd(menu.help, "command", label="R functions (html)",
+        command=OpenHTMLHelp)
+  tkadd(menu.help, "separator")
   tkadd(menu.help, "command", label="About", command=AboutPackage)
   if (!"RNWIS" %in% .packages()) {
     if ("RSurvey" %in% .packages(all.available=TRUE)) {
