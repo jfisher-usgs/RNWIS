@@ -38,7 +38,9 @@ Maintainer: <\email{jfisher@usgs.gov}>
 }
 
 \examples{
-\donttest{library(RNWIS)}
+\donttest{library(RNWIS)
+OpenRNWIS()
+}
 }
 
 \keyword{package}

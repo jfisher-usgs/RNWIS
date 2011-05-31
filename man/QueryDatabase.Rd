@@ -20,8 +20,8 @@ QueryDatabase(con, sqtable, sqvars = "*",
 }
 
 \arguments{
-\item{con}{connection; something.}
-\item{sqtable}{character; something.}
+\item{con}{connection; a connection to a ODBC database.}
+\item{sqtable}{character; the table name.}
 \item{sqvars}{character; something.}
 \item{site.no.var}{character; something.}
 \item{site.no}{numeric; something.}
@@ -36,10 +36,14 @@ QueryDatabase(con, sqtable, sqvars = "*",
 \item{alt.var}{character; something.}
 \item{alt.lim}{numeric; something.}
 \item{d.t.var}{character; something.}
-\item{d.t.lim}{character, POSIXt; something.}
+\item{d.t.lim}{POSIXt; something.}
 }
 
 \details{
+Something.
+}
+
+\value{
 Something.
 }
 
@@ -50,7 +54,9 @@ Something.
 }
 
 \examples{
-print("something")
+\donttest{con <- odbcConnect("NWIS")
+QueryDatabase(con)
+}
 }
 
 \keyword{IO}

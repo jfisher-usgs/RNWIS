@@ -1,5 +1,5 @@
 MapSites <- function(sites, polygons=NULL, map.id=NULL) {
-  # Write site data and polygon data to JSON file, open Google Map.
+  # Write site and polygon data to JSON file and open in Google Maps.
 
   # Additional functions (subroutines)
 

@@ -5,7 +5,7 @@
 \title{Explore Database Connection}
 
 \description{
-A \acronym{GUI} for exploring the database connection
+A \acronym{GUI} for exploring the contents of database.
 }
 
 \usage{
@@ -13,22 +13,23 @@ ExploreDatabase(con, parent = NULL)
 }
 
 \arguments{
-\item{con}{RODBC; connection object.}
+\item{con}{RODBC; a connection to a ODBC database.}
 \item{parent}{tkwin; the parent window (optional).}
 }
 
 \details{
-Something.
+Shows the database table names and column structure for each table.
 }
 
 \author{Fisher, J.C.}
 
 \seealso{
-\code{odbcConnect}, \code{sqlTables}
+\code{sqlTables}, \code{sqlColumns}, \code{sqlPrimaryKeys}
 }
 
 \examples{
-print("something")
+\donttest{con <- odbcConnect("NWIS")
+ExploreDatabase(con)}
 }
 
 \keyword{misc}
