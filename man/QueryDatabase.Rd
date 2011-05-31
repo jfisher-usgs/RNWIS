@@ -56,18 +56,19 @@ Something.
 }
 
 \value{
-Something.
+On success, a data frame (possibly with 0 rows) or character string. On error,
+a character vector of error message(s).
 }
 
 \author{Fisher, J.C.}
 
 \seealso{
-\code{odbcConnect}, \code{sqlQuery}
+\code{sqlQuery}
 }
 
 \examples{
-\donttest{con <- odbcConnect("NWIS Idaho", uid = "", pwd = "")
-
+\dontrun{con <- odbcConnect("NWIS Idaho", uid = "", pwd = "")}
+\donttest{
 d <- QueryDatabase(con, sqtable = "sitefile_01",
                    sqvars = c("site_no", "alt_va"),
                    site.no.var = "site_no",
@@ -83,6 +84,8 @@ d <- QueryDatabase(con, sqtable = "sitefile_01",
 d <- QueryDatabase(con, sqtable = "gw_lev_01",
                    sqvars = c("site_no", "lev_dt", "lev_va"),
                    site.no.var = "site_no", site.no = 432700112470801)
+
+close(con)
 }
 }
 

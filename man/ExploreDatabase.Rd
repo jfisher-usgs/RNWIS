@@ -18,7 +18,7 @@ ExploreDatabase(con, parent = NULL)
 }
 
 \details{
-Shows database table names and column structure for each table.
+Shows database table names and the column structure for each table.
 }
 
 \author{Fisher, J.C.}
@@ -28,8 +28,8 @@ Shows database table names and column structure for each table.
 }
 
 \examples{
-\donttest{con <- odbcConnect("NWIS Idaho", uid = "", pwd = "")
-ExploreDatabase(con)}
+\dontrun{con <- odbcConnect("NWIS Idaho", uid = "", pwd = "")}
+\donttest{ExploreDatabase(con)}
 }
 
 \keyword{misc}

@@ -17,7 +17,7 @@ This package provides access to water-resources data.
     Package: \tab RNWIS\cr
     Type: \tab Package\cr
     Version: \tab 0.1-0\cr
-    Date: \tab 2011-05-26\cr
+    Date: \tab 2011-05-31\cr
     License: \tab GPL (>= 2)
   }
 }

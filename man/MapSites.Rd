@@ -5,7 +5,8 @@
 \title{Map Site Locations in Google Maps}
 
 \description{
-Add site markers and polygon objects to Google Maps.
+Add site markers and polygon objects to
+\href{http://maps.google.com/}{Google Maps}.
 }
 
 \usage{
