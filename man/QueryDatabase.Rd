@@ -21,7 +21,7 @@ QueryDatabase(con, sqtable, sqvars = "*",
 }
 
 \arguments{
-\item{con}{connection; a connection to a ODBC database.}
+\item{con}{RODBC; a connection to a ODBC database.}
 \item{sqtable}{character; name of the table from which data is to be
   retrieved.}
 \item{sqvars}{character; vector of column names in queried table
@@ -32,22 +32,23 @@ QueryDatabase(con, sqtable, sqvars = "*",
 \item{site.no}{numeric; vector of site identification numbers.}
 \item{site.tp.cd.var}{character; column name of queried table which shows the
   site type.}
-\item{site.tp.cd}{character; something.}
+\item{site.tp.cd}{character; vector of site type codes.}
 \item{agency.cd.var}{character; column name of queried table which shows the
   agency code.}
-\item{agency.cd}{character; something.}
+\item{agency.cd}{character; vector of agency codes.}
 \item{lat.var}{character; column name of queried table which shows the
   latitude.}
-\item{lat.lim}{numeric; vector with the minimum and maximum latitude values.}
+\item{lat.lim}{numeric; vector of minimum and maximum latitude values (WGS84).}
 \item{lng.var}{character; column name of queried table which shows the
   longitude.}
-\item{lng.lim}{numeric; something.}
+\item{lng.lim}{numeric; vector of minimum and maximum longitude values (WGS84).}
 \item{alt.var}{character; column name of queried table which shows the
   altitude.}
-\item{alt.lim}{numeric; something.}
+\item{alt.lim}{numeric; vector of minimum and maximum altitude values
+  (NGVD29 or NAVD 88).}
 \item{d.t.var}{character; column name of queried table which shows a
   date and time variable.}
-\item{d.t.lim}{POSIXt; something.}
+\item{d.t.lim}{POSIXt; vector of minimum and maximum date values.}
 }
 
 \details{
@@ -65,8 +66,23 @@ Something.
 }
 
 \examples{
-\donttest{con <- odbcConnect("NWIS")
-QueryDatabase(con)
+\donttest{con <- odbcConnect("NWIS Idaho", uid="", pwd="")
+
+d <- QueryDatabase(con, sqtable="sitefile_01",
+                   sqvars = c("site_no", "alt_va"),
+                   site.no.var = "site_no",
+                   site.no = c(432700112470801, 435038112453401))
+
+d <- QueryDatabase(con, sqtable="sitefile_01",
+                   sqvars = c("site_no", "dec_lat_va", "dec_long_va"),
+                   site.tp.cd.var = "site_tp_cd", site.tp.cd = "GW",
+                   agency.cd.var = "agency_cd", agency.cd = c("USGS", "USEPA"),
+                   lng.var = "dec_long_va", lng.lim = c(-114.00, -112.00),
+                   lat.var = "dec_lat_va", lat.lim = c(43.00, 44.00))
+
+d <- QueryDatabase(con, sqtable="gw_lev_01",
+                   sqvars = c("site_no", "lev_dt", "lev_va"),
+                   site.no.var = "site_no", site.no = 432700112470801)
 }
 }
 
