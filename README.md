@@ -24,11 +24,11 @@ by choosing to customize the startup options and specifying the SDI interface
 Install required R packages from CRAN using a simple call to
 `install.packages()`:
 
-    install.packages(c('tcltk', 'sp', 'RODBC', 'gpclib', 'rgdal'))
+    > install.packages(c('tcltk', 'sp', 'RODBC', 'gpclib', 'rgdal'))
 
 Install the **RNWIS** package:
 
-    install.packages('RNWIS', repos='ftp://ftpext.usgs.gov/pub/wr/id/scoville/Fisher/RNWIS')
+    > install.packages('RNWIS', repos='ftp://ftpext.usgs.gov/pub/wr/id/scoville/Fisher/RNWIS')
 
 The following instructions are provided for accessing NWIS using **RNWIS**.
 The site administrator must
@@ -46,8 +46,8 @@ information:
     is the state postal code, e.g. for the Idaho district the database is named
     "nwisid").
 +   The name of the data source name (DSN) that contains the
-    connection information to NWIS. An ODBC data source
-    allows the user to connect to an NWIS database using the
+    connection information to NWIS. An Open Database Connectivity (ODBC) data
+    source allows the user to connect to an NWIS database using the
     *nwis_select* Ingres access group. The site administrator enters the data
     source information using the *ODBC Data Source Administrator*.
     **RNWIS** will prompt the user for a data source to connect to. To connect to
@@ -59,8 +59,8 @@ Running
 
 Load **RNWIS** in the current R session:
 
-    library(RNWIS)
+    > library(RNWIS)
 
 Activate the main GUI:
 
-    OpenRNWIS()
+    > OpenRNWIS()
