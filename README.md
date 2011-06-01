@@ -26,6 +26,9 @@ Install required R packages from CRAN using a simple call to
 
     install.packages(c('tcltk', 'sp', 'RODBC', 'gpclib', 'rgdal'))
 
+Install the **RNWIS** package from the following FTP site:
+    install.packages("RNWIS", repos="ftp://ftpext.usgs.gov/pub/wr/id/scoville/Fisher/RNWIS")
+
 The following instructions are provided for accessing NWIS using **RNWIS**.
 The site administrator must
 [install the Ingres II client](http://bwtst.usgs.gov/database/ingres/ "Ingres")
