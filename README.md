@@ -28,7 +28,7 @@ Install required R packages from CRAN using a simple call to
 
 Install the **RNWIS** package:
 
-    > install.packages('RNWIS', repos='ftp://ftpext.usgs.gov/pub/wr/id/scoville/Fisher/RNWIS')
+    > install.packages('RNWIS', repos='ftp://ftpint.usgs.gov/private/wr/id/scoville/Fisher/RNWIS')
 
 The following instructions are provided for accessing NWIS using **RNWIS**.
 The site administrator must
