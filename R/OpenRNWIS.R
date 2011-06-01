@@ -357,8 +357,10 @@ OpenRNWIS <- function() {
   SaveFile <- function(type) {
     if (type == "Data") {
       defaultextension <- "txt"
-      filters <- matrix(c("Text Files", ".txt", "ESRI Shapefiles", ".shp",
-                          "All files", "*"), 3, 2, byrow=TRUE)
+      filters <- matrix(c("Text Files", ".txt",
+                          "Compressed Text Files", ".gz",
+                          "ESRI Shapefiles", ".shp",
+                          "All files", "*"), 4, 2, byrow=TRUE)
     } else if (type == "Query") {
       defaultextension <- "rda"
       filters <- matrix(c("RNWIS Project Files", ".rda", "All files", "*"),
@@ -483,7 +485,7 @@ OpenRNWIS <- function() {
     retr.vars <- retr.vars[retr.vars %in% names(d)]
 
     if (!is.null(f)) {
-      if (tolower(substr(f, nchar(f) - 2, nchar(f))) == "shp") {
+      if (grepl(".shp$", tolower(f))) {
         col.names <- unique(c(vars[['lng']], vars[['lat']], retr.vars))
         d <- d[, col.names]
 
@@ -507,9 +509,14 @@ OpenRNWIS <- function() {
         writeOGR(obj=d, dsn=dirname(f), driver="ESRI Shapefile",
                  layer=sub(paste(".shp$", sep=""), "", basename(f)),
                  verbose=TRUE)
-      } else {
+      } else if (grepl(".txt$", tolower(f))) {
         d <- d[, retr.vars]
         write.table(d, file=f, sep="\t", quote=FALSE, row.names=FALSE)
+      } else if (grepl(".gz$", tolower(f))) {
+        d <- d[, retr.vars]
+        con <- gzfile(description=f, open="w", compression=6)
+        write.table(d, file=con, sep="\t", quote=FALSE, row.names=FALSE)
+        close(con)
       }
     }
     tkconfigure(tt, cursor="arrow")
@@ -637,6 +644,15 @@ OpenRNWIS <- function() {
         stop()
       }
 
+      # Convert decimal degree latitude and longitude from NAD83 to WGS84.
+      xy.names <- c(vars[['lng']], vars[['lat']])
+      xy <- sel[, xy.names]
+      coordinates(xy) <- xy.names
+      s <- "+proj=longlat +datum=NAD83"
+      proj4string(xy) <- CRS(s)
+      s <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
+      sel[, xy.names] <- as.data.frame(spTransform(xy, CRS(s)))
+
       # Only permit sites inside polygon spatial domain
       if (!is.null(poly.obj)) {
         poly.pts <- get.pts(poly.obj)
@@ -711,12 +727,16 @@ OpenRNWIS <- function() {
 
   # Variables specific to NWIS:
 
-  # NWIS uses the WGS84 datum for <optional> variables "dec_lat_va" and
-  # "dec_long_va"; Google Maps also uses this dataum. NWIS <required>
-  # variables "lat_va" and "long_va" (unused in this program) are
-  # either using the NAD27 or NAD83 datum and specified with "coord_datum_cd".
-  # NWIS altitudes "alt_va" are either in NGVD29 or NAVD88; this
-  # program does not convert altitudes to the Google Maps WGS84 EGM96 vertical
+  # The decimal degree latitude and longitude (attributes dec_lat_va and
+  # dec_long_va), are stored to a common datum (NAD83). The degrees, minutes,
+  # and seconds version of latitude and longitude (attributes
+  # lat_va and long_va) are stored in the datum that the user entered the
+  # values in. If the lat_va and long_va are retrieved it is recommended
+  # that the attribute coordinate datum (coord_datum_cd) be retrieved as well.
+  # There is no guarantee that all sites have been entered in a consistent datum.
+  #
+  # Altitudes (alt_va) are stored in the NGVD29 or NAVD88 datus; RNWIS
+  # does not convert altitudes to the Google Maps WGS84 EGM96 vertical
   # datum (this may be possible with future versions of PROJ.4).
 
   site.table <- "sitefile_01"
