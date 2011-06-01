@@ -51,10 +51,6 @@ QueryDatabase(con, sqtable, sqvars = "*",
 \item{d.t.lim}{POSIXt; vector of minimum and maximum date values.}
 }
 
-\details{
-Something.
-}
-
 \value{
 On success, a data frame (possibly with 0 rows) or character string. On error,
 a character vector of error message(s).
