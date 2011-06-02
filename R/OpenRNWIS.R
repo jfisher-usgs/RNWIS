@@ -25,7 +25,6 @@ OpenRNWIS <- function() {
     d[["tmin"]] <- tclvalue(tmin.var)
     d[["tmax"]] <- tclvalue(tmax.var)
     d[["retr.vars"]] <- retr.vars
-    d[["initialdir"]] <- initialdir
     d[["save.file"]] <- save.file
     d
   }
@@ -54,7 +53,6 @@ OpenRNWIS <- function() {
     tclvalue(tmin.var) <- d$tmin
     tclvalue(tmax.var) <- d$tmax
 
-    initialdir <<- d$initialdir
     save.file <<- d$save.file
 
     tcl(frame3.box.2.5, "current", d$site.type.sel)
