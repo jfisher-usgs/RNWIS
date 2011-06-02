@@ -444,7 +444,7 @@ OpenRNWIS <- function() {
     sqvars <- unique(c(vars[['site']], retr.vars[!is.site]))
     data.table <- data.tables[[as.character(tclvalue(data.type.var))]]
 
-    if (length(sqvars) > 0) {
+    if (length(sqvars) > 1) {
 
       # Maintain a reasonable number of site numbers for each query;
       # an error results from a query size that's too large.
