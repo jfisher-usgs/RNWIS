@@ -85,7 +85,7 @@ OpenRNWIS <- function() {
       save.file <<- f
     }
     d <- SaveQueryObject()
-    save(d, file=f)
+    save(d, file=f, ascii=TRUE)
   }
 
   # Open query object file
@@ -239,7 +239,7 @@ OpenRNWIS <- function() {
     }
   }
 
-  # Remove variables from retrieval list
+  # Remove selected variables from retrieval list
 
   RemoveVariables <- function() {
     idxs <- as.integer(tkcurselection(frame4.lst.2.6))
@@ -250,6 +250,29 @@ OpenRNWIS <- function() {
     tcl("lset", retr.var, "")
     for (i in retr.vars)
       tcl("lappend", retr.var, i)
+  }
+
+  # Copy variables from retrieval list into Windows clipboard
+
+  CopyVariables <- function() {
+    if (length(retr.vars) == 0)
+      return()
+    s <- paste(retr.vars, collapse="\n")
+    writeClipboard(s, format=1)
+  }
+
+  # Paste variables from Windows clipboard into retrieval list
+
+  PasteVariables <- function() {
+    s <- readClipboard(format=1, raw=FALSE)
+    if (is.null(s))
+      return()
+    is.var <- s %in% c(site.vars, data.vars) & !s %in% retr.vars
+    add.vars <- s[is.var]
+    for (i in seq(along=add.vars)) {
+      retr.vars <<- c(retr.vars, add.vars[i])
+      tcl("lappend", retr.var, add.vars[i])
+    }
   }
 
   # Update data variables
@@ -835,32 +858,45 @@ OpenRNWIS <- function() {
   bits <- c('0x00', '0x00', '0x06', '0x03', '0x8e', '0x03', '0xdc', '0x01',
             '0xf8', '0x00', '0x70', '0x00', '0xf8', '0x00', '0xdc', '0x01',
             '0x8e', '0x03', '0x06', '0x03', '0x00', '0x00')
-  cross.del <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
+  img.del <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
 
   bits <- c('0x00', '0x00', '0x20', '0x00', '0x60', '0x00', '0xe0', '0x00',
             '0xfc', '0x01', '0xfc', '0x03', '0xfc', '0x01', '0xe0', '0x00',
             '0x60', '0x00', '0x20', '0x00', '0x00', '0x00')
-  arrow.right <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
+  img.right <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
 
   bits <- c('0x00', '0x00', '0x20', '0x00', '0x70', '0x00', '0xf8', '0x00',
             '0xfc', '0x01', '0xfe', '0x03', '0x70', '0x00', '0x70', '0x00',
             '0x70', '0x00', '0x00', '0x00', '0x00', '0x00')
-  arrow.up <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
+  img.up <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
 
   bits <- c('0x00', '0x00', '0x00', '0x00', '0x70', '0x00', '0x70', '0x00',
             '0x70', '0x00', '0xfe', '0x03', '0xfc', '0x01', '0xf8', '0x00',
             '0x70', '0x00', '0x20', '0x00', '0x00', '0x00')
-  arrow.down <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
+  img.down <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
 
   bits <- c('0x00', '0x00', '0xfe', '0x03', '0xfe', '0x03', '0x20', '0x00',
             '0x70', '0x00', '0xf8', '0x00', '0xfc', '0x01', '0xfe', '0x03',
             '0x70', '0x00', '0x70', '0x00', '0x70', '0x00')
-  arrow.top <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
+  img.top <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
 
   bits <- c('0x70', '0x00', '0x70', '0x00', '0x70', '0x00', '0xfe', '0x03',
             '0xfc', '0x01', '0xf8', '0x00', '0x70', '0x00', '0x20', '0x00',
             '0xfe', '0x03', '0xfe', '0x03', '0x00', '0x00')
-  arrow.bottom <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
+  img.bottom <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
+
+  bits <- c('0x00', '0x00', '0x7e', '0x00', '0x42', '0x00', '0xf2', '0x03',
+            '0x12', '0x02', '0x12', '0x02', '0x12', '0x02', '0x1e', '0x02',
+            '0x10', '0x02', '0xf0', '0x03', '0x00', '0x00')
+  img.copy <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
+
+  bits <- c('0x10', '0x00', '0xfe', '0x00', '0xba', '0x00', '0x82', '0x00',
+            '0xe2', '0x07', '0xe2', '0x07', '0xe2', '0x07', '0xe2', '0x07',
+            '0xfe', '0x07', '0xe0', '0x07', '0xe0', '0x07')
+  img.paste <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
+
+
+
 
   # Open GUI
 
@@ -979,8 +1015,7 @@ OpenRNWIS <- function() {
                              text="Longitude\n(WGS84)")
   frame3.lab.1.4 <- ttklabel(frame3, justify="center",
                              text="Altitude\nin feet")
-  frame3.lab.1.5 <- ttklabel(frame3, justify="center",
-                             text="Select site type\nand agency")
+  frame3.lab.1.5 <- ttklabel(frame3, justify="center", text="")
   frame3.lab.2.1 <- ttklabel(frame3, text="Minimum")
   frame3.lab.3.1 <- ttklabel(frame3, text="Maximum")
 
@@ -1096,7 +1131,7 @@ OpenRNWIS <- function() {
   tkconfigure(frame4.ysc.2.4, command=paste(.Tk.ID(frame4.lst.2.3), "yview"))
   tkconfigure(frame4.ysc.2.7, command=paste(.Tk.ID(frame4.lst.2.6), "yview"))
 
-  frame4.but.2.5 <- ttkbutton(frame4, width=2, image=arrow.right,
+  frame4.but.2.5 <- ttkbutton(frame4, width=2, image=img.right,
                               command=AddVariables)
 
   frame4.box.4.3 <- ttkcombobox(frame4, state="readonly",
@@ -1104,15 +1139,19 @@ OpenRNWIS <- function() {
 
   frame5 <- ttkframe(frame4, relief="flat")
 
-  frame5.but.1.1 <- ttkbutton(frame5, width=2, image=arrow.top,
+  frame5.but.1.1 <- ttkbutton(frame5, width=2, image=img.top,
                               command=function() Arrange("top"))
-  frame5.but.1.2 <- ttkbutton(frame5, width=2, image=arrow.up,
+  frame5.but.1.2 <- ttkbutton(frame5, width=2, image=img.up,
                               command=function() Arrange("up"))
-  frame5.but.1.3 <- ttkbutton(frame5, width=2, image=arrow.down,
+  frame5.but.1.3 <- ttkbutton(frame5, width=2, image=img.down,
                               command=function() Arrange("down"))
-  frame5.but.1.4 <- ttkbutton(frame5, width=2, image=arrow.bottom,
+  frame5.but.1.4 <- ttkbutton(frame5, width=2, image=img.bottom,
                               command=function() Arrange("bottom"))
-  frame5.but.1.5 <- ttkbutton(frame5, width=2, image=cross.del,
+  frame5.but.1.5 <- ttkbutton(frame5, width=2, image=img.copy,
+                              command=CopyVariables)
+  frame5.but.1.6 <- ttkbutton(frame5, width=2, image=img.paste,
+                              command=PasteVariables)
+  frame5.but.1.7 <- ttkbutton(frame5, width=2, image=img.del,
                               command=RemoveVariables)
 
   tkgrid(frame4.lab.1.1, "x", frame4.lab.1.3, "x", "x", frame4.lab.1.6, "x",
@@ -1120,9 +1159,11 @@ OpenRNWIS <- function() {
   tkgrid(frame4.lst.2.1, frame4.ysc.2.2, frame4.lst.2.3, frame4.ysc.2.4,
          frame4.but.2.5, frame4.lst.2.6, frame4.ysc.2.7)
   tkgrid(frame4.lab.4.1, "x", frame4.box.4.3, "x", "x", frame5, "x")
-  tkgrid.configure(frame5, columnspan=2, sticky="w")
+  tkgrid.configure(frame5, columnspan=1)
   tkgrid(frame5.but.1.1, frame5.but.1.2, frame5.but.1.3, frame5.but.1.4,
-         frame5.but.1.5, padx=c(0, 4), pady=c(4, 0))
+         frame5.but.1.5, frame5.but.1.6, frame5.but.1.7,
+         padx=c(0, 3), pady=c(3, 0))
+  tkgrid.configure(frame5.but.1.7, padx=0)
 
   tkgrid.configure(frame4.lst.2.1, frame4.ysc.2.2, frame4.lst.2.3,
                    frame4.ysc.2.4, frame4.lst.2.6, frame4.ysc.2.7)
