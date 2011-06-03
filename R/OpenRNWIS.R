@@ -978,10 +978,11 @@ OpenRNWIS <- function() {
   tkgrid(frame1.lab.1.1, frame1.box.1.2, frame1.but.1.3,
          padx=c(0, 2), pady=3, sticky="we")
   tkgrid.configure(frame1.lab.1.1, sticky="e")
+  tkgrid.configure(frame1.but.1.3, padx=0)
 
   tkgrid.columnconfigure(frame1, 1, weight=1, minsize=25)
 
-  tkpack(frame1, fill="x", expand=FALSE, padx=15, pady=15)
+  tkpack(frame1, fill="x", expand=FALSE, ipadx=2, ipady=2, padx=8, pady=8)
 
   tkconfigure(frame1.box.1.2, value=names(odbcDataSources()))
 
@@ -1058,7 +1059,8 @@ OpenRNWIS <- function() {
   tkgrid.configure(frame2.rad.1.1, frame2.rad.3.1, frame2.rad.5.1,
                    sticky="w", columnspan=2)
 
-  tkgrid.configure(frame2.ent.2.1, frame2.ent.4.1, sticky="we", padx=c(10, 2))
+  tkgrid.configure(frame2.ent.2.1, sticky="we", padx=c(10, 0))
+  tkgrid.configure(frame2.ent.4.1, sticky="we", padx=c(10, 2))
 
   tkgrid(frame3, columnspan=2, sticky="we")
 
