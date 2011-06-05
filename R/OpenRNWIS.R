@@ -360,9 +360,9 @@ OpenRNWIS <- function() {
       filters <- matrix(c("Polygon Text Files", ".ply", "All files", "*"),
                         2, 2, byrow=TRUE)
     } else if (type == "Query") {
-      caption <- "Open RNWIS Project File"
+      caption <- "Open Project File"
       defaultextension <- "rda"
-      filters <- matrix(c("RNWIS Project Files", ".rda", "All files", "*"),
+      filters <- matrix(c("Project Files", ".rda", "All files", "*"),
                         2, 2, byrow=TRUE)
     }
     f <- CallFileDialogBox("tk_getOpenFile", caption, defaultextension, filters)
@@ -377,18 +377,19 @@ OpenRNWIS <- function() {
 
   SaveFile <- function(type) {
     if (type == "Data") {
+      caption <- "Save As"
       defaultextension <- "txt"
       filters <- matrix(c("Text Files", ".txt",
                           "Compressed Text Files", ".gz",
                           "ESRI Shapefiles", ".shp",
                           "All files", "*"), 4, 2, byrow=TRUE)
     } else if (type == "Query") {
+      caption <- "Save Project As"
       defaultextension <- "rda"
-      filters <- matrix(c("RNWIS Project Files", ".rda", "All files", "*"),
+      filters <- matrix(c("Project Files", ".rda", "All files", "*"),
                         2, 2, byrow=TRUE)
     }
-    CallFileDialogBox("tk_getSaveFile", caption="Save As",
-                      defaultextension, filters)
+    CallFileDialogBox("tk_getSaveFile", caption, defaultextension, filters)
   }
 
   # Call file dialog box
