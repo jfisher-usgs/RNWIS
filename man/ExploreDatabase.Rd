@@ -9,11 +9,11 @@ A \acronym{GUI} for exploring the contents of database.
 }
 
 \usage{
-ExploreDatabase(con, parent = NULL)
+ExploreDatabase(channel, parent = NULL)
 }
 
 \arguments{
-\item{con}{RODBC; connection to ODBC database.}
+\item{channel}{RODBC; connection to ODBC database.}
 \item{parent}{tkwin; parent window (optional).}
 }
 
@@ -28,8 +28,9 @@ Shows database table names and the column structure for each table.
 }
 
 \examples{
-\dontrun{con <- odbcConnect("NWIS Idaho", uid = "", pwd = "")}
-\donttest{ExploreDatabase(con)}
+\dontrun{channel <- odbcConnect("NWIS Idaho", uid = "", pwd = "")}
+\donttest{ExploreDatabase(channel)}
+\donttest{close(channel)}
 }
 
 \keyword{misc}

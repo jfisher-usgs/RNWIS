@@ -105,8 +105,7 @@ OpenRNWIS <- function() {
     tclServiceMode(FALSE)
     if (as.integer(tclvalue(tt.done.var)) != 0)
       return()
-    if (!is.null(con))
-      close(con)
+    odbcCloseAll()
     tclvalue(tt.done.var) <- 1
     tkdestroy(tt)
     tclServiceMode(TRUE)
@@ -121,9 +120,10 @@ OpenRNWIS <- function() {
 
     tkconfigure(tt, cursor="watch")
 
-    odbcCloseAll()
+    # Open database connection
     dsn <- as.character(tclvalue(dsn.var))
-    con <<- odbcConnect(dsn, uid="", pwd="")
+    channel <<- odbcConnect(dsn, uid="", pwd="")
+
     tkfocus(force=tt)
     tclServiceMode(FALSE)
 
@@ -142,8 +142,8 @@ OpenRNWIS <- function() {
     tkconfigure(frame1.but.1.3, state="disabled")
 
     # Update GUI
-    if (inherits(con, "RODBC") && con > 0) {
-      tables <- sqlTables(con, errors=FALSE, as.is=TRUE)[, "TABLE_NAME"]
+    if (channel >= 0L && inherits(channel, "RODBC")) {
+      tables <- sqlTables(channel, errors=FALSE, as.is=TRUE)[, "TABLE_NAME"]
       if (site.table %in% tables) {
 
         # Establish table types
@@ -155,7 +155,7 @@ OpenRNWIS <- function() {
         # Update site variables
         tkconfigure(frame1.but.1.3, state="normal")
 
-        sel <- sqlColumns(con, sqtable=site.table)
+        sel <- sqlColumns(channel, sqtable=site.table)
         sel <- sel[sel[, "TABLE_NAME"] == site.table, "COLUMN_NAME"]
         site.vars <<- unique(sel)
         for (i in seq(along=site.vars))
@@ -164,12 +164,14 @@ OpenRNWIS <- function() {
         # Update data variables
         UpdateDataVariables()
       } else {
-        close(con)
-        con <<- NULL
+        channel <<- NULL
       }
     } else {
-      con <<- NULL
+      channel <<- NULL
     }
+
+    # Close database connection
+    odbcCloseAll()
 
     tkconfigure(tt, cursor="arrow")
     tclServiceMode(TRUE)
@@ -278,14 +280,18 @@ OpenRNWIS <- function() {
   # Update data variables
 
   UpdateDataVariables <- function() {
-    if (is.null(con))
+    if (!inherits(channel, "RODBC"))
       return()
 
     tclServiceMode(FALSE)
 
     data.table <- data.tables[[as.character(tclvalue(data.type.var))]]
 
-    sel <- sqlColumns(con, sqtable=data.table)
+    # Query database
+    channel <- odbcReConnect(channel)
+    sel <- sqlColumns(channel, sqtable=data.table)
+    odbcCloseAll()
+
     sel <- sel[sel[, "TABLE_NAME"] == data.table, ]
     data.vars <<- sel[, "COLUMN_NAME"]
     data.types <- sel[, "TYPE_NAME"]
@@ -416,7 +422,7 @@ OpenRNWIS <- function() {
   # Map sites
 
   CallMapSites <- function() {
-    if (is.null(con)) {
+    if (!inherits(channel, "RODBC")) {
       ShowErrorMessage('01')
       return()
     }
@@ -430,7 +436,7 @@ OpenRNWIS <- function() {
   # Retrieve data
 
   RetrieveData <- function() {
-    if (is.null(con)) {
+    if (!inherits(channel, "RODBC")) {
       ShowErrorMessage('01')
       return()
     }
@@ -475,10 +481,11 @@ OpenRNWIS <- function() {
       if (n != inc[length(inc)])
         inc <- c(inc, n)
 
-      # Query data table
+      # Query database
+      channel <- odbcReConnect(channel)
       for (i in seq(along=inc[-1])) {
         site.numbers <- site.no[inc[i]:inc[i + 1]]
-        sel <- QueryDatabase(con=con,
+        sel <- QueryDatabase(channel,
                              sqtable=data.table,
                              sqvars=sqvars,
                              site.no.var=vars[['site']],
@@ -491,6 +498,7 @@ OpenRNWIS <- function() {
         }
         d.data <- rbind(d.data, sel)
       }
+      odbcCloseAll()
 
       if (nrow(d.data) == 0L)
         d.data <- NULL
@@ -531,12 +539,9 @@ OpenRNWIS <- function() {
         writeOGR(obj=d, dsn=dirname(f), driver="ESRI Shapefile",
                  layer=sub(paste(".shp$", sep=""), "", basename(f)),
                  verbose=TRUE)
-      } else if (grepl(".txt$", tolower(f))) {
+      } else {
         d <- d[, retr.vars]
-        write.table(d, file=f, sep="\t", quote=FALSE, row.names=FALSE)
-      } else if (grepl(".gz$", tolower(f))) {
-        d <- d[, retr.vars]
-        con <- gzfile(description=f, open="w", compression=6)
+        con <- gzfile(description=f, open="w")
         write.table(d, file=con, sep="\t", quote=FALSE, row.names=FALSE)
         close(con)
       }
@@ -575,6 +580,9 @@ OpenRNWIS <- function() {
 
     sqvars <- unique(c(vars[['lat']], vars[['lng']], sqvars))
 
+    # Reconnect to database
+    channel <- odbcReConnect(channel)
+
     # Base query on site numbers
     if (opt == 1L | opt == 2L) {
 
@@ -602,7 +610,7 @@ OpenRNWIS <- function() {
       }
 
       # Query database
-      sel <- QueryDatabase(con=con, sqtable=site.table, sqvars=sqvars,
+      sel <- QueryDatabase(channel, sqtable=site.table, sqvars=sqvars,
                            site.no.var=vars[['site']],
                            site.no=site.no)
 
@@ -648,7 +656,7 @@ OpenRNWIS <- function() {
         agency.codes <- NULL
 
       # Query database
-      sel <- QueryDatabase(con=con,
+      sel <- QueryDatabase(channel,
                            sqtable=site.table,
                            sqvars=sqvars,
                            site.tp.cd.var=vars[['type']],
@@ -692,6 +700,9 @@ OpenRNWIS <- function() {
         }
       }
     }
+
+    # Close database connection
+    odbcCloseAll()
 
     # Return selection
     if (inherits(sel, "data.frame") && nrow(sel) > 0) {
@@ -818,7 +829,7 @@ OpenRNWIS <- function() {
 
   # Initialize top-level variables
 
-  con <- NULL
+  channel <- NULL
   site.vars <- NULL
   data.vars <- NULL
   retr.vars <- NULL
@@ -974,7 +985,7 @@ OpenRNWIS <- function() {
   frame1.lab.1.1 <- ttklabel(frame1, text="Source name")
   frame1.box.1.2 <- ttkcombobox(frame1, textvariable=dsn.var, state="readonly")
   frame1.but.1.3 <- ttkbutton(frame1, width=8, text="Explore",
-                              command=function() ExploreDatabase(con, tt))
+                              command=function() ExploreDatabase(channel, tt))
 
   tkgrid(frame1.lab.1.1, frame1.box.1.2, frame1.but.1.3,
          padx=c(0, 2), pady=3, sticky="we")

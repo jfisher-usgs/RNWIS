@@ -10,7 +10,7 @@ constrain the number of sites selected.
 }
 
 \usage{
-QueryDatabase(con, sqtable, sqvars = "*",
+QueryDatabase(channel, sqtable, sqvars = "*",
           site.no.var = NULL, site.no = NULL,
           site.tp.cd.var = NULL, site.tp.cd = NULL,
           agency.cd.var = NULL, agency.cd = NULL,
@@ -21,7 +21,7 @@ QueryDatabase(con, sqtable, sqvars = "*",
 }
 
 \arguments{
-\item{con}{RODBC; a connection to a ODBC database.}
+\item{channel}{RODBC; a connection to a ODBC database.}
 \item{sqtable}{character; name of the table from which data is to be
   retrieved.}
 \item{sqvars}{character; vector of column names in queried table

@@ -1,4 +1,4 @@
-QueryDatabase <- function(con, sqtable, sqvars="*",
+QueryDatabase <- function(channel, sqtable, sqvars="*",
                           site.no.var=NULL, site.no=NULL,
                           site.tp.cd.var=NULL, site.tp.cd=NULL,
                           agency.cd.var=NULL, agency.cd=NULL,
@@ -19,10 +19,14 @@ QueryDatabase <- function(con, sqtable, sqvars="*",
 
   # Main program
 
-  if (!inherits(con, "RODBC")) {
-    con <- odbcConnect(con, uid="", pwd="")
-    on.exit(close(con))
-  }
+  if (inherits(channel, "RODBC"))
+    channel <- odbcReConnect(channel)
+  else
+    channel <- odbcConnect(channel, uid="", pwd="")
+  if (channel < 0)
+    stop("error occurred when opening connection to ODBC database")
+  on.exit(close(channel))
+
   cond <- c()
 
   # Variables
@@ -96,7 +100,7 @@ QueryDatabase <- function(con, sqtable, sqvars="*",
   query <- paste("SELECT", vars, "FROM", sqtable, conds)
 
   # Query database
-  d <- sqlQuery(con, query, stringsAsFactors=FALSE)
+  d <- sqlQuery(channel, query, stringsAsFactors=FALSE)
 
   # Remove leading and trailing white spaces
   for (i in seq(along=names(d))) {

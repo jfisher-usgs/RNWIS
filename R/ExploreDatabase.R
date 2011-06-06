@@ -1,4 +1,4 @@
-ExploreDatabase <- function(con, parent=NULL) {
+ExploreDatabase <- function(channel, parent=NULL) {
   # GUI for exploring contents of database.
 
   # Additional functions (subroutines)
@@ -19,14 +19,14 @@ ExploreDatabase <- function(con, parent=NULL) {
     tkdelete(frame2.tre.2.1, tree.children)
 
     # Query column names
-    cols <- sqlColumns(con, sqtable=table.name)
+    cols <- sqlColumns(channel, sqtable=table.name)
 
     cols <- cols[cols[, "TABLE_NAME"] == table.name,
                  c("COLUMN_NAME", "TYPE_NAME", "NUM_PREC_RADIX",
                    "CHAR_OCTET_LENGTH")]
 
     # Query keys
-    keys <- sqlPrimaryKeys(con, sqtable=table.name)
+    keys <- sqlPrimaryKeys(channel, sqtable=table.name)
     which.is.key <- which(cols[, "COLUMN_NAME"] %in% keys[, "COLUMN_NAME"])
 
     # Tags, color styles in treeview
@@ -47,7 +47,15 @@ ExploreDatabase <- function(con, parent=NULL) {
 
   # Main program
 
-  sql.tables <- sqlTables(con, errors=FALSE, as.is=TRUE)[, "TABLE_NAME"]
+  if (inherits(channel, "RODBC"))
+    channel <- odbcReConnect(channel)
+  else
+    channel <- odbcConnect(channel, uid="", pwd="")
+  if (channel < 0)
+    stop("error occurred when opening connection to ODBC database")
+  on.exit(close(channel))
+
+  sql.tables <- sqlTables(channel, errors=FALSE, as.is=TRUE)[, "TABLE_NAME"]
   sql.tables <- sort(sql.tables)
 
   help.url <- "http://nwis.usgs.gov/dbms/" # only available on USGS intranet
