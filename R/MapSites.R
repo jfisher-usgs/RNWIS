@@ -1,4 +1,4 @@
-MapSites <- function(sites, polygons=NULL, map.id=NULL) {
+MapSites <- function(sites, polygons=NULL) {
   # Write site and polygon data to JSON file and open in Google Maps.
 
   # Additional functions (subroutines)
@@ -54,38 +54,6 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
 
   # Main program
 
-  # Map ID
-
-  if (is.null(map.id))
-    map.id <- "MapID"
-
-
-
-
-
-
-  # Determine file names
-
-  f <- tempfile(pattern=map.id, tmpdir=tempdir())
-
-
-
-
-
-
-  # Determine path to temporary directory
-
-  if ("package:RNWIS" %in% search())
-    path <- system.file("map", package="RNWIS")
-  else
-    path <- paste(getwd(), "/inst/map", sep="")
-
-
-
-
-
-
-
   # Construct character string based on JSON format
 
   is.sites <- !is.null(sites)
@@ -123,37 +91,26 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
   }
   s <- c(s, "}")
 
-  # Write JSON file
+  # Write JSON file to temporary directory
 
-  f.json <- paste(f, ".json", sep="")
+  temp.dir <- file.path(tempdir(), "json")
+  dir.create(temp.dir, showWarnings=FALSE)
+  f.json <- file.path(temp.dir, "data.json")
+
   con <- file(description=f.json, open="w")
   cat(s, file=con, sep="\n", append=FALSE)
   close(con)
 
+  # Give R application to web server
 
+  if ("package:RNWIS" %in% search())
+    map.path <- system.file("map", package="RNWIS")
+  else
+    map.path <- file.path(getwd(), "inst", "map")
 
+  server <- Rhttpd$new()
+  server$add(app=file.path(map.path, "config.R"), name='map')
 
-
-
-
-
-
-  # Read and write html and js files (TODO: find better way of doing this)
-
-  f.html <- paste(f, ".html", sep="")
-  obj <- readLines(paste(path, "/MapSites.html", sep=""))
-  write(obj, file=f.html, sep="\n")
-
-  f.js <- paste(f, ".js", sep="")
-  obj <- readLines(paste(path, "/markerclusterer_packed.js", sep=""))
-  write(obj, file=f.js, sep="\n")
-
-
-
-
-
-
-  # Open html file in default web browser
-
-  browseURL(paste("file:\\\\", f.html, sep=""), browser=getOption("browser"))
+  server$start(quiet=TRUE)
+  server$browse('map')
 }

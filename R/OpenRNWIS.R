@@ -799,7 +799,7 @@ OpenRNWIS <- function() {
 
   # Load required R packages
 
-  for (i in c("tcltk", "sp", "RODBC", "gpclib", "rgdal"))
+  for (i in c("tcltk", "sp", "RODBC", "gpclib", "rgdal", "brew", "Rook"))
     suppressPackageStartupMessages(require(i, character.only=TRUE))
 
   # Error and warning messages: [icon, type, title, message]

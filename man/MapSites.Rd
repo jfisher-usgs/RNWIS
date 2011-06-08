@@ -10,13 +10,12 @@ Add site markers and polygon objects to
 }
 
 \usage{
-MapSites(sites, polygons = NULL, map.id = NULL)
+MapSites(sites, polygons = NULL)
 }
 
 \arguments{
 \item{sites}{data.frame; site information, see \sQuote{Details}.}
 \item{polygons}{gpc.poly; polygon information.}
-\item{map.id}{character; initial part of the temporary file names.}
 }
 
 \details{
@@ -35,18 +34,15 @@ and \code{type} is the hydrologic setting of the site.
 }
 
 \value{
-Writes three files to a temporary directory. Base names are identical with
-extensions indicating file type. An \acronym{HTML} file (\file{.html}) is
-loaded into the default web browser and calls on MarkerClusterer,
-a javascript library (\file{.js}) that creates and manages per-zoom-level
-clusters for large amounts of markers, and a \href{http://www.json.org/}{JSON}
-data file (\file{.json}) dynamically created from site and polygon information.
+Writes a \href{http://www.json.org/}{JSON} data file (\file{.json})
+to a temporary directory.
+An Rhttpd object is created and started in the internal web server.
 }
 
 \author{Fisher, J.C.}
 
 \seealso{
-\code{\link{browseURL}}, \code{\link{tempfile}}
+\code{\link{tempdir}}, \code{Rhttpd-class}
 }
 
 \examples{
@@ -55,11 +51,11 @@ data file (\file{.json}) dynamically created from site and polygon information.
                 site = c(433433112560201, 433449112523101, 435152112443101),
                 name = c("CPP 1", "NPR Test", "ANP 6"),
                 agency = "USGS", type = "GW", stringsAsFactors = FALSE)
-MapSites(sites = s, map.id = "Example1")
+MapSites(sites = s)
 
 f <- system.file("extdata/ExamplePolygon.ply", package="RNWIS")
 p <- read.polyfile(f, nohole=FALSE)
-MapSites(sites = s, polygons = p, map.id = "Example2")
+MapSites(sites = s, polygons = p)
 }
 }
 
