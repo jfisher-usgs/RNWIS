@@ -59,12 +59,19 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
   if (is.null(map.id))
     map.id <- "MapID"
 
+
+
+
+
+
   # Determine file names
 
   f <- tempfile(pattern=map.id, tmpdir=tempdir())
-  f.html <- paste(f, ".html", sep="")
-  f.json <- paste(f, ".json", sep="")
-  f.js <- paste(f, ".js", sep="")
+
+
+
+
+
 
   # Determine path to temporary directory
 
@@ -73,17 +80,13 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
   else
     path <- paste(getwd(), "/inst/map", sep="")
 
-  # Read and write html and js files (TODO: find better way of doing this)
 
-  obj <- readLines(paste(path, "/MapSites.html", sep=""))
-  write(obj, file=f.html, sep="\n")
 
-  obj <- readLines(paste(path, "/markerclusterer_packed.js", sep=""))
-  write(obj, file=f.js, sep="\n")
 
-  # Construct character string with JSON format
 
-  con <- file(description=f.json, open="w")
+
+
+  # Construct character string based on JSON format
 
   is.sites <- !is.null(sites)
   is.polygons <- !is.null(polygons) && inherits(polygons, "gpc.poly")
@@ -122,8 +125,33 @@ MapSites <- function(sites, polygons=NULL, map.id=NULL) {
 
   # Write JSON file
 
+  f.json <- paste(f, ".json", sep="")
+  con <- file(description=f.json, open="w")
   cat(s, file=con, sep="\n", append=FALSE)
   close(con)
+
+
+
+
+
+
+
+
+
+  # Read and write html and js files (TODO: find better way of doing this)
+
+  f.html <- paste(f, ".html", sep="")
+  obj <- readLines(paste(path, "/MapSites.html", sep=""))
+  write(obj, file=f.html, sep="\n")
+
+  f.js <- paste(f, ".js", sep="")
+  obj <- readLines(paste(path, "/markerclusterer_packed.js", sep=""))
+  write(obj, file=f.js, sep="\n")
+
+
+
+
+
 
   # Open html file in default web browser
 
