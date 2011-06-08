@@ -1,9 +1,12 @@
 app <- Builder$new(
   Static$new(
-    urls = c('/javascript'),
-    root = '.'
+    urls='/javascript',
+    root='.'
   ),
-  Static$new(urls='/json',root=tempdir()),
+  Static$new(
+    urls='/json',
+    root=tempdir()
+  ),
   Brewery$new(
     url='/brew',
     root='.',
