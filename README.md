@@ -33,7 +33,7 @@ Install the **RNWIS** package:
 The following instructions are provided for accessing NWIS using **RNWIS**.
 The site administrator must
 [install the Ingres II client](http://bwtst.usgs.gov/database/ingres/ "Ingres")
-on the user's computer (only available in 32-bit). The user must be added
+(only available in 32-bit) on the user's computer. The user must be added
 to the *nwis_select* Ingres access group (see section 1.5 of the
 [NWIS Security System Documentation](http://nwis.usgs.gov/nwisdocs4_2/nwis_security.pdf "NWIS Security")).
 **RNWIS** must be installed on the user's computer.
