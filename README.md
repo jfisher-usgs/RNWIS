@@ -24,7 +24,7 @@ by choosing to customize the startup options and specifying the SDI interface
 Install required R packages from CRAN using a simple call to
 `install.packages()`:
 
-    > install.packages(c('tcltk', 'sp', 'RODBC', 'gpclib', 'rgdal'))
+    > install.packages(c('tcltk', 'sp', 'RODBC', 'gpclib', 'rgdal', 'brew', 'Rook'))
 
 Install the **RNWIS** package:
 
