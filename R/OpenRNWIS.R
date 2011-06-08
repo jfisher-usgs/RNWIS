@@ -34,8 +34,6 @@ OpenRNWIS <- function() {
   OpenQueryObject <- function(d) {
     tcl(frame1.box.1.2, "current", d$dsn.sel)
 
-    tclServiceMode(FALSE)
-
     OpenConnection()
 
     tclvalue(opt.var) <- d$opt
@@ -59,6 +57,8 @@ OpenRNWIS <- function() {
     tcl(frame3.box.3.5, "current", d$agency.sel)
     tcl(frame4.box.4.3, "current", d$data.type.sel)
     UpdateDataVariables()
+
+    tclServiceMode(FALSE)
 
     tcl("lset", retr.var, "")
     if (!is.null(d$retr.vars)) {
