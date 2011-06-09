@@ -10,7 +10,6 @@ water-resources data stored on the National Water Information System (NWIS).
 The set of standards used for coding **RNWIS** is documented in
 [Google's R Style Guide](http://google-styleguide.googlecode.com/svn/trunk/google-r-style.html "Google's R Style Guide").
 
-
 Installation
 ------------
 
@@ -29,10 +28,6 @@ Install required R packages from CRAN using a simple call to
 Install the **RNWIS** package:
 
     > install.packages('RNWIS', repos='ftp://ftpint.usgs.gov/private/wr/id/scoville/Fisher/RNWIS')
-
-To check for **RNWIS** package updates:
-
-    > update.packages(repos='ftp://ftpint.usgs.gov/private/wr/id/scoville/Fisher/RNWIS')
 
 The following instructions are provided for accessing NWIS using **RNWIS**.
 The site administrator must
@@ -68,3 +63,10 @@ Load **RNWIS** in the current R session (32-bit):
 Activate the main GUI:
 
     > OpenRNWIS()
+
+Updating
+--------
+
+To check for **RNWIS** package updates:
+
+    > update.packages(repos='ftp://ftpint.usgs.gov/private/wr/id/scoville/Fisher/RNWIS')
