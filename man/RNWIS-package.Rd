@@ -19,7 +19,7 @@ through an Open Database Connectivity (\acronym{ODBC}) connection.
     Package: \tab RNWIS\cr
     Type: \tab Package\cr
     Version: \tab 0.1-3\cr
-    Date: \tab 2011-06-08\cr
+    Date: \tab 2011-06-09\cr
     License: \tab GPL (>= 2)
   }
 }
@@ -32,6 +32,7 @@ pager.
 The following user instructions are provided for accessing \acronym{NWIS}
 using \pkg{RNWIS}. The site administrator must
 \href{http://bwtst.usgs.gov/database/ingres/}{install the Ingres II client}
+(only available in 32-bit)
 on the user's computer. The user must be added to the \emph{nwis_select}
 Ingres access group (see section 1.5 of the
 \href{http://nwis.usgs.gov/nwisdocs4_2/nwis_security.pdf}{NWIS Security System Documentation}).
