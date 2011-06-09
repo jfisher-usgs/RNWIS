@@ -18,7 +18,7 @@ through an Open Database Connectivity (\acronym{ODBC}) connection.
   \tabular{ll}{
     Package: \tab RNWIS\cr
     Type: \tab Package\cr
-    Version: \tab 0.1-3\cr
+    Version: \tab 0.1-4\cr
     Date: \tab 2011-06-09\cr
     License: \tab GPL (>= 2)
   }
