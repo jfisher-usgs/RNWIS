@@ -430,7 +430,10 @@ OpenRNWIS <- function() {
                 vars[['name']], vars[['agency']], vars[['type']])
     data <- GetSiteInfo(sqvars)
     names(data$sites) <- names(vars)
-    MapSites(data$sites, data$polygons)
+    tkconfigure(tt, cursor="watch")
+    MapSites(data$sites, data$polygons, map.id=sprintf("%02d", map.idx))
+    tkconfigure(tt, cursor="arrow")
+    map.idx <<- map.idx + 1L
   }
 
   # Retrieve data
@@ -835,6 +838,7 @@ OpenRNWIS <- function() {
   retr.vars <- NULL
   initialdir <- NULL
   save.file <- NULL
+  map.idx <- 1L
 
   # Assign variables linked to Tk widgets
 
@@ -906,9 +910,6 @@ OpenRNWIS <- function() {
             '0xe2', '0x07', '0xe2', '0x07', '0xe2', '0x07', '0xe2', '0x07',
             '0xfe', '0x07', '0xe0', '0x07', '0xe0', '0x07')
   img.paste <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
-
-
-
 
   # Open GUI
 

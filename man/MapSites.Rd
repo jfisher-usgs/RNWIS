@@ -10,12 +10,13 @@ Add site markers and polygon objects to
 }
 
 \usage{
-MapSites(sites, polygons = NULL)
+MapSites(sites, polygons = NULL, map.id = "map")
 }
 
 \arguments{
 \item{sites}{data.frame; site information, see \sQuote{Details}.}
 \item{polygons}{gpc.poly; polygon information.}
+\item{map.id}{character; unique identifier in map \acronym{URL}.}
 }
 
 \details{
@@ -51,11 +52,11 @@ An Rhttpd object is created and started in the internal web server.
                 site = c(433433112560201, 433449112523101, 435152112443101),
                 name = c("CPP 1", "NPR Test", "ANP 6"),
                 agency = "USGS", type = "GW", stringsAsFactors = FALSE)
-MapSites(sites = s)
+MapSites(sites = s, map.id = "map01")
 
 f <- system.file("extdata/ExamplePolygon.ply", package="RNWIS")
 p <- read.polyfile(f, nohole=FALSE)
-MapSites(sites = s, polygons = p)
+MapSites(sites = s, polygons = p, map.id = "map02")
 }
 }
 

@@ -1,4 +1,4 @@
-MapSites <- function(sites, polygons=NULL) {
+MapSites <- function(sites, polygons=NULL, map.id="map") {
   # Write site and polygon data to JSON file and open in Google Maps.
 
   # Additional functions (subroutines)
@@ -109,8 +109,8 @@ MapSites <- function(sites, polygons=NULL) {
     map.path <- file.path(getwd(), "inst", "map")
 
   server <- Rhttpd$new()
-  server$add(app=file.path(map.path, "config.R"), name='map')
+  server$add(app=file.path(map.path, "config.R"), name=map.id)
 
   server$start(quiet=TRUE)
-  server$browse('map')
+  server$browse(map.id)
 }
