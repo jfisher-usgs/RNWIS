@@ -30,6 +30,10 @@ Install the **RNWIS** package:
 
     > install.packages('RNWIS', repos='ftp://ftpint.usgs.gov/private/wr/id/scoville/Fisher/RNWIS')
 
+To check for **RNWIS** package updates:
+
+    > update.packages(repos='ftp://ftpint.usgs.gov/private/wr/id/scoville/Fisher/RNWIS')
+
 The following instructions are provided for accessing NWIS using **RNWIS**.
 The site administrator must
 [install the Ingres II client](http://bwtst.usgs.gov/database/ingres/ "Ingres")
