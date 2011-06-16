@@ -6,6 +6,9 @@ Description
 
 This [R](http://www.r-project.org/ "R") package provides access to
 water-resources data stored on the National Water Information System (NWIS).
+A graphical user interface (GUI) is provided and
+requires R operate as an SDI application, using multiple
+top-level windows for the console, graphics, and pager.
 
 The set of standards used for coding **RNWIS** is documented in
 [Google's R Style Guide](http://google-styleguide.googlecode.com/svn/trunk/google-r-style.html "Google's R Style Guide").
