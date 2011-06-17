@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta http-equiv="content-type" content="initial-scale=1.0, user-scalable=no" />
     <title>RNWIS Map</title>
 
     <style type="text/css">
@@ -33,13 +33,33 @@
 
       function initialize() {
         'use strict';
-        var map, bounds, markers;
+        var map, bounds, markers, image, shadow, shape;
 
         map = new google.maps.Map(document.getElementById('map'), {
           streetViewControl: 0,
           mapTypeId: google.maps.MapTypeId.TERRAIN
         });
+
         bounds = new google.maps.LatLngBounds();
+
+        image = new google.maps.MarkerImage(
+          "../images/icon_gw.png",
+          new google.maps.Size(18,32),
+          new google.maps.Point(0,0),
+          new google.maps.Point(9,32)
+        );
+
+        shadow = new google.maps.MarkerImage(
+          "../images/shadow.png",
+          new google.maps.Size(38,32),
+          new google.maps.Point(0,0),
+          new google.maps.Point(9,32)
+        );
+
+        shape = {
+          coord: [12,0,14,1,15,2,16,3,16,4,17,5,17,6,17,7,17,8,17,9,17,10,17,11,17,12,16,13,16,14,15,15,15,16,14,17,13,18,13,19,12,20,12,21,11,22,11,23,11,24,10,25,10,26,10,27,10,28,9,29,9,30,9,31,8,31,8,30,8,29,7,28,7,27,7,26,7,25,6,24,6,23,6,22,5,21,5,20,4,19,4,18,3,17,2,16,2,15,1,14,1,13,0,12,0,11,0,10,0,9,0,8,0,7,0,6,0,5,1,4,1,3,2,2,3,1,5,0,12,0],
+          type: 'poly'
+        };
 
         if (typeof data.sites === 'object') {
           markers = [];
@@ -47,8 +67,11 @@
           var addMarker = function (lat, lng, title, htmlString) {
             var latLng = new google.maps.LatLng(lat, lng);
             var marker = new google.maps.Marker({
-              position: latLng,
+              icon: image,
+              shadow: shadow,
+              shape: shape,
               map: map,
+              position: latLng,
               title: title
             });
             var infowindow = new google.maps.InfoWindow({
@@ -73,6 +96,8 @@
             addMarker(dataSites.lat, dataSites.lng, dataSites.site + '',
                       htmlString);
           };
+
+          var mcOptions = {maxZoom: 14};
           var markerCluster = new MarkerClusterer(map, markers, mcOptions);
         };
 
@@ -103,7 +128,6 @@
 
         map.setCenter(bounds.getCenter());
         map.fitBounds(bounds);
-        var mcOptions = {maxZoom: 14};
       };
 
       google.setOnLoadCallback(initialize);

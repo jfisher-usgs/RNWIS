@@ -1,6 +1,6 @@
 app <- Builder$new(
   Static$new(
-    urls='/javascript',
+    urls=c('/javascript', '/images'),
     root='.'
   ),
   Static$new(
