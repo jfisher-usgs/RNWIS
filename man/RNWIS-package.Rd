@@ -10,7 +10,8 @@ National Water Information System: R Interface
 
 \description{
 This package provides access to water-resources data.
-It retrieves data from the National Water Information System (\acronym{NWIS})
+It retrieves data from the National Water Information System
+(\href{http://waterdata.usgs.gov/nwis}{NWIS})
 through an Open Database Connectivity (\acronym{ODBC}) connection.
 }
 
