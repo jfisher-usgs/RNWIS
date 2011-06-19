@@ -1,8 +1,23 @@
-# free format with pound sign (#) reserved for comments
+# Free format with pound sign (#) reserved for comments
 
+# Groundwater sites:
 432714112560701 # USGS 103
-  433217113004901,
-433449112523101;433433112560201;435152112443101 # NPR Test, CPP 1, ANP 6
+433449112523101 # NPR Test
+433433112560201 # CPP 1
+435152112443101 # ANP 6
+432700112470801 # USGS 1
+435038112453401 # No Name 1
+433217113004901, 433217113004902 # MIDDLE 2051 ports: 1142.5, 1132.6
 
-432700112470801 435038112453401 # USGS 1, NO NAME 1
-432854113201002
+# Surface-water sites:
+13132510 # Big Lost River above railroad bridge near Arco, ID
+13132530 # Big Lost River near Atomic city, ID
+
+# Spring sites:
+432454113012901 # Webb Spring
+
+# Atmospheric sites:
+432743113334001 # Craters of the Moon
+
+# Other sites:
+434806112103701 # Drain well inflow
