@@ -42,8 +42,33 @@
 
         bounds = new google.maps.LatLngBounds();
 
-        image = new google.maps.MarkerImage(
-          "../images/icon_gw.png",
+        image = [];
+        image['GW'] = new google.maps.MarkerImage(
+          "../images/icon_GW.png",
+          new google.maps.Size(18,32),
+          new google.maps.Point(0,0),
+          new google.maps.Point(9,32)
+        );
+        image['SW'] = new google.maps.MarkerImage(
+          "../images/icon_SW.png",
+          new google.maps.Size(18,32),
+          new google.maps.Point(0,0),
+          new google.maps.Point(9,32)
+        );
+        image['SP'] = new google.maps.MarkerImage(
+          "../images/icon_SP.png",
+          new google.maps.Size(18,32),
+          new google.maps.Point(0,0),
+          new google.maps.Point(9,32)
+        );
+        image['AT'] = new google.maps.MarkerImage(
+          "../images/icon_AT.png",
+          new google.maps.Size(18,32),
+          new google.maps.Point(0,0),
+          new google.maps.Point(9,32)
+        );
+        image['NA'] = new google.maps.MarkerImage(
+          "../images/icon_NA.png",
           new google.maps.Size(18,32),
           new google.maps.Point(0,0),
           new google.maps.Point(9,32)
@@ -64,10 +89,10 @@
         if (typeof data.sites === 'object') {
           markers = [];
 
-          var addMarker = function (lat, lng, title, htmlString) {
+          var addMarker = function (lat, lng, title, htmlString, siteType) {
             var latLng = new google.maps.LatLng(lat, lng);
             var marker = new google.maps.Marker({
-              icon: image,
+              icon: image[siteType],
               shadow: shadow,
               shape: shape,
               map: map,
@@ -94,7 +119,7 @@
                              "<br />" + "<a target='_blank' href='" + url +
                              "'>Access Data</a></div>";
             addMarker(dataSites.lat, dataSites.lng, dataSites.site + '',
-                      htmlString);
+                      htmlString, dataSites.type);
           };
 
           var mcOptions = {maxZoom: 14};
