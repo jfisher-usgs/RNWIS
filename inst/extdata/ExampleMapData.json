@@ -1,8 +1,18 @@
 var data = {
 "sites": [
-{"lat": 43.5757402325101, "lng": -112.934719019175, "site": 433433112560201, "agency": "USGS", "type": "GW", "name": "03N 30E 19BCB1 CPP 1"},
-{"lat": 43.5803046219595, "lng": -112.876178537606, "site": 433449112523101, "agency": "USGS", "type": "GW", "name": "03N 30E 16DDD1 NPR TEST"},
-{"lat": 43.8642317971464, "lng": -112.742880208334, "site": 435152112443101, "agency": "USGS", "type": "GW", "name": "06N 31E 10ACC1 ANP 6"}
+{"lat": 43.5193503132412, "lng": -113.095277948118, "alt": "NA",    "site": 13132510,        "name": "BIG LOST RIVER AB RAILROAD BRIDGE NR ARCO ID",      "agency": "USGS", "type": "ST"},
+{"lat": 43.5471286777596, "lng": -113.009165040692, "alt": "NA",    "site": 13132530,        "name": "BIG LOST RIVER NR ATOMIC CITY ID",                  "agency": "USGS", "type": "ST"},
+{"lat": 43.4149076959200, "lng": -113.025553363461, "alt": 5600,    "site": 432454113012901, "name": "01N 29E 14DBC1S WEBB SPRING",                       "agency": "USGS", "type": "SP"},
+{"lat": 43.4499317351977, "lng": -112.786530370151, "alt": 5022.34, "site": 432700112470801, "name": "02N 31E 35DCC1 USGS 1",                             "agency": "USGS", "type": "GW"},
+{"lat": 43.4536775253211, "lng": -112.935976050977, "alt": 5007.42, "site": 432714112560701, "name": "02N 30E 31CBC1 USGS 103",                           "agency": "USGS", "type": "GW"},
+{"lat": 43.4618477544893, "lng": -113.561960809528, "alt": "NA",    "site": 432743113334001, "name": "02N 24E 35ACC1-METEOROLOGICAL-Craters of the Moon", "agency": "USGS", "type": "AT"},
+{"lat": 43.5379425927720, "lng": -113.014548355576, "alt": 4997.31, "site": 433217113004901, "name": "03N 29E 33CCC1  MIDDLE 2051 PORT 1142.5",           "agency": "USGS", "type": "GW"},
+{"lat": 43.5379425927720, "lng": -113.014548355576, "alt": 4997.31, "site": 433217113004902, "name": "03N 29E 33CCC1 MIDDLE 2051 QA PORT 1132.6",         "agency": "USGS", "type": "GW"},
+{"lat": 43.5757402325101, "lng": -112.934719019175, "alt": 4913.16, "site": 433433112560201, "name": "03N 30E 19BCB1 CPP 1",                              "agency": "USGS", "type": "GW"},
+{"lat": 43.5803046219595, "lng": -112.876178537606, "alt": 4933.13, "site": 433449112523101, "name": "03N 30E 16DDD1 NPR TEST",                           "agency": "USGS", "type": "GW"},
+{"lat": 43.8015761333474, "lng": -112.177754071734, "alt": 4759.99, "site": 434806112103701, "name": "DRAIN WELL INFLOW 6N-36E-35DAD1",                   "agency": "USGS", "type": "FA-WIW"},
+{"lat": 43.8440151167565, "lng": -112.759927827946, "alt": 4784.3,  "site": 435038112453401, "name": "06N 31E 16DCA1 NO NAME 1",                          "agency": "USGS", "type": "GW"},
+{"lat": 43.8642317971464, "lng": -112.742880208334, "alt": 4794.43, "site": 435152112443101, "name": "06N 31E 10ACC1 ANP 6",                              "agency": "USGS", "type": "GW"}
 ],
 "polygons": [
 [
