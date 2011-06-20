@@ -101,7 +101,7 @@ MapSites <- function(sites, polygons=NULL, map.id="map") {
   cat(s, file=con, sep="\n", append=FALSE)
   close(con)
 
-  # Give R application to web server
+  # Give R application to internal web server
 
   if ("package:RNWIS" %in% search())
     map.path <- system.file("map", package="RNWIS")
