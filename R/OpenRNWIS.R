@@ -707,6 +707,16 @@ OpenRNWIS <- function() {
     # Close database connection
     odbcCloseAll()
 
+    # Catergorize site types
+    if ("site_tp_cd" %in% names(sel)) {
+      tp <- sel[, "site_tp_cd"]
+      sel[, "site_tp_cd"] <- NA
+      site.category <- list('Groundwater'="GW", 'Surface water'="SW",
+                            'Spring'="SP", 'Atmospheric'="AT")
+      for (i in names(site.types))
+        sel[tp %in% site.types[[i]], "site_tp_cd"] <- site.category[[i]]
+    }
+
     # Return selection
     if (inherits(sel, "data.frame") && nrow(sel) > 0) {
       return(list(sites=sel[, sqvars], polygons=poly.obj))
@@ -782,13 +792,11 @@ OpenRNWIS <- function() {
                       'Casing construction'="gw_csng_01",
                       'Openings construction'="gw_open_01")
 
-  site.types <- list('Well'=c("GW", "GW-CR", "GW-EX", "GW-HZ", "GW-IW",
-                              "GW-MW", "GW-TH"),
-                     'Other subsurface'=c("SB", "SB-CV", "SB-GWD", "SB-TSM",
-                                          "SB-UZ"),
-                     'Stream'=c("ST", "ST-CA", "ST-DCH", "ST-TS"),
-                     'Lake'="LK",
-                     'Spring'="SP")
+  site.types <- list('Groundwater'=c("GW", "GW-CR", "GW-EX", "GW-HZ", "GW-IW",
+                                     "GW-MW", "GW-TH"),
+                     'Surface water'=c("ST", "ST-CA", "ST-DCH", "ST-TS", "LK"),
+                     'Spring'="SP",
+                     'Atmospheric'="AT")
 
   agencies <- list('USGS'="USGS", 'EPA'="USEPA")
 
