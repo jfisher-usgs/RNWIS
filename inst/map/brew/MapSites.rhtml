@@ -134,6 +134,14 @@
         if (typeof data.polygons === 'object') {
           var polygons = [];
 
+          var polygon = [
+            new google.maps.LatLng(80,-180),
+            new google.maps.LatLng(80,0),
+            new google.maps.LatLng(0,0),
+            new google.maps.LatLng(0,-180)
+          ];
+          polygons.push(polygon);
+
           for (var i = 0; i < data.polygons.length; i++) {
             var polygon = [];
             for (var j = 0, dataPoly; dataPoly = data.polygons[i][j]; j++) {
@@ -147,10 +155,10 @@
           polygons = new google.maps.Polygon({
             paths: polygons,
             strokeColor: "#000000",
-            strokeOpacity: 0.8,
-            strokeWeight: 3,
+            strokeOpacity: 0.5,
+            strokeWeight: 2,
             fillColor: "#000000",
-            fillOpacity: 0.1
+            fillOpacity: 0.4
           });
 
           polygons.setMap(map);

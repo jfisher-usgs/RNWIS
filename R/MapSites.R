@@ -76,10 +76,12 @@ MapSites <- function(sites, polygons=NULL, map.id="map") {
       # Browser graphics engines require clockwise outer polygon(s) and
       # counterclockwise inner polygon(s) for proper rendering of inner
       # hole; this is not documented in the Google Maps API (wtf!).
+      # All polygons will be placed in a giant polygon that is bigger than
+      # North America so everything outside the user defined polygon is tinted.
 
       is.clockwise <- ClockWise(lng, lat)
       is.hole <- poly.pts[[i]]$hole
-      if ((is.hole & is.clockwise) | (!is.hole & !is.clockwise)) {
+      if ((is.hole & !is.clockwise) | (!is.hole & is.clockwise)) {
         lng <- rev(lng)
         lat <- rev(lat)
       }
