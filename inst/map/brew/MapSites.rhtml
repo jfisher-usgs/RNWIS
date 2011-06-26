@@ -33,7 +33,7 @@
 
       function initialize() {
         'use strict';
-        var map, bounds, markers, image, shadow, shape;
+        var map, bounds, markers, image, imagecode, shadow, shape;
 
         map = new google.maps.Map(document.getElementById('map'), {
           streetViewControl: 0,
@@ -43,36 +43,15 @@
         bounds = new google.maps.LatLngBounds();
 
         image = [];
-        image['GW'] = new google.maps.MarkerImage(
-          "../images/icon_GW.png",
-          new google.maps.Size(18,32),
-          new google.maps.Point(0,0),
-          new google.maps.Point(9,32)
-        );
-        image['SW'] = new google.maps.MarkerImage(
-          "../images/icon_SW.png",
-          new google.maps.Size(18,32),
-          new google.maps.Point(0,0),
-          new google.maps.Point(9,32)
-        );
-        image['SP'] = new google.maps.MarkerImage(
-          "../images/icon_SP.png",
-          new google.maps.Size(18,32),
-          new google.maps.Point(0,0),
-          new google.maps.Point(9,32)
-        );
-        image['AT'] = new google.maps.MarkerImage(
-          "../images/icon_AT.png",
-          new google.maps.Size(18,32),
-          new google.maps.Point(0,0),
-          new google.maps.Point(9,32)
-        );
-        image['NA'] = new google.maps.MarkerImage(
-          "../images/icon_NA.png",
-          new google.maps.Size(18,32),
-          new google.maps.Point(0,0),
-          new google.maps.Point(9,32)
-        );
+        imagecode = ['GW', 'SW', 'SP', 'AT', 'NA'];
+        for (var i = 0; i < imagecode.length; i++) {
+          image[imagecode[i]] = new google.maps.MarkerImage(
+            "../images/icon_" + imagecode[i] + ".png",
+            new google.maps.Size(18,32),
+            new google.maps.Point(0,0),
+            new google.maps.Point(9,32)
+          );
+        };
 
         shadow = new google.maps.MarkerImage(
           "../images/shadow.png",
