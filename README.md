@@ -45,9 +45,9 @@ information:
 
 +   The hostname of the NWIS server, e.g. the hostname for
     the Idaho district NWIS server is *sun2didbse.wr.usgs.gov*
-+   The name of the NWIS database in Ingres ("nwisxx" where "xx"
++   The name of the NWIS database in Ingres ("*nwisxx*" where "*xx*"
     is the state postal code, e.g. for the Idaho district the database is named
-    "nwisid").
+    "*nwisid*").
 +   The name of the data source name (DSN) that contains the
     connection information to NWIS. An Open Database Connectivity (ODBC) data
     source allows the user to connect to an NWIS database using the

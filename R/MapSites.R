@@ -94,6 +94,9 @@ MapSites <- function(sites, polygons=NULL, map.id="map") {
   s <- c(s, "}")
 
   # Write JSON file to temporary directory
+  # TODO: Give JSON file a unique name; see config.R for difficulty with
+  #       implementing this. Required for proper browser refresh with older
+  #       maps.
 
   temp.dir <- file.path(tempdir(), "json")
   dir.create(temp.dir, showWarnings=FALSE)
