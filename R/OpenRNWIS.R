@@ -544,7 +544,12 @@ OpenRNWIS <- function() {
                  verbose=TRUE)
       } else {
         d <- d[, retr.vars]
-        con <- gzfile(description=f, open="w")
+
+        if (grepl(".gz$", tolower(f)))
+          con <- gzfile(description=f, open="w")
+        else
+          con <- file(description=f, open="w")
+
         write.table(d, file=con, sep="\t", quote=FALSE, row.names=FALSE)
         close(con)
       }
