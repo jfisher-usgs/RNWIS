@@ -43,9 +43,9 @@ information:
 \itemize{
 \item The hostname of the \acronym{NWIS} server, e.g. the hostname for
 the Idaho district \acronym{NWIS} server is \emph{sun2didbse.wr.usgs.gov}
-\item The name of the \acronym{NWIS} database in Ingres ("nwisxx" where "xx"
-is the state postal code, e.g. for the Idaho district the database is named
-"nwisid").
+\item The name of the \acronym{NWIS} database in Ingres ("\emph{nwisxx}"
+where "\emph{xx}" is the state postal code, e.g. for the Idaho district the
+database is named "\emph{nwisid}").
 \item The name of the data source name (\acronym{DSN}) that contains the
 connection information to \acronym{NWIS}. An \acronym{ODBC} data source
 allows the user to connect to an \acronym{NWIS} database using the

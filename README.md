@@ -60,7 +60,7 @@ information:
 Running
 -------
 
-Load **RNWIS** in the current R session (32-bit):
+Load **RNWIS** in the current 32-bit R session:
 
     > library(RNWIS)
 
@@ -71,6 +71,6 @@ Activate the main GUI:
 Updating
 --------
 
-To check for **RNWIS** package updates:
+Install **RNWIS** package updates:
 
     > update.packages(repos='ftp://ftpint.usgs.gov/private/wr/id/scoville/Fisher/RNWIS')
