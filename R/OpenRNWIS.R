@@ -257,9 +257,11 @@ OpenRNWIS <- function() {
   # Copy variables from retrieval list into Windows clipboard
 
   CopyVariables <- function() {
-    if (length(retr.vars) == 0)
-      return()
-    s <- paste(retr.vars, collapse="\n")
+    idxs <- as.integer(tkcurselection(frame4.lst.2.6))
+    if (length(idxs) == 0)
+      s <- ""
+    else
+      s <- paste(retr.vars[idxs + 1], collapse="\n")
     writeClipboard(s, format=1)
   }
 
