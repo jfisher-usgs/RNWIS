@@ -19,7 +19,7 @@ All functions within \pkg{RNWIS} are accessible in this \acronym{GUI}.
 \author{Fisher, J.C.}
 
 \seealso{
-\code{odbcConnect}, \code{writeOGR}, \code{\link{write.table}},
+\code{\link{odbcConnect}}, \code{\link{writeOGR}}, \code{\link{write.table}},
 \code{\link{point.in.polygon}}
 }
 

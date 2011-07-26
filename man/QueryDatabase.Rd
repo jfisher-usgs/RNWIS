@@ -59,7 +59,7 @@ a character vector of error message(s).
 \author{Fisher, J.C.}
 
 \seealso{
-\code{sqlQuery}
+\code{\link{sqlQuery}}
 }
 
 \examples{

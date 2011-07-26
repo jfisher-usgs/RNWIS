@@ -1,0 +1,8 @@
+importFrom(RODBC, sqlQuery, odbcConnect)
+importFrom(rgdal, writeOGR)
+importClassesFrom(Rook, Rhttpd)
+
+export(ExploreDatabase,
+       MapSites,
+       OpenRNWIS,
+       QueryDatabase)

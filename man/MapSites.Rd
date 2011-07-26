@@ -43,7 +43,7 @@ An Rhttpd object is created and started in the internal web server.
 \author{Fisher, J.C.}
 
 \seealso{
-\code{\link{tempdir}}, \code{Rhttpd-class}
+\code{\link{tempdir}}, \code{\link{Rhttpd-class}}
 }
 
 \examples{

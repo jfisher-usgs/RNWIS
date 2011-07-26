@@ -24,7 +24,7 @@ Shows database table names and the column structure for each table.
 \author{Fisher, J.C.}
 
 \seealso{
-\code{sqlTables}, \code{sqlColumns}, \code{sqlPrimaryKeys}
+\code{\link{sqlTables}}, \code{\link{sqlColumns}}, \code{\link{sqlPrimaryKeys}}
 }
 
 \examples{
