@@ -54,8 +54,8 @@ An Rhttpd object is created and started in the internal web server.
                 agency = "USGS", type = "GW", stringsAsFactors = FALSE)
 MapSites(sites = s, map.id = "map01")
 
-f <- system.file("extdata/ExamplePolygon.ply", package="RNWIS")
-p <- read.polyfile(f, nohole=FALSE)
+f <- system.file("extdata/ExamplePolygon.ply", package = "RNWIS")
+p <- read.polyfile(f, nohole = FALSE)
 MapSites(sites = s, polygons = p, map.id = "map02")
 }
 }
