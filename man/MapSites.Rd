@@ -40,7 +40,7 @@ to a temporary directory.
 An Rhttpd object is created and started in the internal web server.
 }
 
-\author{Fisher, J.C.}
+\author{J.C. Fisher}
 
 \seealso{
 \code{\link{tempdir}}, \code{\link{Rhttpd-class}}

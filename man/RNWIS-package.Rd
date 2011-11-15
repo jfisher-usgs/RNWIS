@@ -15,16 +15,6 @@ It retrieves data from the National Water Information System
 through an Open Database Connectivity (\acronym{ODBC}) connection.
 }
 
-\details{
-  \tabular{ll}{
-    Package: \tab RNWIS\cr
-    Type: \tab Package\cr
-    Version: \tab 0.1-5\cr
-    Date: \tab 2011-11-01\cr
-    License: \tab GPL (>= 2)
-  }
-}
-
 \note{
 The \pkg{RNWIS} \acronym{GUI} requires \R operate as an \acronym{SDI}
 application, using multiple top-level windows for the console, graphics, and
@@ -58,12 +48,6 @@ source information using the \emph{ODBC Data Source Administrator}.
 
 The set of standards used for coding \pkg{RNWIS} is documented in
 \href{http://google-styleguide.googlecode.com/svn/trunk/google-r-style.html}{Google's R Style Guide}.
-}
-
-\author{
-Jason C. Fisher
-
-Maintainer: <\email{jfisher@usgs.gov}>
 }
 
 \examples{

@@ -16,7 +16,7 @@ OpenRNWIS()
 All functions within \pkg{RNWIS} are accessible in this \acronym{GUI}.
 }
 
-\author{Fisher, J.C.}
+\author{J.C. Fisher}
 
 \seealso{
 \code{\link{odbcConnect}}, \code{\link{writeOGR}}, \code{\link{write.table}},

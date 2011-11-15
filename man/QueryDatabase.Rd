@@ -56,7 +56,7 @@ On success, a data frame (possibly with 0 rows) or character string. On error,
 a character vector of error message(s).
 }
 
-\author{Fisher, J.C.}
+\author{J.C. Fisher}
 
 \seealso{
 \code{\link{sqlQuery}}

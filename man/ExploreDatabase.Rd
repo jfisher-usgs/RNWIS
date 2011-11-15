@@ -21,7 +21,7 @@ ExploreDatabase(channel, parent = NULL)
 Shows database table names and the column structure for each table.
 }
 
-\author{Fisher, J.C.}
+\author{J.C. Fisher}
 
 \seealso{
 \code{\link{sqlTables}}, \code{\link{sqlColumns}}, \code{\link{sqlPrimaryKeys}}
