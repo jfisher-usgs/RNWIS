@@ -1,6 +1,6 @@
 Package: RNWIS
 Version: 0.1-6
-Date: 2011-11-16
+Date: 2012-02-09
 Title: National Water Information System: R Interface
 Author: Jason C. Fisher
 Maintainer: Jason C. Fisher <jfisher@usgs.gov>
@@ -9,6 +9,6 @@ Suggests: RSurvey
 SystemRequirements: Tcl/Tk (>= 8.5), ODBC to NWIS database
 Description: This package provides access to water-resources data.
 License: GPL (>= 2)
-URL: https://github.com/stormplot/RNWIS
-BugReports: https://github.com/stormplot/RNWIS/issues
+URL: https://github.com/jfisher-usgs/RNWIS
+BugReports: https://github.com/jfisher-usgs/RNWIS/issues
 ByteCompile: yes

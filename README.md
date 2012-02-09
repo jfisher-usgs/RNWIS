@@ -1,9 +1,6 @@
 RNWIS: National Water Information System: R Interface
 =====================================================
 
-Description
------------
-
 This [R](http://www.r-project.org/ "R") package provides access to
 water-resources data stored on the National Water Information System
 ([NWIS](http://waterdata.usgs.gov/nwis "NWIS")).
@@ -14,8 +11,8 @@ top-level windows for the console, graphics, and pager.
 The set of standards used for coding **RNWIS** is documented in
 [Google's R Style Guide](http://google-styleguide.googlecode.com/svn/trunk/google-r-style.html "Google's R Style Guide").
 
-Installation
-------------
+Install
+-------
 
 If R is not already installed on your
 computer, download and install the latest binary distribution from
@@ -25,7 +22,7 @@ by choosing to customize the startup options and specifying the SDI interface
 (not the default).
 
 Install required R packages from CRAN using a simple call to
-`install.packages()`:
+`install.packages`:
 
     > install.packages(c('sp', 'RODBC', 'gpclib', 'rgdal', 'brew', 'Rook'))
 
@@ -57,8 +54,8 @@ information:
     NWIS, the user would select the data source name for the
     NWIS connection.
 
-Running
--------
+Run
+---
 
 Load **RNWIS** in the current 32-bit R session:
 
@@ -68,8 +65,8 @@ Activate the main GUI:
 
     > OpenRNWIS()
 
-Updating
---------
+Update
+------
 
 Install **RNWIS** package updates:
 
