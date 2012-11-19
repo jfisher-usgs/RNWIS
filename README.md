@@ -30,29 +30,7 @@ Install the **RNWIS** package:
 
     > install.packages('RNWIS', repos='ftp://ftpint.usgs.gov/private/wr/id/scoville/Fisher/RNWIS')
 
-The following instructions are provided for accessing NWIS using **RNWIS**.
-The site administrator must
-[install the Ingres II client](http://bwtst.usgs.gov/database/ingres/ "Ingres")
-(only available in 32-bit) on the user's computer. The user must be added
-to the *nwis_select* Ingres access group (see section 1.5 of the
-[NWIS Security System Documentation](http://nwis.usgs.gov/nwisdocs4_2/nwis_security.pdf "NWIS Security")).
-**RNWIS** must be installed on the user's computer.
-And the user must be provided with the following database connection
-information:
-
-+   The hostname of the NWIS server, e.g. the hostname for
-    the Idaho district NWIS server is *sun2didbse.wr.usgs.gov*
-+   The name of the NWIS database in Ingres ("*nwisxx*" where "*xx*"
-    is the state postal code, e.g. for the Idaho district the database is named
-    "*nwisid*").
-+   The name of the data source name (DSN) that contains the
-    connection information to NWIS. An Open Database Connectivity (ODBC) data
-    source allows the user to connect to an NWIS database using the
-    *nwis_select* Ingres access group. The site administrator enters the data
-    source information using the *ODBC Data Source Administrator*.
-    **RNWIS** will prompt the user for a data source to connect to. To connect to
-    NWIS, the user would select the data source name for the
-    NWIS connection.
+Contact your IT specialist for the Oracle ODBC setup.
 
 Run
 ---

@@ -122,7 +122,7 @@ OpenRNWIS <- function() {
 
     # Open database connection
     dsn <- as.character(tclvalue(dsn.var))
-    channel <<- odbcConnect(dsn, uid="", pwd="")
+    channel <<- odbcConnect(dsn, uid="", pwd="", readOnlyOptimize=TRUE)
 
     tkfocus(force=tt)
     tclServiceMode(FALSE)
@@ -792,12 +792,12 @@ OpenRNWIS <- function() {
   # does not convert altitudes to the Google Maps WGS84 EGM96 vertical
   # datum (this may be possible with future versions of PROJ.4).
 
-  site.table <- "sitefile_01"
+  site.table <- "SITEFILE_01"
 
-  data.tables <- list('Groundwater levels'="gw_lev_01",
-                      'Hole construction'="gw_hole_01",
-                      'Casing construction'="gw_csng_01",
-                      'Openings construction'="gw_open_01")
+  data.tables <- list('Groundwater levels'="GW_LEV_01",
+                      'Hole construction'="GW_HOLE_01",
+                      'Casing construction'="GW_CSNG_01",
+                      'Openings construction'="GW_OPEN_01")
 
   site.types <- list('Groundwater'=c("GW", "GW-CR", "GW-EX", "GW-HZ", "GW-IW",
                                      "GW-MW", "GW-TH"),
@@ -807,13 +807,13 @@ OpenRNWIS <- function() {
 
   agencies <- list('USGS'="USGS", 'EPA'="USEPA")
 
-  vars <- list('lat' = "dec_lat_va",
-               'lng' = "dec_long_va",
-               'alt' = "alt_va",
-               'site' = "site_no",
-               'name' = "station_nm",
-               'agency' = "agency_cd",
-               'type' = "site_tp_cd")
+  vars <- list('lat' = "DEC_LAT_VA",
+               'lng' = "DEC_LONG_VA",
+               'alt' = "ALT_VA",
+               'site' = "SITE_NO",
+               'name' = "STATION_NM",
+               'agency' = "AGENCY_CD",
+               'type' = "SITE_TP_CD")
 
   # Load required R packages
 

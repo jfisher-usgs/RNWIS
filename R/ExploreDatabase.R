@@ -50,7 +50,7 @@ ExploreDatabase <- function(channel, parent=NULL) {
   if (inherits(channel, "RODBC"))
     channel <- odbcReConnect(channel)
   else
-    channel <- odbcConnect(channel, uid="", pwd="")
+    channel <- odbcConnect(channel, uid="", pwd="", readOnlyOptimize=TRUE)
   if (channel < 0)
     stop("error occurred when opening connection to ODBC database")
   on.exit(close(channel))

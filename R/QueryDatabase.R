@@ -22,10 +22,12 @@ QueryDatabase <- function(channel, sqtable, sqvars="*",
   if (inherits(channel, "RODBC"))
     channel <- odbcReConnect(channel)
   else
-    channel <- odbcConnect(channel, uid="", pwd="")
+    channel <- odbcConnect(channel, uid="", pwd="", readOnlyOptimize=TRUE)
   if (channel < 0)
     stop("error occurred when opening connection to ODBC database")
   on.exit(close(channel))
+  
+  server.name <- odbcGetInfo(channel)[["Server_Name"]]
 
   cond <- c()
 
@@ -97,7 +99,8 @@ QueryDatabase <- function(channel, sqtable, sqvars="*",
   conds <- ""
   if (length(cond) > 0)
     conds <- paste("WHERE (", paste(cond, collapse=" AND "), ")", sep="")
-  query <- paste("SELECT", vars, "FROM", sqtable, conds)
+  query <- paste("SELECT", vars, "FROM", paste(server.name, sqtable, sep="."), 
+                 conds)
 
   # Query database
   d <- sqlQuery(channel, query, stringsAsFactors=FALSE)
