@@ -25,7 +25,7 @@ Open an R session and install the required packages from CRAN:
 
     > install.packages(c('sp', 'RODBC', 'gpclib', 'rgdal', 'brew', 'Rook'))
 
-Install the **RNWIS** package:
+Install the **RNWIS** package from a USGS internal FTP site:
 
     > install.packages('RNWIS', repos='ftp://ftpint.usgs.gov/private/wr/id/scoville/Fisher/RNWIS')
 
