@@ -154,8 +154,9 @@ OpenRNWIS <- function() {
 
         # Update site variables
         tkconfigure(frame1.but.1.3, state="normal")
-
-        sel <- sqlColumns(channel, sqtable=site.table)
+        server.name <- odbcGetInfo(channel)[["Server_Name"]]
+        sq.table <- paste(server.name, site.table, sep=".")
+        sel <- sqlColumns(channel, sqtable=sq.table)
         sel <- sel[sel[, "TABLE_NAME"] == site.table, "COLUMN_NAME"]
         site.vars <<- unique(sel)
         for (i in seq(along=site.vars))
@@ -291,7 +292,9 @@ OpenRNWIS <- function() {
 
     # Query database
     channel <- odbcReConnect(channel)
-    sel <- sqlColumns(channel, sqtable=data.table)
+    server.name <- odbcGetInfo(channel)[["Server_Name"]]
+    sq.table <- paste(server.name, data.table, sep=".")
+    sel <- sqlColumns(channel, sqtable=sq.table)
     odbcCloseAll()
 
     sel <- sel[sel[, "TABLE_NAME"] == data.table, ]
@@ -718,8 +721,8 @@ OpenRNWIS <- function() {
     if ("site_tp_cd" %in% names(sel)) {
       tp <- sel[, "site_tp_cd"]
       sel[, "site_tp_cd"] <- NA
-      site.category <- list('Groundwater'="GW", 'Surface water'="SW",
-                            'Spring'="SP", 'Atmospheric'="AT")
+      site.category <- list('groundwater'="GW", 'surface water'="SW",
+                            'spring'="SP", 'atmospheric'="AT")
       for (i in names(site.types))
         sel[tp %in% site.types[[i]], "site_tp_cd"] <- site.category[[i]]
     }
@@ -794,16 +797,16 @@ OpenRNWIS <- function() {
 
   site.table <- "SITEFILE_01"
 
-  data.tables <- list('Groundwater levels'="GW_LEV_01",
-                      'Hole construction'="GW_HOLE_01",
-                      'Casing construction'="GW_CSNG_01",
-                      'Openings construction'="GW_OPEN_01")
+  data.tables <- list('groundwater levels'="GW_LEV_01",
+                      'hole construction'="GW_HOLE_01",
+                      'casing construction'="GW_CSNG_01",
+                      'openings construction'="GW_OPEN_01")
 
-  site.types <- list('Groundwater'=c("GW", "GW-CR", "GW-EX", "GW-HZ", "GW-IW",
+  site.types <- list('groundwater'=c("GW", "GW-CR", "GW-EX", "GW-HZ", "GW-IW",
                                      "GW-MW", "GW-TH"),
-                     'Surface water'=c("ST", "ST-CA", "ST-DCH", "ST-TS", "LK"),
-                     'Spring'="SP",
-                     'Atmospheric'="AT")
+                     'surface water'=c("ST", "ST-CA", "ST-DCH", "ST-TS", "LK"),
+                     'spring'="SP",
+                     'atmospheric'="AT")
 
   agencies <- list('USGS'="USGS", 'EPA'="USEPA")
 

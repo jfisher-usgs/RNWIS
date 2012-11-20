@@ -17,16 +17,18 @@ ExploreDatabase <- function(channel, parent=NULL) {
     # Clear treeview
     tree.children <- tcl(frame2.tre.2.1, "children", "")
     tkdelete(frame2.tre.2.1, tree.children)
-
+    
+    # Table name on server
+    sq.table <- paste(server.name, table.name, sep=".")
+    
     # Query column names
-    cols <- sqlColumns(channel, sqtable=table.name)
-
+    cols <- sqlColumns(channel, sqtable=sq.table)
     cols <- cols[cols[, "TABLE_NAME"] == table.name,
                  c("COLUMN_NAME", "TYPE_NAME", "NUM_PREC_RADIX",
                    "CHAR_OCTET_LENGTH")]
 
     # Query keys
-    keys <- sqlPrimaryKeys(channel, sqtable=table.name)
+    keys <- sqlPrimaryKeys(channel, sqtable=sq.table)
     which.is.key <- which(cols[, "COLUMN_NAME"] %in% keys[, "COLUMN_NAME"])
 
     # Tags, color styles in treeview
@@ -54,9 +56,12 @@ ExploreDatabase <- function(channel, parent=NULL) {
   if (channel < 0)
     stop("error occurred when opening connection to ODBC database")
   on.exit(close(channel))
+  
+  server.name <- odbcGetInfo(channel)[["Server_Name"]]
 
-  sql.tables <- sqlTables(channel, errors=FALSE, as.is=TRUE)[, "TABLE_NAME"]
-  sql.tables <- sort(sql.tables)
+  sql.tables <- sqlTables(channel, errors=FALSE, as.is=TRUE)
+  sql.tables <- sql.tables[sql.tables[, "TABLE_TYPE"] == "TABLE", ]
+  sql.tables <- sort(sql.tables[, "TABLE_NAME"])
 
   help.url <- "http://nwis.usgs.gov/dbms/" # only available on USGS intranet
 
