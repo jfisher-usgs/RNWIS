@@ -113,7 +113,7 @@ MapSites <- function(sites, polygons=NULL, map.id="map") {
   else
     map.path <- file.path(getwd(), "inst", "map")
 
-  startDynamicHelp(start=FALSE)
+  try(startDynamicHelp(start=FALSE), silent=TRUE)
   
   server <- Rhttpd$new()
   server$add(app=file.path(map.path, "config.R"), name=map.id)
