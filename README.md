@@ -23,7 +23,7 @@ by choosing to customize the startup options and specifying the SDI interface
 
 Open an R session and install the required packages from CRAN:
 
-    > install.packages(c('sp', 'RODBC', 'gpclib', 'rgdal', 'brew', 'Rook'))
+    > install.packages(c('sp', 'RODBC', 'rgeos', 'rgdal', 'brew', 'Rook'))
 
 Install the **RNWIS** package from a USGS internal FTP site:
 
