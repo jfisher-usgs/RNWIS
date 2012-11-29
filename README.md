@@ -43,10 +43,3 @@ Load **RNWIS** in the current 32-bit R session:
 Activate the main GUI:
 
     > OpenRNWIS()
-
-Update
-------
-
-Install **RNWIS** package updates:
-
-    > update.packages(repos='ftp://ftpint.usgs.gov/private/wr/id/scoville/Fisher/RNWIS')
