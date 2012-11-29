@@ -29,7 +29,7 @@ Install the **RNWIS** package:
 
     > install.packages('devtools')
     > library(devtools)
-    > install_github('RNWIS', username = 'jfisher-usgs', ref = 'v0.1.7')
+    > install_github('RNWIS', username='jfisher-usgs', ref='v0.1.7')
 
 Contact your IT specialist for the Oracle ODBC setup.
 
