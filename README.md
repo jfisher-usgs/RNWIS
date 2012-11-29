@@ -25,9 +25,11 @@ Open an R session and install the required packages from CRAN:
 
     > install.packages(c('sp', 'RODBC', 'rgeos', 'rgdal', 'brew', 'Rook'))
 
-Install the **RNWIS** package from a USGS internal FTP site:
+Install the **RNWIS** package:
 
-    > install.packages('RNWIS', repos='ftp://ftpint.usgs.gov/private/wr/id/scoville/Fisher/RNWIS')
+    > install.packages('devtools')
+    > library(devtools)
+    > install_github("RNWIS", username = 'jfisher-usgs', ref = 'v0.1.7')
 
 Contact your IT specialist for the Oracle ODBC setup.
 
