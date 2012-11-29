@@ -31,7 +31,9 @@ Install the **RNWIS** package:
     > library(devtools)
     > install_github('RNWIS', username='jfisher-usgs', ref='v0.1.7')
 
-Contact your IT specialist for the Oracle ODBC setup.
+Contact your IT specialist for help with setting up the 
+[Oracle](http://bwtst.usgs.gov/database/oracle/index.html "Oracle") 
+ODBC drivers.
 
 Run
 ---
