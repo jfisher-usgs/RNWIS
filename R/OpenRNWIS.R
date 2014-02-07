@@ -957,23 +957,6 @@ OpenRNWIS <- function() {
         command=OpenHTMLHelp)
   tkadd(menu.help, "separator")
   tkadd(menu.help, "command", label="About", command=AboutPackage)
-  if (!"RNWIS" %in% .packages()) {
-    if ("RSurvey" %in% .packages(all.available=TRUE)) {
-      suppressPackageStartupMessages(require("RSurvey"))
-      if (!is.null(Data("win.loc")))
-        tkwm.geometry(tt, Data("win.loc"))
-      tkadd(menu.help, "separator")
-      tkadd(menu.help, "command", label="Restore R session",
-            command=function() {
-              geo <- unlist(strsplit(as.character(tkwm.geometry(tt)), "\\+"))
-              win.loc <- paste("+", as.integer(geo[2]),
-                               "+", as.integer(geo[3]), sep="")
-              Data("win.loc", win.loc)
-              CloseGUI()
-              RestoreSession(paste(getwd(), "R", sep="/"), fun.call="OpenRNWIS")
-            })
-    }
-  }
 
   tkconfigure(tt, menu=top.menu)
 

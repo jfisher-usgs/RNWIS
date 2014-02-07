@@ -1,5 +1,5 @@
-RNWIS: National Water Information System: R Interface
-=====================================================
+RNWIS
+=====
 
 This [R](http://www.r-project.org/ "R") package provides access to
 water-resources data stored on the National Water Information System
@@ -23,13 +23,13 @@ by choosing to customize the startup options and specifying the SDI interface
 
 Open an R session and install the required packages from CRAN:
 
-    > install.packages(c('sp', 'RODBC', 'rgeos', 'rgdal', 'brew', 'Rook'))
+    > install.packages(c("sp", "RODBC", "rgeos", "rgdal", "brew", "Rook"))
 
 Install the **RNWIS** package:
 
-    > install.packages('devtools')
+    > install.packages("devtools")
     > library(devtools)
-    > install_github('RNWIS', username='jfisher-usgs', ref='v0.1.7')
+    > install_github("RNWIS", username = "jfisher-usgs", ref = "v0.1.7")
 
 Contact your IT specialist for help with setting up the 
 [Oracle](http://bwtst.usgs.gov/database/oracle/index.html "Oracle") 

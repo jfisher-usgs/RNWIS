@@ -4,8 +4,8 @@ Date: 2012-11-28
 Title: National Water Information System: R Interface
 Author: Jason C. Fisher
 Maintainer: Jason C. Fisher <jfisher@usgs.gov>
-Depends: R (>= 2.13.0), tcltk, sp, RODBC, rgeos, rgdal, brew, Rook
-Suggests: RSurvey
+Depends: R (>= 2.13.0)
+Imports: tcltk, sp, RODBC, rgeos, rgdal, brew, Rook
 SystemRequirements: Tcl/Tk (>= 8.5), ODBC to NWIS (>= 5.0) database
 Description: This package provides access to water-resources data.
 License: GPL (>= 2)

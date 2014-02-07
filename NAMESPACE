@@ -1,6 +1,4 @@
-importFrom(RODBC, sqlQuery, odbcConnect)
-importFrom(rgdal, writeOGR)
-importClassesFrom(Rook, Rhttpd)
+import(tcltk, sp, RODBC, rgeos, rgdal, brew, Rook)
 
 export(ExploreDatabase,
        MapSites,
