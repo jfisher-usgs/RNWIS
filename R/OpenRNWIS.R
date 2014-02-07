@@ -541,8 +541,7 @@ OpenRNWIS <- function() {
 
         colnames(d) <- col.names
         coordinates(d) <- col.names[1:2]
-        s <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
-        proj4string(d) <- CRS(s)
+        proj4string(d) <- CRS("+init=epsg:3857")
 
         writeOGR(obj=d, dsn=dirname(f), driver="ESRI Shapefile",
                  layer=sub(paste(".shp$", sep=""), "", basename(f)),
@@ -691,10 +690,8 @@ OpenRNWIS <- function() {
       xy.names <- c(vars[['lng']], vars[['lat']])
       xy <- sel[, xy.names]
       coordinates(xy) <- xy.names
-      s <- "+proj=longlat +datum=NAD83"
-      proj4string(xy) <- CRS(s)
-      s <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
-      sel[, xy.names] <- as.data.frame(spTransform(xy, CRS(s)))
+      proj4string(xy) <- CRS("+proj=longlat +datum=NAD83")
+      sel[, xy.names] <- as.data.frame(spTransform(xy, CRS("+init=epsg:3857")))
 
       # Only permit sites inside polygon spatial domain
       if (!is.null(poly.obj)) {
