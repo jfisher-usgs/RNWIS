@@ -7,7 +7,7 @@ Maintainer: Jason C. Fisher <jfisher@usgs.gov>
 Depends: R (>= 2.13.0)
 Imports: tcltk, sp, RODBC, rgeos, rgdal, brew, Rook
 SystemRequirements: Tcl/Tk (>= 8.5), ODBC to NWIS (>= 5.0) database
-Description: This package provides access to water-resources data.
+Description: Provides access to U.S. Geological Survey water-resources data.
 License: GPL (>= 2)
 URL: https://github.com/jfisher-usgs/RNWIS
 BugReports: https://github.com/jfisher-usgs/RNWIS/issues
