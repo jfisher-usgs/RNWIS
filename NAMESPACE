@@ -1,5 +1,5 @@
 importFrom("stats", "na.omit")
-importFrom("utils", "browseURL", "readClipboard", "write.table", "writeClipboard")
+importFrom("utils", "browseURL", "readClipboard", "write.table", "writeClipboard", "installed.packages", "help")
 importFrom("tools", "startDynamicHelp")
 
 import("tcltk", "sp", "RODBC", "rgeos", "rgdal", "brew", "Rook")
