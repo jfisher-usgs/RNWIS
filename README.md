@@ -19,7 +19,7 @@ Open an R session and run the following commands:
 
 ```r
 if (!"devtools" %in% rownames(installed.packages())) install.packages("devtools")
-devtools::install_github("jfisher-usgs/RNWIS", ref = "v0.1.7")
+devtools::install_github("jfisher-usgs/RNWIS", ref = "v0.1.8")
 ```
 
 Contact your IT specialist for help with setting up the Oracle ODBC drivers.
