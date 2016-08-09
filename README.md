@@ -27,14 +27,8 @@ Contact your IT specialist for help with setting up the Oracle ODBC drivers.
 Run
 ---
 
-Load **RNWIS** in the current 32-bit R session:
+Load **RNWIS** in the current 32-bit R session and activate the main GUI:
 
 ```r
 library(RNWIS)
-```
-
-Activate the main GUI:
-
-```r
-OpenRNWIS()
 ```

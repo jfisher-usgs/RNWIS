@@ -761,13 +761,13 @@ OpenRNWIS <- function() {
   # Open HTML help for R functions
 
   OpenHTMLHelp <- function() {
-    if (!("RNWIS" %in% .packages(all.available=TRUE)))
-      return()
-    if (tools:::httpdPort == 0L)
-      tools::startDynamicHelp()
-    if (tools:::httpdPort > 0L) {
-      url <- paste("http://127.0.0.1:", tools:::httpdPort,
-                   "/library/RNWIS/html/00Index.html", sep="")
+    if (!("RNWIS" %in% .packages(all.available=TRUE))) return()
+    options(help_type="html")
+    hport <- tools:::httpdPort()
+    if (hport <= 0L) hport <- startDynamicHelp()
+    if (hport > 0L) {
+      url <- paste0("http://127.0.0.1:", hport,
+                   "/library/RNWIS/html/00Index.html")
       browseURL(url)
     } else {
       stop("requires the HTTP server to be running", call.=FALSE)

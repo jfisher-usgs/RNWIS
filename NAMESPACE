@@ -1,6 +1,10 @@
-import(tcltk, sp, RODBC, rgeos, rgdal, brew, Rook)
+importFrom("stats", "na.omit")
+importFrom("utils", "browseURL", "readClipboard", "write.table", "writeClipboard")
+importFrom("tools", "startDynamicHelp")
 
-export(ExploreDatabase,
-       MapSites,
-       OpenRNWIS,
-       QueryDatabase)
+import("tcltk", "sp", "RODBC", "rgeos", "rgdal", "brew", "Rook")
+
+export("ExploreDatabase",
+       "MapSites",
+       "OpenRNWIS",
+       "QueryDatabase")
