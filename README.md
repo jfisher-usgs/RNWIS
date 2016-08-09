@@ -18,7 +18,7 @@ Windows users should set R to operate as an SDI application during installation 
 Open an R session and run the following commands:
 
 ```r
-if (!require("devtools")) install.packages("devtools")
+if (!"devtools" %in% rownames(installed.packages())) install.packages("devtools")
 devtools::install_github("RNWIS", username = "jfisher-usgs", ref = "v0.1.7")
 ```
 
