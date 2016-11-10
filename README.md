@@ -5,7 +5,7 @@
 ## Overview
 
 
-The [R](http://www.r-project.org/) package **RNWIS* provides access to water-resources data stored on the
+The [R](http://www.r-project.org/) package **RNWIS** provides access to water-resources data stored on the
 **N**ational **W**ater **I**nformation **S**ystem ([NWIS](http://waterdata.usgs.gov/nwis)).
 A graphical user interface (GUI) is provided and requires R operate as an SDI application,
 using multiple top-level windows for the console, graphics, and pager.
@@ -18,7 +18,7 @@ Windows users should set R to operate as an SDI application during installation
 by choosing to customize the start-up options and specifying the SDI interface (not the default).
 
 You can install the stable version of **ObsNetwork** from [GitHub](https://jfisher-usgs.github.io/R/),
-and its dependencies from [CRAN](http://cran.r-project.org/), using the following commands:
+and its dependencies from CRAN, using the following commands:
 
 ```r
 repos <- c("https://jfisher-usgs.github.io/R", getOption("repos"))
@@ -31,7 +31,7 @@ Or use **devtools** to install the development version.
 devtools::install_github("jfisher-usgs/RNWIS")
 ```
 
-Contact your IT specialist for help with setting up the Oracle 32-bit ODBC drivers.
+Contact your IT specialist for help with setting up the Oracle ODBC driver (only available in 32-bit).
 
 ## Run
 

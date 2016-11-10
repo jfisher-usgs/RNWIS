@@ -4,13 +4,17 @@ language: r
 sudo: required
 dist: trusty
 cache: packages
-r:
-  - oldrel
-  - release
-  - devel
 
 addons:
   apt:
     packages:
       - libgdal-dev
       - libproj-dev
+      - tcl-dev
+      - tk-dev
+      - tk-table
+
+before_script:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3
