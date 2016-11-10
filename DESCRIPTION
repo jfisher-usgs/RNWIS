@@ -1,14 +1,27 @@
 Package: RNWIS
-Version: 0.1.8
-Date: 2016-08-09
 Title: National Water Information System: R Interface
-Author: Jason C. Fisher
-Maintainer: Jason C. Fisher <jfisher@usgs.gov>
-Depends: R (>= 2.13.0)
-Imports: tcltk, sp, RODBC, rgeos, rgdal, brew, Rook
+Version: 0.1.7.9000
+Authors@R: person("Jason", "Fisher", email="jfisher@usgs.gov", role=c("aut", "cre"))
+Description: Provides a graphical user interface for accessing
+    U.S. Geological Survey water-resources data.
+Depends:
+    R (>= 3.2.0)
+Imports:
+    brew,
+    rgdal,
+    rgeos,
+    RODBC,
+    Rook,
+    sp,
+    tcltk
 SystemRequirements: Tcl/Tk (>= 8.5), ODBC to NWIS (>= 5.0) database
-Description: Provides access to U.S. Geological Survey water-resources data.
-License: GPL (>= 2)
+License: CC0
+Copyright: This software is in the public domain because it contains materials
+    that originally came from the USGS, an agency of the United States
+    Department of Interior. For more information, see the official USGS
+    copyright policy at https://www2.usgs.gov/visual-id/credit_usgs.html
 URL: https://github.com/jfisher-usgs/RNWIS
 BugReports: https://github.com/jfisher-usgs/RNWIS/issues
-ByteCompile: yes
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 5.0.1

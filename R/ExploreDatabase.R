@@ -1,9 +1,35 @@
+#' Explore Database Connection
+#'
+#' A graphical user interface for exploring the contents of a database.
+#'
+#' @param channel RODBC.
+#'   Connection to the ODBC database.
+#' @param parent tkwin.
+#'    Parent window (optional)
+#'
+#' @details Shows database table names and the column structure for each table.
+#'
+#' @author J.C. Fisher, U.S. Geological Survey, Idaho Water Science Center
+#'
+#' @seealso \code{\link{sqlTables}}, \code{\link{sqlColumns}}, \code{\link{sqlPrimaryKeys}}
+#'
+#' @keywords misc
+#'
+#' @import tcltk
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'   channel <- RODBC::odbcConnect("NWIS Idaho", uid = "", pwd = "")
+#'   ExploreDatabase(channel)
+#'   close(channel)
+#' }
+#'
+
 ExploreDatabase <- function(channel, parent=NULL) {
-  # GUI for exploring contents of database.
 
-  # Additional functions (subroutines)
-
-  # Retrieve column structure for a database table.
+  # Function for retrieving column structure for database table.
 
   GetVariables <- function() {
     idx <- as.integer(tkcurselection(frame1.lst.2.1))
@@ -17,18 +43,18 @@ ExploreDatabase <- function(channel, parent=NULL) {
     # Clear treeview
     tree.children <- tcl(frame2.tre.2.1, "children", "")
     tkdelete(frame2.tre.2.1, tree.children)
-    
+
     # Table name on server
     sq.table <- paste(server.name, table.name, sep=".")
-    
+
     # Query column names
-    cols <- sqlColumns(channel, sqtable=sq.table)
+    cols <- RODBC::sqlColumns(channel, sqtable=sq.table)
     cols <- cols[cols[, "TABLE_NAME"] == table.name,
                  c("COLUMN_NAME", "TYPE_NAME", "NUM_PREC_RADIX",
                    "CHAR_OCTET_LENGTH")]
 
     # Query keys
-    keys <- sqlPrimaryKeys(channel, sqtable=sq.table)
+    keys <- RODBC::sqlPrimaryKeys(channel, sqtable=sq.table)
     which.is.key <- which(cols[, "COLUMN_NAME"] %in% keys[, "COLUMN_NAME"])
 
     # Tags, color styles in treeview
@@ -50,16 +76,16 @@ ExploreDatabase <- function(channel, parent=NULL) {
   # Main program
 
   if (inherits(channel, "RODBC"))
-    channel <- odbcReConnect(channel)
+    channel <- RODBC::odbcReConnect(channel)
   else
-    channel <- odbcConnect(channel, uid="", pwd="", readOnlyOptimize=TRUE)
+    channel <- RODBC::odbcConnect(channel, uid="", pwd="", readOnlyOptimize=TRUE)
   if (channel < 0)
     stop("error occurred when opening connection to ODBC database")
   on.exit(close(channel))
-  
-  server.name <- odbcGetInfo(channel)[["Server_Name"]]
 
-  sql.tables <- sqlTables(channel, errors=FALSE, as.is=TRUE)
+  server.name <- RODBC::odbcGetInfo(channel)[["Server_Name"]]
+
+  sql.tables <- RODBC::sqlTables(channel, errors=FALSE, as.is=TRUE)
   sql.tables <- sql.tables[sql.tables[, "TABLE_TYPE"] == "TABLE", ]
   sql.tables <- sort(sql.tables[, "TABLE_NAME"])
 
@@ -90,7 +116,7 @@ ExploreDatabase <- function(channel, parent=NULL) {
   frame0 <- ttkframe(tt, relief="flat")
 
   frame0.but.1 <- ttkbutton(frame0, width=12, text="Help",
-                            command=function() browseURL(help.url))
+                            command=function() utils::browseURL(help.url))
   frame0.but.2 <- ttkbutton(frame0, width=12, text="Close",
                             command=function() tclvalue(tt.done.var) <- 1)
   frame0.grp.3 <- ttksizegrip(frame0)

@@ -1,1 +1,8 @@
-templates//
+^\.gitattributes$
+^\.gitignore$
+^\.RData$
+^\.Rhistory$
+^Makefile$
+^\.travis\.yml$
+
+templates/.*[.]ai$

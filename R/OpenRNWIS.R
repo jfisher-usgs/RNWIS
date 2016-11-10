@@ -1,3 +1,25 @@
+#' Open Main Graphical User Interface
+#'
+#' This function activates the main graphcial user interface (GUI) for the \pkg{RNWIS} package.
+#'
+#' @details All functions within the \pkg{RNWIS} package may be called from this GUI.
+#'
+#' @author J.C. Fisher, U.S. Geological Survey, Idaho Water Science Center
+#'
+#' @seealso \code{\link{ExploreDatabase}}, \code{\link{MapSites}}, \code{\link{QueryDatabase}}
+#'
+#' @keywords misc
+#'
+#' @import tcltk
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'   OpenRNWIS()
+#' }
+#'
+
 OpenRNWIS <- function() {
   # GUI for defining search parameters in query.
 
@@ -105,7 +127,7 @@ OpenRNWIS <- function() {
     tclServiceMode(FALSE)
     if (as.integer(tclvalue(tt.done.var)) != 0)
       return()
-    odbcCloseAll()
+    RODBC::odbcCloseAll()
     tclvalue(tt.done.var) <- 1
     tkdestroy(tt)
     tclServiceMode(TRUE)
@@ -122,7 +144,7 @@ OpenRNWIS <- function() {
 
     # Open database connection
     dsn <- as.character(tclvalue(dsn.var))
-    channel <<- odbcConnect(dsn, uid="", pwd="", readOnlyOptimize=TRUE)
+    channel <<- RODBC::odbcConnect(dsn, uid="", pwd="", readOnlyOptimize=TRUE)
 
     tkfocus(force=tt)
     tclServiceMode(FALSE)
@@ -143,7 +165,7 @@ OpenRNWIS <- function() {
 
     # Update GUI
     if (channel >= 0L && inherits(channel, "RODBC")) {
-      tables <- sqlTables(channel, errors=FALSE, as.is=TRUE)[, "TABLE_NAME"]
+      tables <- RODBC::sqlTables(channel, errors=FALSE, as.is=TRUE)[, "TABLE_NAME"]
       if (site.table %in% tables) {
 
         # Establish table types
@@ -154,9 +176,9 @@ OpenRNWIS <- function() {
 
         # Update site variables
         tkconfigure(frame1.but.1.3, state="normal")
-        server.name <- odbcGetInfo(channel)[["Server_Name"]]
+        server.name <- RODBC::odbcGetInfo(channel)[["Server_Name"]]
         sq.table <- paste(server.name, site.table, sep=".")
-        sel <- sqlColumns(channel, sqtable=sq.table)
+        sel <- RODBC::sqlColumns(channel, sqtable=sq.table)
         sel <- sel[sel[, "TABLE_NAME"] == site.table, "COLUMN_NAME"]
         site.vars <<- unique(sel)
         for (i in seq(along=site.vars))
@@ -172,7 +194,7 @@ OpenRNWIS <- function() {
     }
 
     # Close database connection
-    odbcCloseAll()
+    RODBC::odbcCloseAll()
 
     tkconfigure(tt, cursor="arrow")
     tclServiceMode(TRUE)
@@ -263,13 +285,13 @@ OpenRNWIS <- function() {
       s <- ""
     else
       s <- paste(retr.vars[idxs + 1], collapse="\n")
-    writeClipboard(s, format=1)
+    utils::writeClipboard(s, format=1)
   }
 
   # Paste variables from Windows clipboard into retrieval list
 
   PasteVariables <- function() {
-    s <- readClipboard(format=1, raw=FALSE)
+    s <- utils::readClipboard(format=1, raw=FALSE)
     if (is.null(s))
       return()
     is.var <- s %in% c(site.vars, data.vars) & !s %in% retr.vars
@@ -291,11 +313,11 @@ OpenRNWIS <- function() {
     data.table <- data.tables[[as.character(tclvalue(data.type.var))]]
 
     # Query database
-    channel <- odbcReConnect(channel)
-    server.name <- odbcGetInfo(channel)[["Server_Name"]]
+    channel <- RODBC::odbcReConnect(channel)
+    server.name <- RODBC::odbcGetInfo(channel)[["Server_Name"]]
     sq.table <- paste(server.name, data.table, sep=".")
-    sel <- sqlColumns(channel, sqtable=sq.table)
-    odbcCloseAll()
+    sel <- RODBC::sqlColumns(channel, sqtable=sq.table)
+    RODBC::odbcCloseAll()
 
     sel <- sel[sel[, "TABLE_NAME"] == data.table, ]
     data.vars <<- sel[, "COLUMN_NAME"]
@@ -490,7 +512,7 @@ OpenRNWIS <- function() {
         inc <- c(inc, n)
 
       # Query database
-      channel <- odbcReConnect(channel)
+      channel <- RODBC::odbcReConnect(channel)
       for (i in seq(along=inc[-1])) {
         site.numbers <- site.no[inc[i]:inc[i + 1]]
         sel <- QueryDatabase(channel,
@@ -506,7 +528,7 @@ OpenRNWIS <- function() {
         }
         d.data <- rbind(d.data, sel)
       }
-      odbcCloseAll()
+      RODBC::odbcCloseAll()
 
       if (nrow(d.data) == 0L)
         d.data <- NULL
@@ -540,12 +562,12 @@ OpenRNWIS <- function() {
                           unique=TRUE))
 
         colnames(d) <- col.names
-        coordinates(d) <- col.names[1:2]
-        proj4string(d) <- CRS("+init=epsg:3857")
+        sp::coordinates(d) <- col.names[1:2]
+        sp::proj4string(d) <- sp::CRS("+init=epsg:3857")
 
-        writeOGR(obj=d, dsn=dirname(f), driver="ESRI Shapefile",
-                 layer=sub(paste(".shp$", sep=""), "", basename(f)),
-                 verbose=TRUE)
+        rgdal::writeOGR(obj=d, dsn=dirname(f), driver="ESRI Shapefile",
+                        layer=sub(paste(".shp$", sep=""), "", basename(f)),
+                        verbose=TRUE)
       } else {
         d <- d[, retr.vars]
 
@@ -554,7 +576,7 @@ OpenRNWIS <- function() {
         else
           con <- file(description=f, open="w")
 
-        write.table(d, file=con, sep="\t", quote=FALSE, row.names=FALSE)
+        utils::write.table(d, file=con, sep="\t", quote=FALSE, row.names=FALSE)
         close(con)
       }
     }
@@ -593,7 +615,7 @@ OpenRNWIS <- function() {
     sqvars <- unique(c(vars[['lat']], vars[['lng']], sqvars))
 
     # Reconnect to database
-    channel <- odbcReConnect(channel)
+    channel <- RODBC::odbcReConnect(channel)
 
     # Base query on site numbers
     if (opt == 1L | opt == 2L) {
@@ -641,9 +663,9 @@ OpenRNWIS <- function() {
       poly.obj <- NULL
       poly.file <- as.character(tclvalue(poly.file.var))
       if (poly.file != "" && file.access(poly.file, mode=0) == 0) {
-        poly.obj <- read.polyfile(poly.file, nohole=FALSE)
+        poly.obj <- rgeos::read.polyfile(poly.file, nohole=FALSE)
         if (inherits(poly.obj, "gpc.poly")) {
-          poly.bbox <- get.bbox(poly.obj)
+          poly.bbox <- rgeos::get.bbox(poly.obj)
           lat.min <- min(lat.min, poly.bbox$y[1], na.rm=TRUE)
           lat.max <- max(lat.max, poly.bbox$y[2], na.rm=TRUE)
           lng.min <- min(lng.min, poly.bbox$x[1], na.rm=TRUE)
@@ -689,20 +711,20 @@ OpenRNWIS <- function() {
       # Convert decimal degree latitude and longitude from NAD83 to WGS84.
       xy.names <- c(vars[['lng']], vars[['lat']])
       xy <- sel[, xy.names]
-      coordinates(xy) <- xy.names
-      proj4string(xy) <- CRS("+proj=longlat +datum=NAD83")
-      sel[, xy.names] <- as.data.frame(spTransform(xy, CRS("+init=epsg:3857")))
+      sp::coordinates(xy) <- xy.names
+      sp::proj4string(xy) <- sp::CRS("+proj=longlat +datum=NAD83")
+      sel[, xy.names] <- as.data.frame(sp::spTransform(xy, sp::CRS("+init=epsg:3857")))
 
       # Only permit sites inside polygon spatial domain
       if (!is.null(poly.obj)) {
-        poly.pts <- get.pts(poly.obj)
+        poly.pts <- rgeos::get.pts(poly.obj)
         for (i in seq(along=poly.pts)) {
           x <- sel[, vars[['lng']]]
           y <- sel[, vars[['lat']]]
           poly.x <- poly.pts[[i]]$x
           poly.y <- poly.pts[[i]]$y
-          is.inside <- point.in.polygon(point.x=x, point.y=y,
-                                        pol.x=poly.x, pol.y=poly.y)
+          is.inside <- sp::point.in.polygon(point.x=x, point.y=y,
+                                            pol.x=poly.x, pol.y=poly.y)
           if (poly.pts[[i]]$hole)
             sel <- sel[is.inside != 1, ]
           else
@@ -712,7 +734,7 @@ OpenRNWIS <- function() {
     }
 
     # Close database connection
-    odbcCloseAll()
+    RODBC::odbcCloseAll()
 
     # Catergorize site types
     if ("site_tp_cd" %in% names(sel)) {
@@ -761,8 +783,8 @@ OpenRNWIS <- function() {
   # Open HTML help for R functions
 
   OpenHTMLHelp <- function() {
-    if (!("RNWIS" %in% rownames(installed.packages()))) return()
-    help(package="RNWIS", help_type="html")
+    if (!("RNWIS" %in% rownames(utils::installed.packages()))) return()
+    utils::help(package="RNWIS", help_type="html")
     invisible()
   }
 
@@ -986,7 +1008,7 @@ OpenRNWIS <- function() {
 
   tkpack(frame1, fill="x", expand=FALSE, ipadx=2, ipady=2, padx=8, pady=8)
 
-  tkconfigure(frame1.box.1.2, value=names(odbcDataSources()))
+  tkconfigure(frame1.box.1.2, value=names(RODBC::odbcDataSources()))
 
   tkconfigure(frame1.but.1.3, state="disabled")
 
