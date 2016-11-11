@@ -21,128 +21,88 @@
 #'
 
 OpenRNWIS <- function() {
-  # GUI for defining search parameters in query.
 
-  # Additional functions (subroutines)
 
-  # Save query object
+  CallFileDialogBox <- function(cmd, caption, defaultextension, filters) {
+    args <- list(cmd, title=caption, parent=tt)
+    if (!is.null(defaultextension))
+      args <- c(args, defaultextension=defaultextension)
+    if (!is.null(initialdir))
+      args <- c(args, initialdir=initialdir)
+    if (!is.null(filters)) {
+      filters[] <- paste("{", filters, "}", sep="")
+      filters <- apply(filters, 1, paste, collapse=" ")
+      filters <- paste(paste("{", filters, "}", sep=""), collapse=" ")
+      args <- c(args, filetypes=filters)
+    }
+    file <- tclvalue(do.call(tcl, args))
+    if (nzchar(file)) {
+      initialdir <<- dirname(file)
+      return(file)
+    }
+  }
+
+
+  SaveFile <- function(type) {
+    if (type == "Data") {
+      caption <- "Save As"
+      defaultextension <- "txt"
+      filters <- rbind(c("Text Files", ".txt"),
+                       c("Compressed Text Files", ".gz"),
+                       c("ESRI Shapefiles", ".shp"),
+                       c("All files", "*"))
+    } else if (type == "Query") {
+      caption <- "Save Project As"
+      defaultextension <- "rda"
+      filters <- rbind(c("Project Files", ".rda"),
+                       c("All files", "*"))
+    }
+    CallFileDialogBox("tk_getSaveFile", caption, defaultextension, filters)
+  }
+
+
+  SaveQueryFile <- function(file) {
+    if (missing(file) || is.null(file)) {
+      file <- SaveFile("Query")
+      if (is.null(file)) return()
+      save.file <<- file
+    }
+    obj <- SaveQueryObject()
+    save(obj, file=file, ascii=TRUE)
+  }
+
 
   SaveQueryObject <- function() {
-    d <- list()
-    d[["dsn.sel"]] <- as.integer(tcl(frame1.box.1.2, "current"))
-    d[["opt"]] <- tclvalue(opt.var)
-    d[["site.no"]] <- tclvalue(site.no.var)
-    d[["site.file"]] <- tclvalue(site.file.var)
-    d[["site.type.sel"]] <- as.integer(tcl(frame3.box.2.5, "current"))
-    d[["agency.sel"]] <- as.integer(tcl(frame3.box.3.5, "current"))
-    d[["poly.file"]] <- tclvalue(poly.file.var)
-    d[["lng.min"]] <- tclvalue(lng.min.var)
-    d[["lng.max"]] <- tclvalue(lng.max.var)
-    d[["lat.min"]] <- tclvalue(lat.min.var)
-    d[["lat.max"]] <- tclvalue(lat.max.var)
-    d[["alt.min"]] <- tclvalue(alt.min.var)
-    d[["alt.max"]] <- tclvalue(alt.max.var)
-    d[["data.type.sel"]] <- as.integer(tcl(frame4.box.4.3, "current"))
-    d[["date.time"]] <- tclvalue(date.time.var)
-    d[["tmin"]] <- tclvalue(tmin.var)
-    d[["tmax"]] <- tclvalue(tmax.var)
-    d[["retr.vars"]] <- retr.vars
-    d[["save.file"]] <- save.file
-    d
+    obj <- list()
+    obj$dsn.sel       <- as.integer(tcl(f1.box.1.2, "current"))
+    obj$site.type.sel <- as.integer(tcl(f3.box.2.5, "current"))
+    obj$agency.sel    <- as.integer(tcl(f3.box.3.5, "current"))
+    obj$data.type.sel <- as.integer(tcl(f4.box.4.3, "current"))
+    obj$opt           <- tclvalue(opt.var)
+    obj$site.no       <- tclvalue(site.no.var)
+    obj$site.file     <- tclvalue(site.file.var)
+    obj$poly.file     <- tclvalue(poly.file.var)
+    obj$lng.min       <- tclvalue(lng.min.var)
+    obj$lng.max       <- tclvalue(lng.max.var)
+    obj$lat.min       <- tclvalue(lat.min.var)
+    obj$lat.max       <- tclvalue(lat.max.var)
+    obj$alt.min       <- tclvalue(alt.min.var)
+    obj$alt.max       <- tclvalue(alt.max.var)
+    obj$date.time     <- tclvalue(date.time.var)
+    obj$tmin          <- tclvalue(tmin.var)
+    obj$tmax          <- tclvalue(tmax.var)
+    obj$retr.vars     <- retr.vars
+    obj$save.file     <- save.file
+    obj
   }
 
-  # Open query object
 
-  OpenQueryObject <- function(d) {
-    tcl(frame1.box.1.2, "current", d$dsn.sel)
-
-    OpenConnection()
-
-    tclvalue(opt.var) <- d$opt
-    SetState()
-
-    tclvalue(site.no.var) <- d$site.no
-    tclvalue(site.file.var) <- d$site.file
-    tclvalue(poly.file.var) <- d$poly.file
-    tclvalue(lng.min.var) <- d$lng.min
-    tclvalue(lng.max.var) <- d$lng.max
-    tclvalue(lat.min.var) <- d$lat.min
-    tclvalue(lat.max.var) <- d$lat.max
-    tclvalue(alt.min.var) <- d$alt.min
-    tclvalue(alt.max.var) <- d$alt.max
-    tclvalue(tmin.var) <- d$tmin
-    tclvalue(tmax.var) <- d$tmax
-
-    save.file <<- d$save.file
-
-    tcl(frame3.box.2.5, "current", d$site.type.sel)
-    tcl(frame3.box.3.5, "current", d$agency.sel)
-    tcl(frame4.box.4.3, "current", d$data.type.sel)
-    UpdateDataVariables()
-
-    tclServiceMode(FALSE)
-
-    tcl("lset", retr.var, "")
-    if (!is.null(d$retr.vars)) {
-      is.retr <- d$retr.vars %in% c(site.vars, data.vars)
-      retr.vars <<- d$retr.vars[is.retr]
-      for (i in seq(along=retr.vars))
-        tcl("lappend", retr.var, retr.vars[i])
-    }
-
-    cur.vals <- as.character(tkcget(frame6.box.1.2, "-values"))
-    if (d$date.time %in% cur.vals)
-      tcl(frame6.box.1.2, "set", d$date.time)
-
-    tclServiceMode(TRUE)
-  }
-
-  # Save query object to file
-
-  SaveQueryFile <- function(f) {
-    if (missing(f) || is.null(f)) {
-      f <- SaveFile("Query")
-      if (is.null(f))
-        return()
-      save.file <<- f
-    }
-    d <- SaveQueryObject()
-    save(d, file=f, ascii=TRUE)
-  }
-
-  # Open query object file
-
-  OpenQueryFile <- function() {
-    f <- OpenFile("Query")
-    if (is.null(f))
-      return()
-    d <- NULL
-    load(file=f)
-    OpenQueryObject(d)
-  }
-
-  # Close GUI
-
-  CloseGUI <- function() {
-    tclServiceMode(FALSE)
-    if (as.integer(tclvalue(tt.done.var)) != 0)
-      return()
-    RODBC::odbcCloseAll()
-    tclvalue(tt.done.var) <- 1
-    tkdestroy(tt)
-    tclServiceMode(TRUE)
-  }
-
-  # Open database connection and query tables/variables
-
+  # open db connection and query tables/variables
   OpenConnection <- function() {
-    idx <- as.integer(tcl(frame1.box.1.2, "current"))
-    if (idx < 0)
-      return()
-
+    idx <- as.integer(tcl(f1.box.1.2, "current"))
+    if (idx < 0) return()
     tkconfigure(tt, cursor="watch")
 
-    # Open database connection
     dsn <- as.character(tclvalue(dsn.var))
     channel <<- RODBC::odbcConnect(dsn, uid="", pwd="", readOnlyOptimize=TRUE)
 
@@ -153,29 +113,28 @@ OpenRNWIS <- function() {
     data.vars <<- NULL
     retr.vars <<- NULL
 
-    # Clear GUI
+    # clear gui
     tcl("lset", site.var, "")
     tcl("lset", data.var, "")
     tcl("lset", retr.var, "")
     tclvalue(data.type.var) <- ""
     tclvalue(date.time.var) <- ""
-    tkconfigure(frame4.box.4.3, value="")
-    tkconfigure(frame6.box.1.2, value="")
-    tkconfigure(frame1.but.1.3, state="disabled")
+    tkconfigure(f4.box.4.3, value="")
+    tkconfigure(f6.box.1.2, value="")
+    tkconfigure(f1.but.1.3, state="disabled")
 
-    # Update GUI
+    # update gui
     if (channel >= 0L && inherits(channel, "RODBC")) {
       tables <- RODBC::sqlTables(channel, errors=FALSE, as.is=TRUE)[, "TABLE_NAME"]
       if (site.table %in% tables) {
 
-        # Establish table types
-        types <- names(data.tables)[sapply(data.tables, function(i) i)
-                                    %in% tables]
-        tkconfigure(frame4.box.4.3, values=types)
-        tcl(frame4.box.4.3, "current", 0)
+        # establish table types
+        types <- names(data.tables)[sapply(data.tables, function(i) i) %in% tables]
+        tkconfigure(f4.box.4.3, values=types)
+        tcl(f4.box.4.3, "current", 0)
 
-        # Update site variables
-        tkconfigure(frame1.but.1.3, state="normal")
+        # update site variables
+        tkconfigure(f1.but.1.3, state="normal")
         server.name <- RODBC::odbcGetInfo(channel)[["Server_Name"]]
         sq.table <- paste(server.name, site.table, sep=".")
         sel <- RODBC::sqlColumns(channel, sqtable=sq.table)
@@ -184,7 +143,6 @@ OpenRNWIS <- function() {
         for (i in seq(along=site.vars))
           tcl("lappend", site.var, site.vars[i])
 
-        # Update data variables
         UpdateDataVariables()
       } else {
         channel <<- NULL
@@ -193,126 +151,47 @@ OpenRNWIS <- function() {
       channel <<- NULL
     }
 
-    # Close database connection
     RODBC::odbcCloseAll()
 
     tkconfigure(tt, cursor="arrow")
     tclServiceMode(TRUE)
   }
 
-  # Convert image bits to the image data string format
 
-  BitsToString <- function(bits) {
-    n <- length(bits) / 2
-    paste("#define v_width ", n, "\n#define v_height ", n, "\n",
-          "static unsigned char v_bits[] = { ", paste(bits, collapse=", "),
-          " }; ", sep="")
-  }
-
-  # Set state for site options
-
+  # set state for site options
   SetState <- function() {
     opt <- as.integer(tclvalue(opt.var))
 
     s <- if (opt == 1L) "normal" else "disabled"
-    tkconfigure(frame2.ent.2.1, state=s)
+    tkconfigure(f2.ent.2.1, state=s)
 
     s <- if (opt == 2L) "normal" else "disabled"
-    tkconfigure(frame2.ent.4.1, state=s)
-    tkconfigure(frame2.but.4.2, state=s)
+    tkconfigure(f2.ent.4.1, state=s)
+    tkconfigure(f2.but.4.2, state=s)
 
     s <- if (opt == 3L) "normal" else "disabled"
-    tkconfigure(frame3.ent.2.2, state=s)
-    tkconfigure(frame3.ent.2.3, state=s)
-    tkconfigure(frame3.ent.2.4, state=s)
-    tkconfigure(frame3.ent.3.2, state=s)
-    tkconfigure(frame3.ent.3.3, state=s)
-    tkconfigure(frame3.ent.3.4, state=s)
-    tkconfigure(frame3.ent.5.2, state=s)
-    tkconfigure(frame3.but.5.6, state=s)
+    tkconfigure(f3.ent.2.2, state=s)
+    tkconfigure(f3.ent.2.3, state=s)
+    tkconfigure(f3.ent.2.4, state=s)
+    tkconfigure(f3.ent.3.2, state=s)
+    tkconfigure(f3.ent.3.3, state=s)
+    tkconfigure(f3.ent.3.4, state=s)
+    tkconfigure(f3.ent.5.2, state=s)
+    tkconfigure(f3.but.5.6, state=s)
 
     s <- if (opt == 3L) "readonly" else "disabled"
-    tkconfigure(frame3.box.2.5, state=s)
-    tkconfigure(frame3.box.3.5, state=s)
+    tkconfigure(f3.box.2.5, state=s)
+    tkconfigure(f3.box.3.5, state=s)
   }
 
-  # Add variables to retrieval list
-
-  AddVariables <- function() {
-    site.idxs <- as.integer(tkcurselection(frame4.lst.2.1))
-    data.idxs <- as.integer(tkcurselection(frame4.lst.2.3))
-
-    ids <- NULL
-    if (length(site.idxs) > 0)
-      for (i in site.idxs)
-        ids <- c(ids, as.character(tkget(frame4.lst.2.1, i, i)))
-    if (length(data.idxs) > 0)
-      for (i in data.idxs)
-        ids <- c(ids, as.character(tkget(frame4.lst.2.3, i, i)))
-
-    if (is.null(ids))
-      return()
-
-    tkselection.clear(frame4.lst.2.1, 0, "end")
-    tkselection.clear(frame4.lst.2.3, 0, "end")
-
-    for (i in ids) {
-      if (!i %in% retr.vars) {
-        tcl("lappend", retr.var, i)
-        retr.vars <<- c(retr.vars, i)
-      }
-    }
-  }
-
-  # Remove selected variables from retrieval list
-
-  RemoveVariables <- function() {
-    idxs <- as.integer(tkcurselection(frame4.lst.2.6))
-    if (length(idxs) == 0)
-      return()
-    tkselection.clear(frame4.lst.2.6, 0, "end")
-    retr.vars <<- retr.vars[-(idxs + 1)]
-    tcl("lset", retr.var, "")
-    for (i in retr.vars)
-      tcl("lappend", retr.var, i)
-  }
-
-  # Copy variables from retrieval list into Windows clipboard
-
-  CopyVariables <- function() {
-    idxs <- as.integer(tkcurselection(frame4.lst.2.6))
-    if (length(idxs) == 0)
-      s <- ""
-    else
-      s <- paste(retr.vars[idxs + 1], collapse="\n")
-    utils::writeClipboard(s, format=1)
-  }
-
-  # Paste variables from Windows clipboard into retrieval list
-
-  PasteVariables <- function() {
-    s <- utils::readClipboard(format=1, raw=FALSE)
-    if (is.null(s))
-      return()
-    is.var <- s %in% c(site.vars, data.vars) & !s %in% retr.vars
-    add.vars <- s[is.var]
-    for (i in seq(along=add.vars)) {
-      retr.vars <<- c(retr.vars, add.vars[i])
-      tcl("lappend", retr.var, add.vars[i])
-    }
-  }
-
-  # Update data variables
 
   UpdateDataVariables <- function() {
-    if (!inherits(channel, "RODBC"))
-      return()
+    if (!inherits(channel, "RODBC")) return()
 
     tclServiceMode(FALSE)
 
     data.table <- data.tables[[as.character(tclvalue(data.type.var))]]
 
-    # Query database
     channel <- RODBC::odbcReConnect(channel)
     server.name <- RODBC::odbcGetInfo(channel)[["Server_Name"]]
     sq.table <- paste(server.name, data.table, sep=".")
@@ -327,60 +206,56 @@ OpenRNWIS <- function() {
       is.var <- retr.vars %in% c(site.vars, data.vars)
       retr.vars <<- retr.vars[is.var]
       tcl("lset", retr.var, "")
-      for (i in seq(along=retr.vars))
-        tcl("lappend", retr.var, retr.vars[i])
+      for (i in seq(along=retr.vars)) tcl("lappend", retr.var, retr.vars[i])
     }
 
     tcl("lset", data.var, "")
-    for (i in seq(along=data.vars))
-      tcl("lappend", data.var, data.vars[i])
+    for (i in seq(along=data.vars)) tcl("lappend", data.var, data.vars[i])
 
     dt.vars <- data.vars[data.types == "DATE"]
     if (length(dt.vars) > 0) {
-      tkconfigure(frame6.box.1.2, values=dt.vars)
-      tcl(frame6.box.1.2, "current", 0)
+      tkconfigure(f6.box.1.2, values=dt.vars)
+      tcl(f6.box.1.2, "current", 0)
     }
 
     tclServiceMode(TRUE)
   }
 
-  # Arrange variables in listbox
 
-  Arrange <- function(type) {
-    sel.idxs <- as.integer(tkcurselection(frame4.lst.2.6)) + 1
-    if (length(sel.idxs) == 0)
-      return()
-    n <- length(retr.vars)
-    idxs <- 1:n
-
-    if (type == "top") {
-      idxs <- c(sel.idxs, idxs[-sel.idxs])
-    } else if (type == "bottom") {
-      idxs <- c(idxs[-sel.idxs], sel.idxs)
-    } else if (type == "up") {
-      for (i in sel.idxs) {
-        if (i == 1L || idxs[i - 1L] %in% sel.idxs)
-          next
-        idxs[c(i - 1L, i)] <- c(i, idxs[i - 1L])
-      }
-    } else if (type == "down") {
-      for (i in rev(sel.idxs)) {
-        if (i == n || idxs[i + 1L] %in% sel.idxs)
-          return()
-        idxs[c(i, i + 1L)] <- c(idxs[i + 1L], i)
-      }
+  OpenQueryObject <- function(obj) {
+    tcl(f1.box.1.2, "current", obj$dsn.sel)
+    OpenConnection()
+    tclvalue(opt.var) <- obj$opt
+    SetState()
+    tclvalue(site.no.var)   <- obj$site.no
+    tclvalue(site.file.var) <- obj$site.file
+    tclvalue(poly.file.var) <- obj$poly.file
+    tclvalue(lng.min.var)   <- obj$lng.min
+    tclvalue(lng.max.var)   <- obj$lng.max
+    tclvalue(lat.min.var)   <- obj$lat.min
+    tclvalue(lat.max.var)   <- obj$lat.max
+    tclvalue(alt.min.var)   <- obj$alt.min
+    tclvalue(alt.max.var)   <- obj$alt.max
+    tclvalue(tmin.var)      <- obj$tmin
+    tclvalue(tmax.var)      <- obj$tmax
+    save.file <<- obj$save.file
+    tcl(f3.box.2.5, "current", obj$site.type.sel)
+    tcl(f3.box.3.5, "current", obj$agency.sel)
+    tcl(f4.box.4.3, "current", obj$data.type.sel)
+    UpdateDataVariables()
+    tclServiceMode(FALSE)
+    tcl("lset", retr.var, "")
+    if (!is.null(obj$retr.vars)) {
+      is.retr <- obj$retr.vars %in% c(site.vars, data.vars)
+      retr.vars <<- obj$retr.vars[is.retr]
+      for (i in seq(along=retr.vars)) tcl("lappend", retr.var, retr.vars[i])
     }
-
-    retr.vars <<- retr.vars[idxs]
-    for (i in 1:n)
-      tclvalue(retr.var) <- tcl("lreplace", tclvalue(retr.var),
-                                i - 1, i - 1, retr.vars[i])
-    tkselection.clear(frame4.lst.2.6, 0, "end")
-    for (i in which(idxs %in% sel.idxs))
-      tkselection.set(frame4.lst.2.6, i - 1)
+    cur.vals <- as.character(tkcget(f6.box.1.2, "-values"))
+    if (obj$date.time %in% cur.vals)
+      tcl(f6.box.1.2, "set", obj$date.time)
+    tclServiceMode(TRUE)
   }
 
-  # Open file
 
   OpenFile <- function(type, obj) {
     if (type == "Sites") {
@@ -390,13 +265,11 @@ OpenRNWIS <- function() {
     } else if (type == "Polygon") {
       caption <- "Open Polygon File"
       defaultextension <- "ply"
-      filters <- matrix(c("Polygon Text Files", ".ply", "All files", "*"),
-                        2, 2, byrow=TRUE)
+      filters <- rbind(c("Polygon Text Files", ".ply"), c("All files", "*"))
     } else if (type == "Query") {
       caption <- "Open Project File"
       defaultextension <- "rda"
-      filters <- matrix(c("Project Files", ".rda", "All files", "*"),
-                        2, 2, byrow=TRUE)
+      filters <- rbind(c("Project Files", ".rda"), c("All files", "*"))
     }
     f <- CallFileDialogBox("tk_getOpenFile", caption, defaultextension, filters)
     if (missing(obj)) {
@@ -406,90 +279,166 @@ OpenRNWIS <- function() {
     }
   }
 
-   # Save file as
 
-  SaveFile <- function(type) {
-    if (type == "Data") {
-      caption <- "Save As"
-      defaultextension <- "txt"
-      filters <- matrix(c("Text Files", ".txt",
-                          "Compressed Text Files", ".gz",
-                          "ESRI Shapefiles", ".shp",
-                          "All files", "*"), 4, 2, byrow=TRUE)
-    } else if (type == "Query") {
-      caption <- "Save Project As"
-      defaultextension <- "rda"
-      filters <- matrix(c("Project Files", ".rda", "All files", "*"),
-                        2, 2, byrow=TRUE)
-    }
-    CallFileDialogBox("tk_getSaveFile", caption, defaultextension, filters)
+  OpenQueryFile <- function() {
+    file <- OpenFile("Query")
+    if (is.null(file)) return()
+    obj <- NULL
+    load(file)
+    OpenQueryObject(obj)
   }
 
-  # Call file dialog box
 
-  CallFileDialogBox <- function(cmd, caption, defaultextension, filters) {
-    args <- list(cmd, title=caption, parent=tt)
-    if (!is.null(defaultextension))
-      args <- c(args, defaultextension=defaultextension)
-    if (!is.null(initialdir))
-      args <- c(args, initialdir=initialdir)
-    if (!is.null(filters)) {
-      filters[] <- paste("{", filters, "}", sep="")
-      filters <- apply(filters, 1, paste, collapse=" ")
-      filters <- paste(paste("{", filters, "}", sep=""), collapse=" ")
-      args <- c(args, filetypes=filters)
-    }
-    f <- tclvalue(do.call(tcl, args))
-    if (nzchar(f)) {
-      initialdir <<- dirname(f)
-      return(f)
+  CloseGUI <- function() {
+    tclServiceMode(FALSE)
+    if (as.integer(tclvalue(tt.done.var)) != 0) return()
+    RODBC::odbcCloseAll()
+    tclvalue(tt.done.var) <- 1
+    tkdestroy(tt)
+    tclServiceMode(TRUE)
+  }
+
+
+  # convert image bits to the image data string format
+  BitsToString <- function(bits) {
+    n <- length(bits) / 2
+    b <- paste(bits, collapse=", ")
+    sprintf("#define v_width %d\n#define v_height %d\nstatic unsigned char v_bits[] = { %s }; ",
+            n, n, b)
+  }
+
+
+  # add variables to retrieval list
+  AddVariables <- function() {
+    site.idxs <- as.integer(tkcurselection(f4.lst.2.1))
+    data.idxs <- as.integer(tkcurselection(f4.lst.2.3))
+
+    ids <- NULL
+    if (length(site.idxs) > 0)
+      for (i in site.idxs)
+        ids <- c(ids, as.character(tkget(f4.lst.2.1, i, i)))
+    if (length(data.idxs) > 0)
+      for (i in data.idxs)
+        ids <- c(ids, as.character(tkget(f4.lst.2.3, i, i)))
+
+    if (is.null(ids)) return()
+
+    tkselection.clear(f4.lst.2.1, 0, "end")
+    tkselection.clear(f4.lst.2.3, 0, "end")
+
+    for (i in ids) {
+      if (!i %in% retr.vars) {
+        tcl("lappend", retr.var, i)
+        retr.vars <<- c(retr.vars, i)
+      }
     }
   }
 
-  # Map sites
 
-  CallMapSites <- function() {
+  # remove selected variables from retrieval list
+  RemoveVariables <- function() {
+    idxs <- as.integer(tkcurselection(f4.lst.2.6))
+    if (length(idxs) == 0) return()
+    tkselection.clear(f4.lst.2.6, 0, "end")
+    retr.vars <<- retr.vars[-(idxs + 1)]
+    tcl("lset", retr.var, "")
+    for (i in retr.vars) tcl("lappend", retr.var, i)
+  }
+
+
+  # copy variables from retrieval list into Windows clipboard
+  CopyVariables <- function() {
+    idxs <- as.integer(tkcurselection(f4.lst.2.6))
+    s <- ""
+    if (length(idxs) != 0) s <- paste(retr.vars[idxs + 1], collapse="\n")
+    utils::writeClipboard(s, format=1)
+  }
+
+
+  # paste variables from clipboard into retrieval list
+  PasteVariables <- function() {
+    s <- utils::readClipboard(format=1, raw=FALSE)
+    if (is.null(s)) return()
+    is.var <- s %in% c(site.vars, data.vars) & !s %in% retr.vars
+    add.vars <- s[is.var]
+    for (i in seq(along=add.vars)) {
+      retr.vars <<- c(retr.vars, add.vars[i])
+      tcl("lappend", retr.var, add.vars[i])
+    }
+  }
+
+
+  # arrange variables in listbox
+  Arrange <- function(type) {
+    sel.idxs <- as.integer(tkcurselection(f4.lst.2.6)) + 1
+    if (length(sel.idxs) == 0) return()
+    n <- length(retr.vars)
+    idxs <- seq_len(n)
+
+    if (type == "top") {
+      idxs <- c(sel.idxs, idxs[-sel.idxs])
+    } else if (type == "bottom") {
+      idxs <- c(idxs[-sel.idxs], sel.idxs)
+    } else if (type == "up") {
+      for (i in sel.idxs) {
+        if (i == 1 || idxs[i - 1] %in% sel.idxs) next
+        idxs[c(i - 1, i)] <- c(i, idxs[i - 1])
+      }
+    } else if (type == "down") {
+      for (i in rev(sel.idxs)) {
+        if (i == n || idxs[i + 1] %in% sel.idxs) return()
+        idxs[c(i, i + 1)] <- c(idxs[i + 1], i)
+      }
+    }
+
+    retr.vars <<- retr.vars[idxs]
+    for (i in 1:n) tclvalue(retr.var) <- tcl("lreplace", tclvalue(retr.var),
+                                             i - 1, i - 1, retr.vars[i])
+    tkselection.clear(f4.lst.2.6, 0, "end")
+    for (i in which(idxs %in% sel.idxs)) tkselection.set(f4.lst.2.6, i - 1)
+  }
+
+
+  CallMapSites <- function(vars) {
     if (!inherits(channel, "RODBC")) {
-      ShowErrorMessage('01')
+      ShowErrorMessage("01")
       return()
     }
-    sqvars <- c(vars[['lat']], vars[['lng']], vars[['alt']], vars[['site']],
-                vars[['name']], vars[['agency']], vars[['type']])
+    sqvars <- c(vars$lat, vars$lng, vars$alt, vars$site, vars$name, vars$agency, vars$type)
     data <- GetSiteInfo(sqvars)
     names(data$sites) <- names(vars)
     tkconfigure(tt, cursor="watch")
     MapSites(data$sites, data$polygons, map.id=sprintf("%02d", map.idx))
     tkconfigure(tt, cursor="arrow")
-    map.idx <<- map.idx + 1L
+    map.idx <<- map.idx + 1
   }
 
-  # Retrieve data
 
   RetrieveData <- function() {
     if (!inherits(channel, "RODBC")) {
-      ShowErrorMessage('01')
+      ShowErrorMessage("01")
       return()
     }
-    if (is.null(retr.vars) || length(retr.vars) == 0L) {
-      ShowErrorMessage('02')
+    if (is.null(retr.vars) || length(retr.vars) == 0) {
+      ShowErrorMessage("02")
       return()
     }
     tkconfigure(tt, cursor="watch")
 
-    # Determine site variables in retrieval list
+    # determine site variables in retrieval list
     is.site <- retr.vars %in% site.vars
 
-    # Construct site table and identify site numbers
-    sqvars <-  unique(c(vars[['site']], retr.vars[is.site]))
+    # construct site table and identify site numbers
+    sqvars <-  unique(c(vars$site, retr.vars[is.site]))
     d.site <- GetSiteInfo(sqvars)
     if (is.null(d.site)) {
-      ShowErrorMessage('04')
+      ShowErrorMessage("04")
       return()
     }
     d.site <- d.site$sites
-    site.no <- d.site[, vars[['site']]]
+    site.no <- d.site[, vars$site]
 
-   # Date and time range
+   # date and time range
     d.t.lim <- c(NA, NA)
     d.t.var <- as.character(tclvalue(date.time.var))
     if (d.t.var != "")
@@ -497,69 +446,64 @@ OpenRNWIS <- function() {
     else
       d.t.var <- NULL
 
-    # Construct data table
+    # construct data table
     d.data <- NULL
-    sqvars <- unique(c(vars[['site']], retr.vars[!is.site]))
+    sqvars <- unique(c(vars$site, retr.vars[!is.site]))
     data.table <- data.tables[[as.character(tclvalue(data.type.var))]]
 
     if (length(sqvars) > 1) {
 
-      # Maintain a reasonable number of site numbers for each query;
-      # an error results from a query size that's too large.
+      # maintain a reasonable number of site numbers for each query;
+      # an error results from a query size that's too large
       n <- length(site.no)
       inc <- seq(0, n, by=200)
-      if (n != inc[length(inc)])
-        inc <- c(inc, n)
+      if (n != inc[length(inc)]) inc <- c(inc, n)
 
-      # Query database
+      # query database
       channel <- RODBC::odbcReConnect(channel)
       for (i in seq(along=inc[-1])) {
         site.numbers <- site.no[inc[i]:inc[i + 1]]
         sel <- QueryDatabase(channel,
                              sqtable=data.table,
                              sqvars=sqvars,
-                             site.no.var=vars[['site']],
+                             site.no.var=vars$site,
                              site.no=site.numbers,
                              d.t.var=d.t.var,
                              d.t.lim=d.t.lim)
         if (inherits(sel, "character")) {
-          ShowErrorMessage('06', d.data[1])
+          ShowErrorMessage("06", d.data[1])
           stop()
         }
         d.data <- rbind(d.data, sel)
       }
       RODBC::odbcCloseAll()
 
-      if (nrow(d.data) == 0L)
-        d.data <- NULL
+      if (nrow(d.data) == 0L) d.data <- NULL
     }
 
-    # Merge site and data tables
+    # merge site and data tables
     if (is.null(d.data))
       d <- d.site
     else
-      d <- merge(d.site, d.data, by=vars[['site']])
+      d <- merge(d.site, d.data, by=vars$site)
 
-    # Save data to file
+    # save data to file
     f <- SaveFile("Data")
     retr.vars <- retr.vars[retr.vars %in% names(d)]
 
     if (!is.null(f)) {
       if (grepl(".shp$", tolower(f))) {
-        col.names <- unique(c(vars[['lng']], vars[['lat']], retr.vars))
+        col.names <- unique(c(vars$lng, vars$lat, retr.vars))
         d <- d[, col.names]
 
-        # Columns of class POSIXct are not permitted, convert to
-        # character strings
+        # columns of class POSIXct are not permitted, convert to character strings
         col.class <- sapply(names(d), function(i) class(d[, i])[1])
         dt.idxs <- which(col.class == "POSIXct")
         if (length(dt.idxs) > 0)
           d[, dt.idxs] <- as.character(format(d[, dt.idxs]))
 
-        # Column names are finicky for shapefiles, rules are convoluted,
-        # 8-bit names and no periods
-        col.names <- gsub("\\.", "", make.names(substr(col.names, 1, 7),
-                          unique=TRUE))
+        # column names are finicky for shapefiles, rules are convoluted, 8-bit names and no periods
+        col.names <- gsub("\\.", "", make.names(substr(col.names, 1, 7), unique=TRUE))
 
         colnames(d) <- col.names
         sp::coordinates(d) <- col.names[1:2]
@@ -583,54 +527,50 @@ OpenRNWIS <- function() {
     tkconfigure(tt, cursor="arrow")
   }
 
-  # Convert Tk entry to date-time value
 
+  # convert tk entry to date-time value
   ConvertEntryToDate <- function(tk.ent) {
     string <- as.character(tclvalue(tk.ent))
-    if (string == "")
-      return(NA)
+    if (string == "") return(NA)
     fmt <- "%Y-%m-%d"
-    if (length(strsplit(string, " ")[[1]]) > 1)
-      fmt <- paste(fmt, "%H:%M")
+    if (length(strsplit(string, " ")[[1]]) > 1) fmt <- paste(fmt, "%H:%M")
     date <- as.POSIXct(string, format=fmt)
-    if (is.na(date))
-      ShowErrorMessage('05', string)
+    if (is.na(date)) ShowErrorMessage("05", string)
     date
   }
 
-  # Convert site strings to vector of site numbers
 
+  # convert site strings to vector of site numbers
   CleanSiteStrings <- function(s) {
-    str.split <- unlist(strsplit(s, '[[:punct:][:space:]]'))
+    str.split <- unlist(strsplit(s, "[[:punct:][:space:]]"))
     int.split <- suppressWarnings(as.numeric(str.split))
     as.character(int.split[!is.na(int.split)])
   }
 
-  # Retrieve site data and polygon domain
-
+  # retrieve site data and polygon domain
   GetSiteInfo <- function(sqvars) {
     opt <- as.integer(tclvalue(opt.var))
     poly.obj <- NULL
 
-    sqvars <- unique(c(vars[['lat']], vars[['lng']], sqvars))
+    sqvars <- unique(c(vars$lat, vars$lng, sqvars))
 
-    # Reconnect to database
+    # reconnect to db
     channel <- RODBC::odbcReConnect(channel)
 
-    # Base query on site numbers
+    # base query on site numbers
     if (opt == 1L | opt == 2L) {
 
       if (opt == 1L) { # get site number(s) in entry box
         site.no <- as.character(tclvalue(site.no.var))
         if (site.no == "") {
-          ShowErrorMessage('03')
+          ShowErrorMessage("03")
           stop()
         }
         site.no <- CleanSiteStrings(site.no)
       } else { # read site number(s) from file
         site.file <- as.character(tclvalue(site.file.var))
         if (site.file == "" || file.access(site.file, mode=0) < 0) {
-          ShowErrorMessage('03')
+          ShowErrorMessage("03")
           return()
         }
         scanned.strings <- scan(file=site.file, what="character",
@@ -639,19 +579,18 @@ OpenRNWIS <- function() {
       }
 
       if (length(site.no) == 0L) {
-        ShowErrorMessage('03')
+        ShowErrorMessage("03")
         return()
       }
 
-      # Query database
+      # query database
       sel <- QueryDatabase(channel, sqtable=site.table, sqvars=sqvars,
-                           site.no.var=vars[['site']],
-                           site.no=site.no)
+                           site.no.var=vars$site, site.no=site.no)
 
-    # Base query on site attributes
+    # base query on site attributes
     } else if (opt == 3L) {
 
-      # Spatial limits
+      # spatial limits
       lat.min <- suppressWarnings(as.numeric(tclvalue(lat.min.var)))
       lat.max <- suppressWarnings(as.numeric(tclvalue(lat.max.var)))
       lng.min <- suppressWarnings(as.numeric(tclvalue(lng.min.var)))
@@ -659,7 +598,7 @@ OpenRNWIS <- function() {
       alt.min <- suppressWarnings(as.numeric(tclvalue(alt.min.var)))
       alt.max <- suppressWarnings(as.numeric(tclvalue(alt.max.var)))
 
-      # Account for spatial limits imposed by polygon bounding box
+      # account for spatial limits imposed by polygon bounding box
       poly.obj <- NULL
       poly.file <- as.character(tclvalue(poly.file.var))
       if (poly.file != "" && file.access(poly.file, mode=0) == 0) {
@@ -675,52 +614,52 @@ OpenRNWIS <- function() {
         }
       }
 
-      # Site types
+      # site types
       site.type <- as.character(tclvalue(site.type.var))
       if (site.type %in% names(site.types))
         site.type.codes <- site.types[[site.type]]
       else
         site.type.codes <- NULL
 
-      # Agency
+      # agency
       agency <- as.character(tclvalue(agency.var))
       if (agency %in% names(agencies))
         agency.codes <- agencies[[agency]]
       else
         agency.codes <- NULL
 
-      # Query database
+      # query database
       sel <- QueryDatabase(channel,
                            sqtable=site.table,
                            sqvars=sqvars,
-                           site.tp.cd.var=vars[['type']],
+                           site.tp.cd.var=vars$type,
                            site.tp.cd=site.type.codes,
-                           agency.cd.var=vars[['agency']],
+                           agency.cd.var=vars$agency,
                            agency.cd=agency.codes,
-                           lng.var=vars[['lng']],
+                           lng.var=vars$lng,
                            lng.lim=c(lng.min, lng.max),
-                           lat.var=vars[['lat']],
+                           lat.var=vars$lat,
                            lat.lim=c(lat.min, lat.max),
-                           alt.var=vars[['alt']],
+                           alt.var=vars$alt,
                            alt.lim=c(alt.min, alt.max))
       if (inherits(sel, "character")) {
-        ShowErrorMessage('06', sel[1])
+        ShowErrorMessage("06", sel[1])
         stop()
       }
 
-      # Convert decimal degree latitude and longitude from NAD83 to WGS84.
-      xy.names <- c(vars[['lng']], vars[['lat']])
+      # convert decimal degree latitude and longitude from NAD83 to WGS84
+      xy.names <- c(vars$lng, vars$lat)
       xy <- sel[, xy.names]
       sp::coordinates(xy) <- xy.names
       sp::proj4string(xy) <- sp::CRS("+proj=longlat +datum=NAD83")
       sel[, xy.names] <- as.data.frame(sp::spTransform(xy, sp::CRS("+init=epsg:3857")))
 
-      # Only permit sites inside polygon spatial domain
+      # only permit sites inside polygon spatial domain
       if (!is.null(poly.obj)) {
         poly.pts <- rgeos::get.pts(poly.obj)
         for (i in seq(along=poly.pts)) {
-          x <- sel[, vars[['lng']]]
-          y <- sel[, vars[['lat']]]
+          x <- sel[, vars$lng]
+          y <- sel[, vars$lat]
           poly.x <- poly.pts[[i]]$x
           poly.y <- poly.pts[[i]]$y
           is.inside <- sp::point.in.polygon(point.x=x, point.y=y,
@@ -733,43 +672,41 @@ OpenRNWIS <- function() {
       }
     }
 
-    # Close database connection
+    # close database connection
     RODBC::odbcCloseAll()
 
-    # Catergorize site types
+    # catergorize site types
     if ("site_tp_cd" %in% names(sel)) {
       tp <- sel[, "site_tp_cd"]
       sel[, "site_tp_cd"] <- NA
-      site.category <- list('groundwater'="GW", 'surface water'="SW",
-                            'spring'="SP", 'atmospheric'="AT")
+      site.category <- list(groundwater="GW", "surface water"="SW",
+                            spring="SP", atmospheric="AT")
       for (i in names(site.types))
         sel[tp %in% site.types[[i]], "site_tp_cd"] <- site.category[[i]]
     }
 
-    # Return selection
+    # return selection
     if (inherits(sel, "data.frame") && nrow(sel) > 0) {
       return(list(sites=sel[, sqvars], polygons=poly.obj))
     } else {
-      ShowErrorMessage('04')
+      ShowErrorMessage("04")
       stop(sel)
     }
   }
 
-  # Show error message dialog box
 
+  # show error message dialog box
   ShowErrorMessage <- function(code, detail=NULL) {
     err <- err[[code]]
     arg <- list("tk_messageBox", parent=tt, default="ok",
                 icon=err[1], type=err[2], title=err[3], message=err[4])
-    if (!is.null(detail))
-      arg <- c(arg, detail=detail)
+    if (!is.null(detail)) arg <- c(arg, detail=detail)
     ans <- tclvalue(do.call(tcl, arg))
     tkconfigure(tt, cursor="arrow")
     tclServiceMode(TRUE)
     as.character(ans)
   }
 
-  # About package
 
   AboutPackage <- function() {
     if ("package:RNWIS" %in% search())
@@ -780,8 +717,8 @@ OpenRNWIS <- function() {
     tkmessageBox(icon="info", message=msg, title="About", parent=tt)
   }
 
-  # Open HTML help for R functions
 
+  # open html help for r functions
   OpenHTMLHelp <- function() {
     if (!("RNWIS" %in% rownames(utils::installed.packages()))) return()
     utils::help(package="RNWIS", help_type="html")
@@ -789,164 +726,137 @@ OpenRNWIS <- function() {
   }
 
 
-  # Main program
+  # main program
 
-  # Variables specific to NWIS:
-
-  # The decimal degree latitude and longitude (attributes dec_lat_va and
-  # dec_long_va), are stored to a common datum (NAD83). The degrees, minutes,
-  # and seconds version of latitude and longitude (attributes
-  # lat_va and long_va) are stored in the datum that the user entered the
-  # values in. If the lat_va and long_va are retrieved it is recommended
-  # that the attribute coordinate datum (coord_datum_cd) be retrieved as well.
-  # There is no guarantee that all sites have been entered in a consistent datum.
-  #
-  # Altitudes (alt_va) are stored in the NGVD29 or NAVD88 datus; RNWIS
-  # does not convert altitudes to the Google Maps WGS84 EGM96 vertical
-  # datum (this may be possible with future versions of PROJ.4).
+  # variables specific to nwis:
+  #   The decimal degree latitude and longitude (attributes dec_lat_va and
+  #   dec_long_va), are stored to a common datum (NAD83). The degrees, minutes,
+  #   and seconds version of latitude and longitude (attributes
+  #   lat_va and long_va) are stored in the datum that the user entered the
+  #   values in. If the lat_va and long_va are retrieved it is recommended
+  #   that the attribute coordinate datum (coord_datum_cd) be retrieved as well.
+  #   There is no guarantee that all sites have been entered in a consistent datum.
+  #   Altitudes (alt_va) are stored in the NGVD29 or NAVD88 datus; RNWIS
+  #   does not convert altitudes to the Google Maps WGS84 EGM96 vertical
+  #   datum (this may be possible with future versions of PROJ.4).
 
   site.table <- "SITEFILE_01"
 
-  data.tables <- list('groundwater levels'="GW_LEV_01",
-                      'hole construction'="GW_HOLE_01",
-                      'casing construction'="GW_CSNG_01",
-                      'openings construction'="GW_OPEN_01")
+  data.tables <- list("groundwater levels"="GW_LEV_01",
+                      "hole construction"="GW_HOLE_01",
+                      "casing construction"="GW_CSNG_01",
+                      "openings construction"="GW_OPEN_01")
 
-  site.types <- list('groundwater'=c("GW", "GW-CR", "GW-EX", "GW-HZ", "GW-IW",
-                                     "GW-MW", "GW-TH"),
-                     'surface water'=c("ST", "ST-CA", "ST-DCH", "ST-TS", "LK"),
-                     'spring'="SP",
-                     'atmospheric'="AT")
+  site.types <- list(groundwater=c("GW", "GW-CR", "GW-EX", "GW-HZ", "GW-IW", "GW-MW", "GW-TH"),
+                     "surface water"=c("ST", "ST-CA", "ST-DCH", "ST-TS", "LK"),
+                     spring="SP", atmospheric="AT")
 
-  agencies <- list('USGS'="USGS", 'EPA'="USEPA")
+  agencies <- list(USGS="USGS", EPA="USEPA")
 
-  vars <- list('lat' = "DEC_LAT_VA",
-               'lng' = "DEC_LONG_VA",
-               'alt' = "ALT_VA",
-               'site' = "SITE_NO",
-               'name' = "STATION_NM",
-               'agency' = "AGENCY_CD",
-               'type' = "SITE_TP_CD")
+  vars <- list(lat="DEC_LAT_VA", lng="DEC_LONG_VA", alt="ALT_VA", site="SITE_NO",
+               name="STATION_NM", agency="AGENCY_CD", type="SITE_TP_CD")
 
-  # Load required R packages
-
-  for (i in c("tcltk", "sp", "RODBC", "rgeos", "rgdal", "brew", "Rook"))
-    suppressPackageStartupMessages(require(i, character.only=TRUE))
-
-  # Error and warning messages: [icon, type, title, message]
-
+  # error and warning messages: [icon, type, title, message]
   err <- list()
-  err[['01']] <- c("warning", "ok",
-                   "Missing Database Connection",
+  err[["01"]] <- c("warning", "ok", "Missing Database Connection",
                    "Select a registerd ODBC data source")
-  err[['02']] <- c("warning", "ok",
-                   "Missing Retrieval Variables",
+  err[["02"]] <- c("warning", "ok", "Missing Retrieval Variables",
                    "Add variables to retrieval list.")
-  err[['03']] <- c("error", "ok",
-                   "Missing Site Numbers",
+  err[["03"]] <- c("error", "ok", "Missing Site Numbers",
                    "Site numbers missing or improperly formatted.")
-  err[['04']] <- c("error", "ok",
-                   "Empty Database Query",
+  err[["04"]] <- c("error", "ok", "Empty Database Query",
                    "Query of site table returned no data.")
-  err[['05']] <- c("warning", "ok",
-                   "Date and Time Conversion",
+  err[["05"]] <- c("warning", "ok", "Date and Time Conversion",
                    "Character string could not be converted to date object.")
-  err[['06']] <- c("error", "ok",
-                   "Query Error",
+  err[["06"]] <- c("error", "ok", "Query Error",
                    "Query resulted in error.")
-  err[['07']] <- c("error", "ok",
-                   "Empty Database Query",
+  err[["07"]] <- c("error", "ok", "Empty Database Query",
                    "Query of data table returned no data.")
 
-  # Initialize top-level variables
-
-  channel <- NULL
-  site.vars <- NULL
-  data.vars <- NULL
-  retr.vars <- NULL
+  # initialize top-level variables
+  channel    <- NULL
+  site.vars  <- NULL
+  data.vars  <- NULL
+  retr.vars  <- NULL
   initialdir <- NULL
-  save.file <- NULL
-  map.idx <- 1L
+  save.file  <- NULL
+  map.idx    <- 1L
 
-  # Assign variables linked to Tk widgets
+  # assign variables linked to tk widgets
+  dsn.var       <- tclVar()
 
-  dsn.var <- tclVar()
-
-  opt.var <- tclVar(1)
-  site.no.var <- tclVar()
+  opt.var       <- tclVar(1)
+  site.no.var   <- tclVar()
   site.file.var <- tclVar()
   poly.file.var <- tclVar()
   site.type.var <- tclVar()
-  agency.var <- tclVar()
-  lng.min.var <- tclVar()
-  lng.max.var <- tclVar()
-  lat.min.var <- tclVar()
-  lat.max.var <- tclVar()
-  alt.min.var <- tclVar()
-  alt.max.var <- tclVar()
+  agency.var    <- tclVar()
+  lng.min.var   <- tclVar()
+  lng.max.var   <- tclVar()
+  lat.min.var   <- tclVar()
+  lat.max.var   <- tclVar()
+  alt.min.var   <- tclVar()
+  alt.max.var   <- tclVar()
 
   data.type.var <- tclVar()
-  site.var <- tclVar()
-  data.var <- tclVar()
-  retr.var <- tclVar()
+  site.var      <- tclVar()
+  data.var      <- tclVar()
+  retr.var      <- tclVar()
 
   date.time.var <- tclVar()
-  tmin.var <- tclVar()
-  tmax.var <- tclVar()
+  tmin.var      <- tclVar()
+  tmax.var      <- tclVar()
 
-  tt.done.var <- tclVar(0)
+  tt.done.var   <- tclVar(0)
 
-  # Create image bitmaps for buttons,
-  # based on arrows.tcl by Keith Vetter, http://wiki.tcl.tk/8554
-
-  bits <- c('0x00', '0x00', '0x06', '0x03', '0x8e', '0x03', '0xdc', '0x01',
-            '0xf8', '0x00', '0x70', '0x00', '0xf8', '0x00', '0xdc', '0x01',
-            '0x8e', '0x03', '0x06', '0x03', '0x00', '0x00')
+  # create image bitmaps for buttons, based on arrows.tcl
+  # by Keith Vetter, http://wiki.tcl.tk/8554
+  bits <- c("0x00", "0x00", "0x06", "0x03", "0x8e", "0x03", "0xdc", "0x01",
+            "0xf8", "0x00", "0x70", "0x00", "0xf8", "0x00", "0xdc", "0x01",
+            "0x8e", "0x03", "0x06", "0x03", "0x00", "0x00")
   img.del <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
 
-  bits <- c('0x00', '0x00', '0x20', '0x00', '0x60', '0x00', '0xe0', '0x00',
-            '0xfc', '0x01', '0xfc', '0x03', '0xfc', '0x01', '0xe0', '0x00',
-            '0x60', '0x00', '0x20', '0x00', '0x00', '0x00')
+  bits <- c("0x00", "0x00", "0x20", "0x00", "0x60", "0x00", "0xe0", "0x00",
+            "0xfc", "0x01", "0xfc", "0x03", "0xfc", "0x01", "0xe0", "0x00",
+            "0x60", "0x00", "0x20", "0x00", "0x00", "0x00")
   img.right <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
 
-  bits <- c('0x00', '0x00', '0x20', '0x00', '0x70', '0x00', '0xf8', '0x00',
-            '0xfc', '0x01', '0xfe', '0x03', '0x70', '0x00', '0x70', '0x00',
-            '0x70', '0x00', '0x00', '0x00', '0x00', '0x00')
+  bits <- c("0x00", "0x00", "0x20", "0x00", "0x70", "0x00", "0xf8", "0x00",
+            "0xfc", "0x01", "0xfe", "0x03", "0x70", "0x00", "0x70", "0x00",
+            "0x70", "0x00", "0x00", "0x00", "0x00", "0x00")
   img.up <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
 
-  bits <- c('0x00', '0x00', '0x00', '0x00', '0x70', '0x00', '0x70', '0x00',
-            '0x70', '0x00', '0xfe', '0x03', '0xfc', '0x01', '0xf8', '0x00',
-            '0x70', '0x00', '0x20', '0x00', '0x00', '0x00')
+  bits <- c("0x00", "0x00", "0x00", "0x00", "0x70", "0x00", "0x70", "0x00",
+            "0x70", "0x00", "0xfe", "0x03", "0xfc", "0x01", "0xf8", "0x00",
+            "0x70", "0x00", "0x20", "0x00", "0x00", "0x00")
   img.down <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
 
-  bits <- c('0x00', '0x00', '0xfe', '0x03', '0xfe', '0x03', '0x20', '0x00',
-            '0x70', '0x00', '0xf8', '0x00', '0xfc', '0x01', '0xfe', '0x03',
-            '0x70', '0x00', '0x70', '0x00', '0x70', '0x00')
+  bits <- c("0x00", "0x00", "0xfe", "0x03", "0xfe", "0x03", "0x20", "0x00",
+            "0x70", "0x00", "0xf8", "0x00", "0xfc", "0x01", "0xfe", "0x03",
+            "0x70", "0x00", "0x70", "0x00", "0x70", "0x00")
   img.top <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
 
-  bits <- c('0x70', '0x00', '0x70', '0x00', '0x70', '0x00', '0xfe', '0x03',
-            '0xfc', '0x01', '0xf8', '0x00', '0x70', '0x00', '0x20', '0x00',
-            '0xfe', '0x03', '0xfe', '0x03', '0x00', '0x00')
+  bits <- c("0x70", "0x00", "0x70", "0x00", "0x70", "0x00", "0xfe", "0x03",
+            "0xfc", "0x01", "0xf8", "0x00", "0x70", "0x00", "0x20", "0x00",
+            "0xfe", "0x03", "0xfe", "0x03", "0x00", "0x00")
   img.bottom <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
 
-  bits <- c('0x00', '0x00', '0x7e', '0x00', '0x42', '0x00', '0xf2', '0x03',
-            '0x12', '0x02', '0x12', '0x02', '0x12', '0x02', '0x1e', '0x02',
-            '0x10', '0x02', '0xf0', '0x03', '0x00', '0x00')
+  bits <- c("0x00", "0x00", "0x7e", "0x00", "0x42", "0x00", "0xf2", "0x03",
+            "0x12", "0x02", "0x12", "0x02", "0x12", "0x02", "0x1e", "0x02",
+            "0x10", "0x02", "0xf0", "0x03", "0x00", "0x00")
   img.copy <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
 
-  bits <- c('0x10', '0x00', '0xfe', '0x00', '0xba', '0x00', '0x82', '0x00',
-            '0xe2', '0x07', '0xe2', '0x07', '0xe2', '0x07', '0xe2', '0x07',
-            '0xfe', '0x07', '0xe0', '0x07', '0xe0', '0x07')
+  bits <- c("0x10", "0x00", "0xfe", "0x00", "0xba", "0x00", "0x82", "0x00",
+            "0xe2", "0x07", "0xe2", "0x07", "0xe2", "0x07", "0xe2", "0x07",
+            "0xfe", "0x07", "0xe0", "0x07", "0xe0", "0x07")
   img.paste <- tkimage.create("bitmap", data=as.tclObj(BitsToString(bits)))
 
-  # Open GUI
-
+  # open gui
   tclServiceMode(FALSE)
   tt <- tktoplevel(padx=0, pady=0)
   tktitle(tt) <- "National Water Information System: R Interface"
 
-  # Create pull-down menus
-
+  # create pull-down menus
   top.menu <- tkmenu(tt, tearoff=0)
 
   menu.file <- tkmenu(tt, tearoff=0, relief="flat")
@@ -966,317 +876,283 @@ OpenRNWIS <- function() {
   tkadd(menu.help, "command", label="R functions (html)",
         command=OpenHTMLHelp)
   tkadd(menu.help, "separator")
-  tkadd(menu.help, "command", label="About", command=AboutPackage)
+  tkadd(menu.help, "command", label="About",
+        command=AboutPackage)
 
   tkconfigure(tt, menu=top.menu)
 
-  # Frame 0, map and export buttons
+  # frame 0, map and export buttons
+  f0 <- ttkframe(tt, relief="flat")
 
-  frame0 <- ttkframe(tt, relief="flat")
+  f0.but.1 <- ttkbutton(f0, width=15, text="Map Sites",
+                        command=function() CallMapSites(vars))
+  f0.but.2 <- ttkbutton(f0, width=15, text="Retrieve Data",
+                        command=RetrieveData)
 
-  frame0.but.1 <- ttkbutton(frame0, width=15, text="Map Sites",
-                            command=CallMapSites)
-  frame0.but.2 <- ttkbutton(frame0, width=15, text="Retrieve Data",
-                            command=RetrieveData)
+  f0.grp.3 <- ttksizegrip(f0)
 
-  frame0.grp.3 <- ttksizegrip(frame0)
+  tkgrid(f0.but.1, f0.but.2, f0.grp.3)
 
-  tkgrid(frame0.but.1, frame0.but.2, frame0.grp.3)
+  tkgrid.configure(f0.but.1, f0.but.2, sticky="e", padx=2, pady=c(12, 10))
+  tkgrid.configure(f0.grp.3, sticky="se")
 
-  tkgrid.configure(frame0.but.1, frame0.but.2, sticky="e",
-                   padx=2, pady=c(12, 10))
-  tkgrid.configure(frame0.grp.3, sticky="se")
+  tkpack(f0, side="bottom", anchor="e")
 
-  tkpack(frame0, side="bottom", anchor="e")
+  # frame 1, odbc db source name
+  f1 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3,
+                      text="Select a registerd ODBC data source")
 
-  # Frame 1, ODBC database source name selection
+  f1.lab.1.1 <- ttklabel(f1, text="Source name")
+  f1.box.1.2 <- ttkcombobox(f1, textvariable=dsn.var, state="readonly")
+  f1.but.1.3 <- ttkbutton(f1, width=8, text="Explore",
+                          command=function() ExploreDatabase(channel, tt))
 
-  frame1 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3,
-                          text="Select a registerd ODBC data source")
+  tkgrid(f1.lab.1.1, f1.box.1.2, f1.but.1.3, padx=c(0, 2), pady=3, sticky="we")
+  tkgrid.configure(f1.lab.1.1, sticky="e")
+  tkgrid.configure(f1.but.1.3, padx=0)
 
-  frame1.lab.1.1 <- ttklabel(frame1, text="Source name")
-  frame1.box.1.2 <- ttkcombobox(frame1, textvariable=dsn.var, state="readonly")
-  frame1.but.1.3 <- ttkbutton(frame1, width=8, text="Explore",
-                              command=function() ExploreDatabase(channel, tt))
+  tkgrid.columnconfigure(f1, 1, weight=1, minsize=25)
 
-  tkgrid(frame1.lab.1.1, frame1.box.1.2, frame1.but.1.3,
-         padx=c(0, 2), pady=3, sticky="we")
-  tkgrid.configure(frame1.lab.1.1, sticky="e")
-  tkgrid.configure(frame1.but.1.3, padx=0)
+  tkpack(f1, fill="x", expand=FALSE, ipadx=2, ipady=2, padx=8, pady=8)
 
-  tkgrid.columnconfigure(frame1, 1, weight=1, minsize=25)
+  tkconfigure(f1.box.1.2, value=names(RODBC::odbcDataSources()))
 
-  tkpack(frame1, fill="x", expand=FALSE, ipadx=2, ipady=2, padx=8, pady=8)
+  tkconfigure(f1.but.1.3, state="disabled")
 
-  tkconfigure(frame1.box.1.2, value=names(RODBC::odbcDataSources()))
-
-  tkconfigure(frame1.but.1.3, state="disabled")
-
-  # Frame 2 and 3, select sites
-
+  # frame 2 and 3, sites
   txt <- "Select sites based on one of the following options"
-  frame2 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3, text=txt)
+  f2 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3, text=txt)
 
-  frame2.rad.1.1 <- ttkradiobutton(frame2, variable=opt.var, value=1,
-                                   command=SetState, text='Site number(s):')
-  frame2.rad.3.1 <- ttkradiobutton(frame2, variable=opt.var, value=2,
-                                   command=SetState,
-                                   text='File of site numbers:')
-  frame2.rad.5.1 <- ttkradiobutton(frame2, variable=opt.var, value=3,
-                                   command=SetState, text='Site attributes:')
+  f2.rad.1.1 <- ttkradiobutton(f2, variable=opt.var, value=1,
+                               command=SetState, text="Site number(s):")
+  f2.rad.3.1 <- ttkradiobutton(f2, variable=opt.var, value=2,
+                               command=SetState, text="File of site numbers:")
+  f2.rad.5.1 <- ttkradiobutton(f2, variable=opt.var, value=3,
+                               command=SetState, text="Site attributes:")
 
-  frame2.ent.2.1 <- ttkentry(frame2, width=25, textvariable=site.no.var)
-  frame2.ent.4.1 <- ttkentry(frame2, width=25, textvariable=site.file.var)
+  f2.ent.2.1 <- ttkentry(f2, width=25, textvariable=site.no.var)
+  f2.ent.4.1 <- ttkentry(f2, width=25, textvariable=site.file.var)
 
-  frame2.but.4.2 <- ttkbutton(frame2, width=8, text="Browse",
-                              command=function() OpenFile("Sites",
-                                                               site.file.var))
+  f2.but.4.2 <- ttkbutton(f2, width=8, text="Browse",
+                          command=function() OpenFile("Sites", site.file.var))
 
-  frame3 <- ttkframe(frame2, relief="flat")
+  f3 <- ttkframe(f2, relief="flat")
 
-  frame3.lab.1.2 <- ttklabel(frame3, justify="center",
-                             text="Latitude\n(WGS84)")
-  frame3.lab.1.3 <- ttklabel(frame3, justify="center",
-                             text="Longitude\n(WGS84)")
-  frame3.lab.1.4 <- ttklabel(frame3, justify="center",
-                             text="Altitude\nin feet")
-  frame3.lab.1.5 <- ttklabel(frame3, justify="center", text="")
-  frame3.lab.2.1 <- ttklabel(frame3, text="Minimum")
-  frame3.lab.3.1 <- ttklabel(frame3, text="Maximum")
+  f3.lab.1.2 <- ttklabel(f3, justify="center", text="Latitude\n(WGS84)")
+  f3.lab.1.3 <- ttklabel(f3, justify="center", text="Longitude\n(WGS84)")
+  f3.lab.1.4 <- ttklabel(f3, justify="center", text="Altitude\nin feet")
+  f3.lab.1.5 <- ttklabel(f3, justify="center", text="")
+  f3.lab.2.1 <- ttklabel(f3, text="Minimum")
+  f3.lab.3.1 <- ttklabel(f3, text="Maximum")
 
-  frame3.ent.2.3 <- ttkentry(frame3, width=15, textvariable=lng.min.var)
-  frame3.ent.3.3 <- ttkentry(frame3, width=15, textvariable=lng.max.var)
+  f3.ent.2.3 <- ttkentry(f3, width=15, textvariable=lng.min.var)
+  f3.ent.3.3 <- ttkentry(f3, width=15, textvariable=lng.max.var)
 
-  frame3.ent.2.2 <- ttkentry(frame3, width=15, textvariable=lat.min.var)
-  frame3.ent.3.2 <- ttkentry(frame3, width=15, textvariable=lat.max.var)
+  f3.ent.2.2 <- ttkentry(f3, width=15, textvariable=lat.min.var)
+  f3.ent.3.2 <- ttkentry(f3, width=15, textvariable=lat.max.var)
 
-  frame3.ent.2.4 <- ttkentry(frame3, width=15, textvariable=alt.min.var)
-  frame3.ent.3.4 <- ttkentry(frame3, width=15, textvariable=alt.max.var)
+  f3.ent.2.4 <- ttkentry(f3, width=15, textvariable=alt.min.var)
+  f3.ent.3.4 <- ttkentry(f3, width=15, textvariable=alt.max.var)
 
-  frame3.box.2.5 <- ttkcombobox(frame3, state="readonly", width=15,
-                                textvariable=site.type.var)
-  frame3.box.3.5 <- ttkcombobox(frame3, state="readonly", width=15,
-                                textvariable=agency.var)
-  tkconfigure(frame3.box.2.5, values=c("All types ...", names(site.types)))
-  tkconfigure(frame3.box.3.5, values=c("All agencies ...",
-                                       names(agencies)))
-  tcl(frame3.box.2.5, "current", 0)
-  tcl(frame3.box.3.5, "current", 0)
+  f3.box.2.5 <- ttkcombobox(f3, state="readonly", width=15, textvariable=site.type.var)
+  f3.box.3.5 <- ttkcombobox(f3, state="readonly", width=15, textvariable=agency.var)
+  tkconfigure(f3.box.2.5, values=c("All types ...", names(site.types)))
+  tkconfigure(f3.box.3.5, values=c("All agencies ...", names(agencies)))
+  tcl(f3.box.2.5, "current", 0)
+  tcl(f3.box.3.5, "current", 0)
 
-  frame3.lab.4.1 <- ttklabel(frame3, foreground="#414042", text="e.g.")
-  frame3.lab.4.2 <- ttklabel(frame3, foreground="#414042", text="43.510023")
-  frame3.lab.4.3 <- ttklabel(frame3, foreground="#414042", text="-112.980728")
-  frame3.lab.4.4 <- ttklabel(frame3, foreground="#414042", text="4382.3")
+  f3.lab.4.1 <- ttklabel(f3, foreground="#414042", text="e.g.")
+  f3.lab.4.2 <- ttklabel(f3, foreground="#414042", text="43.510023")
+  f3.lab.4.3 <- ttklabel(f3, foreground="#414042", text="-112.980728")
+  f3.lab.4.4 <- ttklabel(f3, foreground="#414042", text="4382.3")
 
-  frame3.lab.5.1 <- ttklabel(frame3, text="Polygon")
-  frame3.ent.5.2 <- ttkentry(frame3, width=25, textvariable=poly.file.var)
-  frame3.but.5.6 <- ttkbutton(frame3, width=8, text="Browse",
-                              command=function() OpenFile("Polygon",
-                                                          poly.file.var))
+  f3.lab.5.1 <- ttklabel(f3, text="Polygon")
+  f3.ent.5.2 <- ttkentry(f3, width=25, textvariable=poly.file.var)
+  f3.but.5.6 <- ttkbutton(f3, width=8, text="Browse",
+                          command=function() OpenFile("Polygon", poly.file.var))
 
-  tkgrid(frame2.rad.1.1)
-  tkgrid(frame2.ent.2.1, columnspan=2, pady=c(0, 4))
-  tkgrid(frame2.rad.3.1)
-  tkgrid(frame2.ent.4.1, frame2.but.4.2, pady=c(0, 4))
-  tkgrid(frame2.rad.5.1)
+  tkgrid(f2.rad.1.1)
+  tkgrid(f2.ent.2.1, columnspan=2, pady=c(0, 4))
+  tkgrid(f2.rad.3.1)
+  tkgrid(f2.ent.4.1, f2.but.4.2, pady=c(0, 4))
+  tkgrid(f2.rad.5.1)
 
-  tkgrid.configure(frame2.rad.1.1, frame2.rad.3.1, frame2.rad.5.1,
+  tkgrid.configure(f2.rad.1.1, f2.rad.3.1, f2.rad.5.1,
                    sticky="w", columnspan=2)
 
-  tkgrid.configure(frame2.ent.2.1, sticky="we", padx=c(10, 0))
-  tkgrid.configure(frame2.ent.4.1, sticky="we", padx=c(10, 2))
+  tkgrid.configure(f2.ent.2.1, sticky="we", padx=c(10, 0))
+  tkgrid.configure(f2.ent.4.1, sticky="we", padx=c(10, 2))
 
-  tkgrid(frame3, columnspan=2, sticky="we")
+  tkgrid(f3, columnspan=2, sticky="we")
 
-  tkgrid("x", frame3.lab.1.2, frame3.lab.1.3, frame3.lab.1.4, frame3.lab.1.5,
-         "x", pady=c(0, 1))
+  tkgrid("x", f3.lab.1.2, f3.lab.1.3, f3.lab.1.4, f3.lab.1.5, "x", pady=c(0, 1))
 
-  tkgrid(frame3.lab.2.1, frame3.ent.2.2, frame3.ent.2.3, frame3.ent.2.4,
-         frame3.box.2.5, "x", padx=1, pady=c(0, 1), sticky="we")
+  tkgrid(f3.lab.2.1, f3.ent.2.2, f3.ent.2.3, f3.ent.2.4,
+         f3.box.2.5, "x", padx=1, pady=c(0, 1), sticky="we")
 
-  tkgrid(frame3.lab.3.1, frame3.ent.3.2, frame3.ent.3.3, frame3.ent.3.4,
-         frame3.box.3.5, "x", padx=1, pady=c(1, 0), sticky="we")
+  tkgrid(f3.lab.3.1, f3.ent.3.2, f3.ent.3.3, f3.ent.3.4,
+         f3.box.3.5, "x", padx=1, pady=c(1, 0), sticky="we")
 
-  tkgrid.configure(frame3.lab.2.1, frame3.lab.3.1, sticky="e", padx=c(10, 0))
+  tkgrid.configure(f3.lab.2.1, f3.lab.3.1, sticky="e", padx=c(10, 0))
 
-  tkgrid(frame3.lab.4.1, frame3.lab.4.2, frame3.lab.4.3, frame3.lab.4.4)
-  tkgrid.configure(frame3.lab.4.1, sticky="e")
+  tkgrid(f3.lab.4.1, f3.lab.4.2, f3.lab.4.3, f3.lab.4.4)
+  tkgrid.configure(f3.lab.4.1, sticky="e")
 
-  tkgrid(frame3.lab.5.1, frame3.ent.5.2, "x", "x", "x", frame3.but.5.6,
-         pady=c(7, 0))
+  tkgrid(f3.lab.5.1, f3.ent.5.2, "x", "x", "x", f3.but.5.6, pady=c(7, 0))
 
-  tkgrid.configure(frame3.lab.1.5, frame3.box.2.5, frame3.box.3.5,
-                   padx=c(10, 0), columnspan=2)
+  tkgrid.configure(f3.lab.1.5, f3.box.2.5, f3.box.3.5, padx=c(10, 0), columnspan=2)
 
-  tkgrid.configure(frame3.lab.5.1, padx=c(10, 0), sticky="e")
-  tkgrid.configure(frame3.ent.5.2, columnspan=4, sticky="we", padx=c(1, 2))
+  tkgrid.configure(f3.lab.5.1, padx=c(10, 0), sticky="e")
+  tkgrid.configure(f3.ent.5.2, columnspan=4, sticky="we", padx=c(1, 2))
 
-  tkgrid.columnconfigure(frame3, 1, weight=1, minsize=15)
-  tkgrid.columnconfigure(frame3, 2, weight=1, minsize=15)
-  tkgrid.columnconfigure(frame3, 3, weight=1, minsize=15)
-  tkgrid.columnconfigure(frame3, 4, weight=1, minsize=15)
+  tkgrid.columnconfigure(f3, 1, weight=1, minsize=15)
+  tkgrid.columnconfigure(f3, 2, weight=1, minsize=15)
+  tkgrid.columnconfigure(f3, 3, weight=1, minsize=15)
+  tkgrid.columnconfigure(f3, 4, weight=1, minsize=15)
 
-  tkgrid.columnconfigure(frame2, 0, weight=1, minsize=15)
+  tkgrid.columnconfigure(f2, 0, weight=1, minsize=15)
 
-  tkpack(frame2, fill="x", ipadx=2, ipady=2, padx=8, pady=8, anchor="n")
+  tkpack(f2, fill="x", ipadx=2, ipady=2, padx=8, pady=8, anchor="n")
 
-  # Frame 4 and 3, select variables
-
-  frame4 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3,
+  # frame 4 and 3, variables
+  f4 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3,
                           text="Add variables to retrieval list")
 
-  frame4.lab.1.1 <- ttklabel(frame4, text="Site variables")
-  frame4.lab.1.3 <- ttklabel(frame4, text="Data variables")
-  frame4.lab.1.6 <- ttklabel(frame4, text="Retrieve variables")
-  frame4.lab.4.1 <- ttklabel(frame4, text="Type")
+  f4.lab.1.1 <- ttklabel(f4, text="Site variables")
+  f4.lab.1.3 <- ttklabel(f4, text="Data variables")
+  f4.lab.1.6 <- ttklabel(f4, text="Retrieve variables")
+  f4.lab.4.1 <- ttklabel(f4, text="Type")
 
-  frame4.lst.2.1 <- tklistbox(frame4, selectmode="extended", activestyle="none",
-                              relief="flat", borderwidth=5, width=15, height=3,
-                              exportselection=FALSE, listvariable=site.var,
-                              highlightthickness=0)
-  frame4.lst.2.3 <- tklistbox(frame4, selectmode="extended", activestyle="none",
-                              relief="flat", borderwidth=5, width=15, height=3,
-                              exportselection=FALSE, listvariable=data.var,
-                              highlightthickness=0)
-  frame4.lst.2.6 <- tklistbox(frame4, selectmode="extended", activestyle="none",
-                              relief="flat", borderwidth=5, width=15, height=3,
-                              exportselection=FALSE, listvariable=retr.var,
-                              highlightthickness=0)
+  f4.lst.2.1 <- tklistbox(f4, selectmode="extended", activestyle="none",
+                          relief="flat", borderwidth=5, width=15, height=3,
+                          exportselection=FALSE, listvariable=site.var,
+                          highlightthickness=0)
+  f4.lst.2.3 <- tklistbox(f4, selectmode="extended", activestyle="none",
+                          relief="flat", borderwidth=5, width=15, height=3,
+                          exportselection=FALSE, listvariable=data.var,
+                          highlightthickness=0)
+  f4.lst.2.6 <- tklistbox(f4, selectmode="extended", activestyle="none",
+                          relief="flat", borderwidth=5, width=15, height=3,
+                          exportselection=FALSE, listvariable=retr.var,
+                          highlightthickness=0)
 
-  frame4.ysc.2.2 <- ttkscrollbar(frame4, orient="vertical")
-  frame4.ysc.2.4 <- ttkscrollbar(frame4, orient="vertical")
-  frame4.ysc.2.7 <- ttkscrollbar(frame4, orient="vertical")
+  f4.ysc.2.2 <- ttkscrollbar(f4, orient="vertical")
+  f4.ysc.2.4 <- ttkscrollbar(f4, orient="vertical")
+  f4.ysc.2.7 <- ttkscrollbar(f4, orient="vertical")
 
-  tkconfigure(frame4.lst.2.1, background="white",
-              yscrollcommand=paste(.Tk.ID(frame4.ysc.2.2), "set"))
-  tkconfigure(frame4.lst.2.3, background="white",
-              yscrollcommand=paste(.Tk.ID(frame4.ysc.2.4), "set"))
-  tkconfigure(frame4.lst.2.6, background="white",
-              yscrollcommand=paste(.Tk.ID(frame4.ysc.2.7), "set"))
-  tkconfigure(frame4.ysc.2.2, command=paste(.Tk.ID(frame4.lst.2.1), "yview"))
-  tkconfigure(frame4.ysc.2.4, command=paste(.Tk.ID(frame4.lst.2.3), "yview"))
-  tkconfigure(frame4.ysc.2.7, command=paste(.Tk.ID(frame4.lst.2.6), "yview"))
+  tkconfigure(f4.lst.2.1, background="white",
+              yscrollcommand=paste(.Tk.ID(f4.ysc.2.2), "set"))
+  tkconfigure(f4.lst.2.3, background="white",
+              yscrollcommand=paste(.Tk.ID(f4.ysc.2.4), "set"))
+  tkconfigure(f4.lst.2.6, background="white",
+              yscrollcommand=paste(.Tk.ID(f4.ysc.2.7), "set"))
+  tkconfigure(f4.ysc.2.2, command=paste(.Tk.ID(f4.lst.2.1), "yview"))
+  tkconfigure(f4.ysc.2.4, command=paste(.Tk.ID(f4.lst.2.3), "yview"))
+  tkconfigure(f4.ysc.2.7, command=paste(.Tk.ID(f4.lst.2.6), "yview"))
 
-  frame4.but.2.5 <- ttkbutton(frame4, width=2, image=img.right,
-                              command=AddVariables)
+  f4.but.2.5 <- ttkbutton(f4, width=2, image=img.right, command=AddVariables)
 
-  frame4.box.4.3 <- ttkcombobox(frame4, state="readonly",
-                                textvariable=data.type.var, width=10)
+  f4.box.4.3 <- ttkcombobox(f4, state="readonly", textvariable=data.type.var, width=10)
 
-  frame5 <- ttkframe(frame4, relief="flat")
+  f5 <- ttkframe(f4, relief="flat")
 
-  frame5.but.1.1 <- ttkbutton(frame5, width=2, image=img.top,
-                              command=function() Arrange("top"))
-  frame5.but.1.2 <- ttkbutton(frame5, width=2, image=img.up,
-                              command=function() Arrange("up"))
-  frame5.but.1.3 <- ttkbutton(frame5, width=2, image=img.down,
-                              command=function() Arrange("down"))
-  frame5.but.1.4 <- ttkbutton(frame5, width=2, image=img.bottom,
-                              command=function() Arrange("bottom"))
-  frame5.but.1.5 <- ttkbutton(frame5, width=2, image=img.copy,
-                              command=CopyVariables)
-  frame5.but.1.6 <- ttkbutton(frame5, width=2, image=img.paste,
-                              command=PasteVariables)
-  frame5.but.1.7 <- ttkbutton(frame5, width=2, image=img.del,
-                              command=RemoveVariables)
+  f5.but.1.1 <- ttkbutton(f5, width=2, image=img.top,
+                          command=function() Arrange("top"))
+  f5.but.1.2 <- ttkbutton(f5, width=2, image=img.up,
+                          command=function() Arrange("up"))
+  f5.but.1.3 <- ttkbutton(f5, width=2, image=img.down,
+                          command=function() Arrange("down"))
+  f5.but.1.4 <- ttkbutton(f5, width=2, image=img.bottom,
+                          command=function() Arrange("bottom"))
+  f5.but.1.5 <- ttkbutton(f5, width=2, image=img.copy,
+                          command=CopyVariables)
+  f5.but.1.6 <- ttkbutton(f5, width=2, image=img.paste,
+                          command=PasteVariables)
+  f5.but.1.7 <- ttkbutton(f5, width=2, image=img.del,
+                          command=RemoveVariables)
 
-  tkgrid(frame4.lab.1.1, "x", frame4.lab.1.3, "x", "x", frame4.lab.1.6, "x",
-         pady=c(0, 1))
-  tkgrid(frame4.lst.2.1, frame4.ysc.2.2, frame4.lst.2.3, frame4.ysc.2.4,
-         frame4.but.2.5, frame4.lst.2.6, frame4.ysc.2.7)
-  tkgrid(frame4.lab.4.1, "x", frame4.box.4.3, "x", "x", frame5, "x")
-  tkgrid.configure(frame5, columnspan=1)
-  tkgrid(frame5.but.1.1, frame5.but.1.2, frame5.but.1.3, frame5.but.1.4,
-         frame5.but.1.5, frame5.but.1.6, frame5.but.1.7,
-         padx=c(0, 3), pady=c(3, 0))
-  tkgrid.configure(frame5.but.1.7, padx=0)
+  tkgrid(f4.lab.1.1, "x", f4.lab.1.3, "x", "x", f4.lab.1.6, "x", pady=c(0, 1))
+  tkgrid(f4.lst.2.1, f4.ysc.2.2, f4.lst.2.3, f4.ysc.2.4,
+         f4.but.2.5, f4.lst.2.6, f4.ysc.2.7)
+  tkgrid(f4.lab.4.1, "x", f4.box.4.3, "x", "x", f5, "x")
+  tkgrid.configure(f5, columnspan=1)
+  tkgrid(f5.but.1.1, f5.but.1.2, f5.but.1.3, f5.but.1.4,
+         f5.but.1.5, f5.but.1.6, f5.but.1.7, padx=c(0, 3), pady=c(3, 0))
+  tkgrid.configure(f5.but.1.7, padx=0)
 
-  tkgrid.configure(frame4.lst.2.1, frame4.ysc.2.2, frame4.lst.2.3,
-                   frame4.ysc.2.4, frame4.lst.2.6, frame4.ysc.2.7)
+  tkgrid.configure(f4.lst.2.1, f4.ysc.2.2, f4.lst.2.3,
+                   f4.ysc.2.4, f4.lst.2.6, f4.ysc.2.7)
 
-  tkgrid.configure(frame4.lst.2.1, frame4.lst.2.3, frame4.lst.2.6,
-                   sticky="nsew")
-  tkgrid.configure(frame4.ysc.2.2, sticky="ns", padx=c(0, 10))
-  tkgrid.configure(frame4.ysc.2.4, frame4.ysc.2.7, sticky="ns", padx=0)
+  tkgrid.configure(f4.lst.2.1, f4.lst.2.3, f4.lst.2.6, sticky="nsew")
+  tkgrid.configure(f4.ysc.2.2, sticky="ns", padx=c(0, 10))
+  tkgrid.configure(f4.ysc.2.4, f4.ysc.2.7, sticky="ns", padx=0)
 
-  tkgrid.configure(frame4.but.2.5, padx=10, pady=c(0, 0))
+  tkgrid.configure(f4.but.2.5, padx=10, pady=c(0, 0))
 
-  tkgrid.configure(frame4.lab.4.1, sticky="e", padx=c(0, 1), pady=c(4, 0),
-                   columnspan=2)
-  tkgrid.configure(frame4.box.4.3, sticky="we", pady=c(4, 0), padx=0)
+  tkgrid.configure(f4.lab.4.1, sticky="e", padx=c(0, 1), pady=c(4, 0), columnspan=2)
+  tkgrid.configure(f4.box.4.3, sticky="we", pady=c(4, 0), padx=0)
 
-  tkgrid.columnconfigure(frame4, 0, weight=1, minsize=15)
-  tkgrid.columnconfigure(frame4, 2, weight=1, minsize=15)
-  tkgrid.columnconfigure(frame4, 5, weight=1, minsize=15)
+  tkgrid.columnconfigure(f4, 0, weight=1, minsize=15)
+  tkgrid.columnconfigure(f4, 2, weight=1, minsize=15)
+  tkgrid.columnconfigure(f4, 5, weight=1, minsize=15)
 
-  tkgrid.rowconfigure(frame4, 1, weight=1)
+  tkgrid.rowconfigure(f4, 1, weight=1)
 
-  tkpack(frame4, fill="both", expand=TRUE, ipadx=2, ipady=2,
-         padx=8, pady=8)
+  tkpack(f4, fill="both", expand=TRUE, ipadx=2, ipady=2, padx=8, pady=8)
 
-  # Frame 6, specify date range
+  # frame 6, date range
+  f6 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3,
+                      text="Specify date and time range")
 
-  frame6 <- ttklabelframe(tt, relief="flat", borderwidth=5, padding=3,
-                          text="Specify date and time range")
+  f6.lab.1.1 <- ttklabel(f6, text="Variable")
+  f6.lab.1.3 <- ttklabel(f6, text="From")
+  f6.lab.2.3 <- ttklabel(f6, text="To")
+  f6.lab.1.5 <- ttklabel(f6, foreground="#414042", text="e.g. 2010-06-27")
+  f6.lab.2.5 <- ttklabel(f6, foreground="#414042", text="e.g. 2011-03-13 17:00")
 
-  frame6.lab.1.1 <- ttklabel(frame6, text="Variable")
-  frame6.lab.1.3 <- ttklabel(frame6, text="From")
-  frame6.lab.2.3 <- ttklabel(frame6, text="To")
-  frame6.lab.1.5 <- ttklabel(frame6, foreground="#414042",
-                             text="e.g. 2010-06-27")
-  frame6.lab.2.5 <- ttklabel(frame6, foreground="#414042",
-                             text="e.g. 2011-03-13 17:00")
+  f6.box.1.2 <- ttkcombobox(f6, state="readonly", width=15, textvariable=date.time.var)
 
-  frame6.box.1.2 <- ttkcombobox(frame6, state="readonly", width=15,
-                                textvariable=date.time.var)
+  f6.ent.1.4 <- ttkentry(f6, width=15, textvariable=tmin.var)
+  f6.ent.2.4 <- ttkentry(f6, width=15, textvariable=tmax.var)
 
-  frame6.ent.1.4 <- ttkentry(frame6, width=15, textvariable=tmin.var)
-  frame6.ent.2.4 <- ttkentry(frame6, width=15, textvariable=tmax.var)
+  tkgrid(f6.lab.1.1, f6.box.1.2, f6.lab.1.3, f6.ent.1.4, f6.lab.1.5, pady=c(0, 2))
+  tkgrid("x", "x", f6.lab.2.3, f6.ent.2.4, f6.lab.2.5)
 
-  tkgrid(frame6.lab.1.1, frame6.box.1.2, frame6.lab.1.3, frame6.ent.1.4,
-         frame6.lab.1.5, pady=c(0, 2))
-  tkgrid("x", "x", frame6.lab.2.3, frame6.ent.2.4, frame6.lab.2.5)
+  tkgrid(f6.box.1.2, f6.ent.1.4, f6.ent.2.4, sticky="we")
+  tkgrid.configure(f6.lab.1.1, f6.lab.1.3, f6.lab.2.3, sticky="e")
+  tkgrid.configure(f6.lab.1.5, f6.lab.2.5, sticky="w")
 
-  tkgrid(frame6.box.1.2, frame6.ent.1.4, frame6.ent.2.4, sticky="we")
-  tkgrid.configure(frame6.lab.1.1, frame6.lab.1.3, frame6.lab.2.3, sticky="e")
-  tkgrid.configure(frame6.lab.1.5, frame6.lab.2.5, sticky="w")
+  tkgrid.configure(f6.lab.1.3, f6.lab.2.3, padx=c(25, 0))
+  tkgrid.configure(f6.lab.1.5, f6.lab.2.5, padx=c(5, 0))
 
-  tkgrid.configure(frame6.lab.1.3, frame6.lab.2.3, padx=c(25, 0))
-  tkgrid.configure(frame6.lab.1.5, frame6.lab.2.5, padx=c(5, 0))
+  tkgrid.columnconfigure(f6, 1, weight=1, minsize=15)
+  tkgrid.columnconfigure(f6, 3, weight=1, minsize=15)
+  tkpack(f6, fill="x", ipadx=2, ipady=2, padx=8, pady=8)
 
-  tkgrid.columnconfigure(frame6, 1, weight=1, minsize=15)
-  tkgrid.columnconfigure(frame6, 3, weight=1, minsize=15)
-  tkpack(frame6, fill="x", ipadx=2, ipady=2, padx=8, pady=8)
-
-  # Bind events
-
+  # bind events
   tkbind(tt, "<Control-o>", function() OpenQueryFile())
   tkbind(tt, "<Control-s>", function() SaveQueryFile(save.file))
   tkbind(tt, "<Shift-Control-S>", function() SaveQueryFile())
 
-  tkbind(frame1.box.1.2, "<<ComboboxSelected>>", OpenConnection)
-  tkbind(frame4.box.4.3, "<<ComboboxSelected>>", UpdateDataVariables)
+  tkbind(f1.box.1.2, "<<ComboboxSelected>>", OpenConnection)
+  tkbind(f4.box.4.3, "<<ComboboxSelected>>", UpdateDataVariables)
 
-  tkbind(frame4.lst.2.6, "<Control-[>", function() Arrange("up"))
-  tkbind(frame4.lst.2.6, "<Control-]>", function() Arrange("down"))
-  tkbind(frame4.lst.2.6, "<Shift-Control-{>", function() Arrange("top"))
-  tkbind(frame4.lst.2.6, "<Shift-Control-}>", function() Arrange("bottom"))
+  tkbind(f4.lst.2.6, "<Control-[>", function() Arrange("up"))
+  tkbind(f4.lst.2.6, "<Control-]>", function() Arrange("down"))
+  tkbind(f4.lst.2.6, "<Shift-Control-{>", function() Arrange("top"))
+  tkbind(f4.lst.2.6, "<Shift-Control-}>", function() Arrange("bottom"))
 
-  tkbind(frame4.lst.2.1, "<Control-a>",
-         function() tkselection.set(frame4.lst.2.1, 0, "end"))
-  tkbind(frame4.lst.2.3, "<Control-a>",
-         function() tkselection.set(frame4.lst.2.3, 0, "end"))
-  tkbind(frame4.lst.2.6, "<Control-a>",
-         function() tkselection.set(frame4.lst.2.6, 0, "end"))
+  tkbind(f4.lst.2.1, "<Control-a>", function() tkselection.set(f4.lst.2.1, 0, "end"))
+  tkbind(f4.lst.2.3, "<Control-a>", function() tkselection.set(f4.lst.2.3, 0, "end"))
+  tkbind(f4.lst.2.6, "<Control-a>", function() tkselection.set(f4.lst.2.6, 0, "end"))
 
-  tkbind(frame4.lst.2.6, "<BackSpace>", RemoveVariables)
-  tkbind(frame4.lst.2.6, "<Delete>", RemoveVariables)
+  tkbind(f4.lst.2.6, "<BackSpace>", RemoveVariables)
+  tkbind(f4.lst.2.6, "<Delete>",    RemoveVariables)
 
-  tkbind(frame4.lst.2.1, "<Control-r>", AddVariables)
-  tkbind(frame4.lst.2.3, "<Control-r>", AddVariables)
+  tkbind(f4.lst.2.1, "<Control-r>", AddVariables)
+  tkbind(f4.lst.2.3, "<Control-r>", AddVariables)
 
-  # GUI control
-
+  # gui control
   SetState()
   tkbind(tt, "<Destroy>", CloseGUI)
   tkfocus(tt)
