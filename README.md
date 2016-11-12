@@ -9,14 +9,13 @@ The [R](http://www.r-project.org/) package **RNWIS** provides access to water-re
 **N**ational **W**ater **I**nformation **S**ystem ([NWIS](http://waterdata.usgs.gov/nwis)).
 Importing data requires read-only permissions for you local NWIS server; therefore,
 the usefulness of this package may be limited to U.S. Geological Survey (USGS) employees.
-A **G**raphical **U**ser **I**nterface (GUI) is provided and requires R operate as an SDI application,
-using multiple top-level windows for the console, graphics, and pager.
+A **G**raphical **U**ser **I**nterface (GUI) is provided for data selection.
 
 ## Install
 
 If R is not already installed on your computer, download and install the latest binary distribution from
 [CRAN](http://cran.r-project.org/ "The Comprehensive R Archive Network").
-Windows users should set R to operate as an SDI application during installation
+Windows users should set R to operate as an **S**ingle-**D**ocument **I**nterface (SDI) application during installation
 by choosing to customize the start-up options and specifying the SDI interface (not the default).
 
 You can install the stable version of **RNWIS** from [GitHub](https://jfisher-usgs.github.io/R/),
@@ -33,8 +32,7 @@ Or use **devtools** to install the development version.
 devtools::install_github("jfisher-usgs/RNWIS")
 ```
 
-Contact your IT specialist for help with setting up the Oracle ODBC driver (currently only available in 32-bit).
-Guidance for setting up an ODBC connection to NWIS is provided on this 
+Guidance for setting up an ODBC connection to NWIS is provided on this
 [website](https://github.com/USGS-R/WQ-Review/blob/master/README.md).
 
 ## Run

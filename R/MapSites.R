@@ -47,12 +47,8 @@
 #'
 
 MapSites <- function(sites, polygons=NULL, map.id="map") {
-  # Write site and polygon data to JSON file and open in Google Maps.
 
-  # Additional functions (subroutines)
-
-  # Build JavaScript Object Notation (JSON) data table
-
+  # build JavaScript Object Notation (JSON) data table
   BuildJSONTable <- function(d) {
     idxs <- which(sapply(1:ncol(d), function(i) mode(d[, i])) == "character")
     col.names <- names(d)
@@ -71,12 +67,10 @@ MapSites <- function(sites, polygons=NULL, map.id="map") {
     s
   }
 
-  # Check if polygon winding direction is clockwise
-
+  # check if polygon winding direction is clockwise
   ClockWise <- function(x, y) {
     num <- length(x)
-    if (num < 3)
-      return()
+    if (num < 3) return()
     count <- 0
     m <- c(2:num, 1)
     n <- c(3:num, 1:2)
@@ -100,10 +94,7 @@ MapSites <- function(sites, polygons=NULL, map.id="map") {
   }
 
 
-  # Main program
-
-  # Construct character string based on JSON format
-
+  # construct character string based on JSON format
   is.sites <- !is.null(sites)
   is.polygons <- !is.null(polygons) && inherits(polygons, "gpc.poly")
 
@@ -154,8 +145,7 @@ MapSites <- function(sites, polygons=NULL, map.id="map") {
   cat(s, file=con, sep="\n", append=FALSE)
   close(con)
 
-  # Give R application to internal web server
-
+  # give r application to internal web server
   if ("package:RNWIS" %in% search())
     map.path <- system.file("map", package="RNWIS")
   else
