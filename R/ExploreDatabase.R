@@ -44,7 +44,7 @@ ExploreDatabase <- function(channel, parent=NULL) {
     # table name on server
     sq.table <- paste(server.name, table.name, sep=".")
 
-    # Query column names
+    # query column names
     cols <- RODBC::sqlColumns(channel, sqtable=sq.table)
     cols <- cols[cols[, "TABLE_NAME"] == table.name,
                  c("COLUMN_NAME", "TYPE_NAME", "NUM_PREC_RADIX", "CHAR_OCTET_LENGTH")]
