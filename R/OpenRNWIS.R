@@ -30,9 +30,9 @@ OpenRNWIS <- function() {
     if (!is.null(initialdir))
       args <- c(args, initialdir=initialdir)
     if (!is.null(filters)) {
-      filters[] <- paste("{", filters, "}", sep="")
+      filters[] <- paste0("{", filters, "}")
       filters <- apply(filters, 1, paste, collapse=" ")
-      filters <- paste(paste("{", filters, "}", sep=""), collapse=" ")
+      filters <- paste(paste0("{", filters, "}"), collapse=" ")
       args <- c(args, filetypes=filters)
     }
     file <- tclvalue(do.call(tcl, args))
@@ -510,8 +510,7 @@ OpenRNWIS <- function() {
         sp::proj4string(d) <- sp::CRS("+init=epsg:3857")
 
         rgdal::writeOGR(obj=d, dsn=dirname(f), driver="ESRI Shapefile",
-                        layer=sub(paste(".shp$", sep=""), "", basename(f)),
-                        verbose=TRUE)
+                        layer=sub(".shp$", "", basename(f)), verbose=TRUE)
       } else {
         d <- d[, retr.vars]
 
@@ -712,7 +711,7 @@ OpenRNWIS <- function() {
     if ("package:RNWIS" %in% search())
       path <- system.file("DESCRIPTION", package="RNWIS")
     else
-      path <- paste(getwd(), "/DESCRIPTION", sep="")
+      path <- paste0(getwd(), "/DESCRIPTION")
     msg <- paste(readLines(path, n=-1L), collapse="\n")
     tkmessageBox(icon="info", message=msg, title="About", parent=tt)
   }

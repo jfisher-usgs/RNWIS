@@ -96,8 +96,8 @@ ExploreDatabase <- function(channel, parent=NULL) {
   if (!is.null(parent)) {
     tkwm.transient(tt, parent)
     tmp <- unlist(strsplit(as.character(tkwm.geometry(parent)), "\\+"))
-    tkwm.geometry(tt, paste("+", as.integer(tmp[2]) + 25,
-                            "+", as.integer(tmp[3]) + 25, sep=""))
+    tkwm.geometry(tt, paste0("+", as.integer(tmp[2]) + 25,
+                             "+", as.integer(tmp[3]) + 25))
   }
   tktitle(tt) <- "Explore Database"
 

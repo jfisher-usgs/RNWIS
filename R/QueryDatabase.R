@@ -97,21 +97,17 @@ QueryDatabase <- function(channel, sqtable, sqvars="*",
   vars <- paste(sqvars, collapse=", ")
 
   # site type
-  if (!is.null(site.tp.cd.var)) {
-    if (!is.null(site.tp.cd)) {
-      hold <- paste(site.tp.cd.var, "=\'", site.tp.cd, "\'", sep="")
-      hold <- paste("(", paste(hold, collapse=" OR "), ")", sep="")
-      cond <- c(cond, hold)
-    }
+  if (!is.null(site.tp.cd.var) && !is.null(site.tp.cd)) {
+    hold <- paste0(site.tp.cd.var, "=\'", site.tp.cd, "\'")
+    hold <- paste0("(", paste(hold, collapse=" OR "), ")")
+    cond <- c(cond, hold)
   }
 
   # agency
-  if (!is.null(agency.cd.var)) {
-    if (!is.null(agency.cd)) {
-      hold <- paste(agency.cd.var, "=\'", agency.cd, "\'", sep="")
-      hold <- paste("(", paste(hold, collapse=" OR "), ")", sep="")
-      cond <- c(cond, hold)
-    }
+  if (!is.null(agency.cd.var) && !is.null(agency.cd)) {
+    hold <- paste0(agency.cd.var, "=\'", agency.cd, "\'")
+    hold <- paste0("(", paste(hold, collapse=" OR "), ")")
+    cond <- c(cond, hold)
   }
 
   if (is.null(site.no.var)) {
@@ -119,33 +115,33 @@ QueryDatabase <- function(channel, sqtable, sqvars="*",
     # latitude limits
     if (!is.null(lat.var)) {
       if (!is.na(lat.lim[1]))
-        cond <- c(cond, paste(lat.var, ">=\'", lat.lim[1], "\'", sep=""))
+        cond <- c(cond, paste0(lat.var, ">=\'", lat.lim[1], "\'"))
       if (!is.na(lat.lim[2]))
-        cond <- c(cond, paste(lat.var, "<=\'", lat.lim[2], "\'", sep=""))
+        cond <- c(cond, paste0(lat.var, "<=\'", lat.lim[2], "\'"))
     }
 
     # longitude limits
     if (!is.null(lng.var)) {
       if (!is.na(lng.lim[1]))
-        cond <- c(cond, paste(lng.var, ">=\'", lng.lim[1], "\'", sep=""))
+        cond <- c(cond, paste0(lng.var, ">=\'", lng.lim[1], "\'"))
       if (!is.na(lng.lim[2]))
-        cond <- c(cond, paste(lng.var, "<=\'", lng.lim[2], "\'", sep=""))
+        cond <- c(cond, paste0(lng.var, "<=\'", lng.lim[2], "\'"))
     }
 
     # altitude limits
     if (!is.null(alt.var)) {
       if (!is.na(alt.lim[1]))
-        cond <- c(cond, paste(alt.var, ">=\'", alt.lim[1], "\'", sep=""))
+        cond <- c(cond, paste0(alt.var, ">=\'", alt.lim[1], "\'"))
       if (!is.na(alt.lim[2]))
-        cond <- c(cond, paste(alt.var, "<=\'", alt.lim[2], "\'", sep=""))
+        cond <- c(cond, paste0(alt.var, "<=\'", alt.lim[2], "\'"))
     }
 
   } else {
     if (is.null(site.no)) return()
     site.no <- stats::na.omit(as.numeric(site.no))
     if (length(site.no) == 0) stop("invalid site number(s)")
-    hold <- paste(site.no.var, " = \'", site.no, "\'", sep="")
-    hold <- paste("(", paste(hold, collapse=" OR "), ")", sep="")
+    hold <- paste0(site.no.var, " = \'", site.no, "\'")
+    hold <- paste0("(", paste(hold, collapse=" OR "), ")")
     cond <- c(cond, hold)
   }
 
@@ -154,15 +150,15 @@ QueryDatabase <- function(channel, sqtable, sqvars="*",
     if (inherits(d.t.lim, "POSIXt"))
       d.t.lim <- format(d.t.lim, format="%Y-%m-%d %H:%M:%S")
     if (!is.na(d.t.lim[1]))
-      cond <- c(cond, paste(d.t.var, ">=\'", d.t.lim[1], "\'", sep=""))
+      cond <- c(cond, paste0(d.t.var, ">=\'", d.t.lim[1], "\'"))
     if (!is.na(d.t.lim[2]))
-      cond <- c(cond, paste(d.t.var, "<=\'", d.t.lim[2], "\'", sep=""))
+      cond <- c(cond, paste0(d.t.var, "<=\'", d.t.lim[2], "\'"))
   }
 
   # construct query string
   conds <- ""
   if (length(cond) > 0)
-    conds <- paste("WHERE (", paste(cond, collapse=" AND "), ")", sep="")
+    conds <- paste0("WHERE (", paste(cond, collapse=" AND "), ")")
   sq.table <- paste(RODBC::odbcGetInfo(channel)[["Server_Name"]], sqtable, sep=".")
   query <- paste("SELECT", vars, "FROM", sq.table, conds)
 

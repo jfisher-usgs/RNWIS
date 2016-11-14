@@ -55,14 +55,14 @@ MapSites <- function(sites, polygons=NULL, map.id="map") {
     for (i in seq(along=col.names)) {
       na.rows <- is.na(d[, i])
       if (i %in% idxs) {
-        d[, i] <- paste("\"", col.names[i], "\": \"", d[, i], "\"", sep="")
+        d[, i] <- paste0("\"", col.names[i], "\": \"", d[, i], "\"")
       } else {
-        d[, i] <- paste("\"", col.names[i], "\": ", d[, i], sep="")
-        d[na.rows, i] <- paste("\"", col.names[i], "\": \"NA\"", sep="")
+        d[, i] <- paste0("\"", col.names[i], "\": ", d[, i])
+        d[na.rows, i] <- paste0("\"", col.names[i], "\": \"NA\"")
       }
     }
     s <- apply(d, 1, function(i) paste(i, collapse=", "))
-    s <- paste("{", s, "}", sep="")
+    s <- paste0("{", s, "}")
     s <- paste(s, collapse=",\n")
     s
   }
