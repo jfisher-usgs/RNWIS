@@ -1,7 +1,7 @@
 Package: RNWIS
 Title: National Water Information System: R Interface
 Version: 0.1.7.9000
-Authors@R: person("Jason", "Fisher", email="jfisher@usgs.gov", role=c("aut", "cre"))
+Authors@R: person(given=c("Jason", "C."), family="Fisher", role=c("aut", "cre"), email="jfisher@usgs.gov")
 Description: Provides a graphical user interface for accessing
     U.S. Geological Survey water-resources data.
 Depends:
