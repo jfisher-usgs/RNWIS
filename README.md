@@ -22,7 +22,7 @@ You can install the stable version of **RNWIS** from [GitHub](https://jfisher-us
 and its dependencies from CRAN, using the following commands:
 
 ```r
-repos <- c("https://jfisher-usgs.github.io/R", getOption("repos"))
+repos <- c("https://jfisher-usgs.github.io/R", "https://cloud.r-project.org/")
 install.packages("RNWIS", repos = repos)
 ```
 
