@@ -8,8 +8,8 @@ QueryDatabase(channel, sqtable, sqvars = "*", site.no.var = NULL,
   site.no = NULL, site.tp.cd.var = NULL, site.tp.cd = NULL,
   agency.cd.var = NULL, agency.cd = NULL, lat.var = NULL,
   lat.lim = c(NA, NA), lng.var = NULL, lng.lim = c(NA, NA),
-  alt.var = NULL, alt.lim = c(NA, NA), d.t.var = NULL, d.t.lim = c(NA,
-  NA))
+  alt.var = NULL, alt.lim = c(NA, NA), d.t.var = NULL,
+  d.t.lim = c(NA, NA))
 }
 \arguments{
 \item{channel}{RODBC.
@@ -96,11 +96,10 @@ site selection criteria to constrain the number of sites selected.
 }
 
 }
-\author{
-J.C. Fisher, U.S. Geological Survey, Idaho Water Science Center
-}
 \seealso{
 \code{\link{sqlQuery}}
 }
+\author{
+J.C. Fisher, U.S. Geological Survey, Idaho Water Science Center
+}
 \keyword{IO}
-

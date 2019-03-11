@@ -27,11 +27,10 @@ Shows database table names and the column structure for each table.
 }
 
 }
-\author{
-J.C. Fisher, U.S. Geological Survey, Idaho Water Science Center
-}
 \seealso{
 \code{\link{sqlTables}}, \code{\link{sqlColumns}}, \code{\link{sqlPrimaryKeys}}
 }
+\author{
+J.C. Fisher, U.S. Geological Survey, Idaho Water Science Center
+}
 \keyword{misc}
-

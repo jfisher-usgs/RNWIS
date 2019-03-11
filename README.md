@@ -2,11 +2,15 @@
 
 [![Travis-CI Build Status](https://travis-ci.org/jfisher-usgs/RNWIS.svg?branch=master)](https://travis-ci.org/jfisher-usgs/RNWIS)
 
+## Deprecated
+
+Development of this package has halted.
+If you are interested in taking over maintainer status for the package, please email the author.
+
 ## Overview
 
-
-The [R](http://www.r-project.org/) package **RNWIS** provides access to water-resources data stored on the
-**N**ational **W**ater **I**nformation **S**ystem ([NWIS](http://waterdata.usgs.gov/nwis)).
+The [R](https://www.r-project.org/) package **RNWIS** provides access to water-resources data stored on the
+**N**ational **W**ater **I**nformation **S**ystem ([NWIS](https://waterdata.usgs.gov/nwis)).
 Importing data requires read-only permissions for you local NWIS server; therefore,
 the usefulness of this package may be limited to **U**.**S**. **G**eological **S**urvey (USGS) employees.
 A **g**raphical **u**ser **i**nterface (GUI) is provided for data selection.
@@ -14,7 +18,7 @@ A **g**raphical **u**ser **i**nterface (GUI) is provided for data selection.
 ## Install
 
 If R is not already installed on your computer, download and install the latest binary distribution from
-[CRAN](http://cran.r-project.org/ "The Comprehensive R Archive Network").
+[CRAN](https://cran.r-project.org/ "The Comprehensive R Archive Network").
 Windows users should set R to operate as an **s**ingle-**d**ocument **i**nterface (SDI) application during installation
 by choosing to customize the start-up options and specifying the SDI interface (not the default).
 
@@ -50,16 +54,12 @@ Please consider reporting bugs and asking questions on the [Issues page](https:/
 
 ## Disclaimer
 
-This software is in the public domain because it contains materials that originally came from the USGS,
-an agency of the United States Department of Interior.
-For more information, see the
-[official USGS copyright policy](https://www2.usgs.gov/visual-id/credit_usgs.html "official USGS copyright policy").
-
-Although this software program has been used by the USGS, no warranty, expressed or implied,
-is made by the USGS or the U.S. Government as to the accuracy and functioning of the program and
-related program material nor shall the fact of distribution constitute any such warranty,
-and no responsibility is assumed by the USGS in connection therewith.
-
-This software is provided "AS IS."
-
-[![CC0](http://i.creativecommons.org/p/zero/1.0/88x31.png)](http://creativecommons.org/publicdomain/zero/1.0/)
+This software has been approved for release by the U.S. Geological Survey
+(USGS). Although the software has been subjected to rigorous review, the USGS
+reserves the right to update the software as needed pursuant to further analysis
+and review. No warranty, expressed or implied, is made by the USGS or the U.S.
+Government as to the functionality of the software and related material nor
+shall the fact of release constitute any such warranty. Furthermore, the
+software is released on condition that neither the USGS nor the U.S. Government
+shall be held liable for any damages resulting from its authorized or
+unauthorized use.

@@ -18,11 +18,10 @@ All functions within the \pkg{RNWIS} package may be called from this GUI.
 }
 
 }
-\author{
-J.C. Fisher, U.S. Geological Survey, Idaho Water Science Center
-}
 \seealso{
 \code{\link{ExploreDatabase}}, \code{\link{MapSites}}, \code{\link{QueryDatabase}}
 }
+\author{
+J.C. Fisher, U.S. Geological Survey, Idaho Water Science Center
+}
 \keyword{misc}
-

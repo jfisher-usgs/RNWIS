@@ -17,19 +17,19 @@ Polygon information}
 Unique identifier in map URL}
 }
 \value{
-Writes a \href{http://www.json.org/}{JSON} data file (\file{.json}) to a temporary directory.
+Writes a \href{https://www.json.org/}{JSON} data file (\file{.json}) to a temporary directory.
   An Rhttpd object is created and started in the internal web server.
 }
 \description{
-Add site markers and polygon objects to \href{http://maps.google.com/}{Google Maps}.
+Add site markers and polygon objects to \href{https://www.google.com/maps}{Google Maps}.
 }
 \details{
 The \code{sites} data table has components of \code{lat}, \code{lng},
   \code{alt}, \code{site}, \code{name}, \code{agency}, and \code{type}.
   Where \code{lat} and \code{lng} are the latitude and longitude based on the
-  \href{http://en.wikipedia.org/wiki/WGS84}{WGS84} datum;
+  \href{https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84}{WGS84} datum;
   \code{alt} is the altitude of the site referenced to the specified vertical datum
-  (\href{http://en.wikipedia.org/wiki/NGVD29}{NGVD29} or \href{http://en.wikipedia.org/wiki/NAVD88}{NAVD 88});
+  (\href{https://en.wikipedia.org/wiki/Sea_Level_Datum_of_1929}{NGVD29} or \href{https://en.wikipedia.org/wiki/North_American_Vertical_Datum_of_1988}{NAVD 88});
   \code{site} is the unique site identification number;
   \code{name} is the name of the site;
   \code{agency} is the code for the agency reporting the data; and
@@ -50,11 +50,10 @@ The \code{sites} data table has components of \code{lat}, \code{lng},
 }
 
 }
-\author{
-J.C. Fisher, U.S. Geological Survey, Idaho Water Science Center
-}
 \seealso{
 \code{\link{Rhttpd-class}}
 }
+\author{
+J.C. Fisher, U.S. Geological Survey, Idaho Water Science Center
+}
 \keyword{aplot}
-

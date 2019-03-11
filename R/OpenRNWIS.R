@@ -809,7 +809,7 @@ OpenRNWIS <- function() {
   tt.done.var   <- tclVar(0)
 
   # create image bitmaps for buttons, based on arrows.tcl
-  # by Keith Vetter, http://wiki.tcl.tk/8554
+  # by Keith Vetter, https://wiki.tcl-lang.org/page/Arrow+buttons
   bits <- c("0x00", "0x00", "0x06", "0x03", "0x8e", "0x03", "0xdc", "0x01",
             "0xf8", "0x00", "0x70", "0x00", "0xf8", "0x00", "0xdc", "0x01",
             "0x8e", "0x03", "0x06", "0x03", "0x00", "0x00")
