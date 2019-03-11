@@ -1,4 +1,6 @@
-RNWIS 0.1.7.9000
+RNWIS 0.1.8
+
+- Update outdated URLs
 
 - Add Makefile for automating package-development tasks.
 
