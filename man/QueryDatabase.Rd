@@ -4,12 +4,25 @@
 \alias{QueryDatabase}
 \title{Query the National Water Information System Database}
 \usage{
-QueryDatabase(channel, sqtable, sqvars = "*", site.no.var = NULL,
-  site.no = NULL, site.tp.cd.var = NULL, site.tp.cd = NULL,
-  agency.cd.var = NULL, agency.cd = NULL, lat.var = NULL,
-  lat.lim = c(NA, NA), lng.var = NULL, lng.lim = c(NA, NA),
-  alt.var = NULL, alt.lim = c(NA, NA), d.t.var = NULL,
-  d.t.lim = c(NA, NA))
+QueryDatabase(
+  channel,
+  sqtable,
+  sqvars = "*",
+  site.no.var = NULL,
+  site.no = NULL,
+  site.tp.cd.var = NULL,
+  site.tp.cd = NULL,
+  agency.cd.var = NULL,
+  agency.cd = NULL,
+  lat.var = NULL,
+  lat.lim = c(NA, NA),
+  lng.var = NULL,
+  lng.lim = c(NA, NA),
+  alt.var = NULL,
+  alt.lim = c(NA, NA),
+  d.t.var = NULL,
+  d.t.lim = c(NA, NA)
+)
 }
 \arguments{
 \item{channel}{RODBC.

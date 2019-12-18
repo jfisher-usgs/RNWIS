@@ -1,30 +1,43 @@
-# prepare the package for release
+# Prepare package for release
+
+SHELL := bash
+.ONESHELL:
+.SHELLFLAGS := -eu -o pipefail -c
+.DELETE_ON_ERROR:
+MAKEFLAGS += --warn-undefined-variables
+MAKEFLAGS += --no-builtin-rules
 
 PKGNAME := $(shell sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION)
 PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
 PKGSRC  := $(shell basename `pwd`)
 
 all: docs install check clean
+.PHONY: all
 
 docs:
-	R -q -e 'pkgload::load_all()';\
-	R -q -e 'roxygen2::roxygenize()';\
-	R -q -e 'pkgbuild::clean_dll()';\
+	R -q -e 'pkgload::load_all()'
+	R -q -e 'roxygen2::roxygenize()'
+	R -q -e 'pkgbuild::clean_dll()'
+.PHONY: docs
 
 build:
-	cd ..;\
-	R CMD build --no-build-vignettes $(PKGSRC);\
+	cd ..
+	R CMD build --no-build-vignettes $(PKGSRC)
+.PHONY: build
 
 install: build
-	cd ..;\
-	R CMD INSTALL --build $(PKGNAME)_$(PKGVERS).tar.gz;\
+	cd ..
+	R CMD INSTALL --build $(PKGNAME)_$(PKGVERS).tar.gz
+.PHONY: install
 
 check:
-	cd ..;\
-	R CMD check --no-build-vignettes --as-cran $(PKGNAME)_$(PKGVERS).tar.gz;\
+	cd ..
+	R CMD check --no-build-vignettes --as-cran $(PKGNAME)_$(PKGVERS).tar.gz
+.PHONY: check
 
 clean:
-	cd ..;\
-	$(RM) -r $(PKGNAME).Rcheck/;\
-
-.PHONY: all docs build install check clean
+	cd ..
+	rm -f -r $(PKGNAME).Rcheck/
+	rm -f sysdata.rda
+	rm -f -r figures
+.PHONY: clean
